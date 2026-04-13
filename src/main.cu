@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <vector>
+#include <cuda_runtime.h>
+#include <cuda_fp16.h>
+#include "include/config.h"
+#include "include/cuda_utils.h"
+#include "src/solver.h"
+#include "src/data.h"
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+static void run_verify() {
+    constexpr int Mv = 512, Nv = 512, Kv = 512;
+
+    std::vector<half>  h_A(Mv * Kv), h_B(Kv * Nv);
+    std::vector<float> h_C_ref(Mv * Nv, 0.f), h_C_out(Mv * Nv, 0.f);
+
+    generate_fp16(h_A.data(), h_B.data(), Mv, Nv, Kv, 1);
+    cpu_gemm_fp16(h_A.data(), h_B.data(), h_C_ref.data(), Mv, Nv, Kv);
+
+    DeviceBuffer<half>  d_A(Mv * Kv);
+    DeviceBuffer<half>  d_B(Kv * Nv);
+    DeviceBuffer<float> d_C(Mv * Nv);
+
+    CHECK_CUDA(cudaMemcpy(d_A.get(), h_A.data(), Mv * Kv * sizeof(half),  cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemcpy(d_B.get(), h_B.data(), Kv * Nv * sizeof(half),  cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemset(d_C.get(), 0, Mv * Nv * sizeof(float)));
+
+    GemmConfig vcfg{.M=Mv, .N=Nv, .K=Kv, .num_batches=1, .warmups=0, .runs=1};
+    Solver solver;
+    solver.configure(vcfg);
+    solver.run(d_A.get(), d_B.get(), d_C.get());
+
+    CHECK_CUDA(cudaMemcpy(h_C_out.data(), d_C.get(), Mv * Nv * sizeof(float), cudaMemcpyDeviceToHost));
+    printf("[verify]  M=%d N=%d K=%d  %s\n", Mv, Nv, Kv,
+           verify(h_C_ref.data(), h_C_out.data(), Mv, Nv) ? "PASS" : "FAIL");
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────────
+int main() {
+    run_verify();
+
+    // ── Profiling run ─────────────────────────────────────────────────────────
+    GemmConfig cfg{.M=8192, .N=8192, .K=8192, .num_batches=4, .warmups=2, .runs=10};
+
+    size_t szA = (size_t)cfg.num_batches * cfg.M * cfg.K;
+    size_t szB = (size_t)cfg.num_batches * cfg.K * cfg.N;
+    size_t szC = (size_t)cfg.num_batches * cfg.M * cfg.N;
+
+    std::vector<half> h_A(szA), h_B(szB);
+    generate_fp16(h_A.data(), h_B.data(), cfg.M, cfg.N, cfg.K, cfg.num_batches);
+
+    DeviceBuffer<half>  d_A(szA);
+    DeviceBuffer<half>  d_B(szB);
+    DeviceBuffer<float> d_C(szC);
+
+    CHECK_CUDA(cudaMemcpy(d_A.get(), h_A.data(), szA * sizeof(half),  cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemcpy(d_B.get(), h_B.data(), szB * sizeof(half),  cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemset(d_C.get(), 0, szC * sizeof(float)));
+
+    Solver solver;
+    solver.configure(cfg);
+    float avg_ms = solver.run(d_A.get(), d_B.get(), d_C.get());
+
+    double tflops = 2.0 * cfg.num_batches * (double)cfg.M * cfg.N * cfg.K
+                    / (avg_ms * 1e-3) / 1e12;
+    printf("[profile] fp16_wmma | M=%d N=%d K=%d B=%d | %.3f ms avg | %.2f TFLOPS\n",
+           cfg.M, cfg.N, cfg.K, cfg.num_batches, avg_ms, tflops);
+
+    return 0;
+}
