@@ -12,7 +12,6 @@ This repository collects findings, experiments, and design notes for implementin
 - [Advanced Topics](#advanced-topics)
 - [Profiling Checkpoints](#profiling-checkpoints)
 - [Natural Build Order](#natural-build-order)
-- [Project Structure](#project-structure)
 
 ## Overview
 
@@ -135,23 +134,3 @@ Results pending first build on L4. Table will be populated with measured TFLOPS 
 | `fp16_manual_pack` | 4+2 scalar `ld.shared` + `mov.b32` | m16n8k16 × 2 | f32 | 2-stage cp.async | No `ldmatrix`; exposes its instruction-count cost |
 
 ---
-
-## Project Structure
-
-TensorCorePTX/
-├── include/
-│   ├── config.h          # compile-time tile/warp constants
-│   └── cuda_utils.h      # RAII wrappers, CHECK_CUDA macro
-├── kernels/
-│   ├── fp16_wmma.cu      # baseline: WMMA only (current fp16.cu)
-│   ├── fp16_ptx.cu       # PTX variant: ldmatrix + mma.sync
-│   ├── fp16_manual.cu    # manual register packing variant
-│   ├── fp8.cu            # (later)
-│   ├── int8.cu           # (later)
-│   └── int4.cu           # (later)
-├── src/
-│   ├── main.cu           # entry point: parse args, dispatch Solver
-│   ├── solver.cu/h       # Solver class
-│   └── data.cu/h         # input generation / verification
-├── Makefile
-└── README.md
