@@ -121,6 +121,21 @@ Where practical, derive the shared-memory swizzle analytically per precision bef
 
 ---
 
+## Run 1
+
+Results pending first build on L4. Table will be populated with measured TFLOPS and accuracy figures.
+
+| Kernel | SRAM→Regs | mma.sync shape | Acc type | Pipeline | Notes |
+|---|---|---|---|---|---|
+| `fp16_wmma` | `wmma::load_matrix_sync` | m16n16k16 (WMMA) | f32 | 2-stage cp.async | WMMA baseline; no explicit PTX |
+| `fp16_ptx_mma` | `ldmatrix.x4` / `.x2.trans` | m16n8k16 × 2 | f32 | 2-stage cp.async | First pure-PTX kernel |
+| `fp16_ptx_k8` | `ldmatrix.x2` / `.x1.trans` | m16n8k8 × 4 | f32 | 2-stage cp.async | Narrower K tile; 4 MMA calls per K-step |
+| `fp16_ptx_f16acc` | `ldmatrix.x4` / `.x2.trans` | m16n8k16 × 2 | f16 (packed) | 2-stage cp.async | Half the accumulator registers vs f32 |
+| `fp16_ptx_3stage` | `ldmatrix.x4` / `.x2.trans` | m16n8k16 × 2 | f32 | **3-stage** cp.async | `wait_group 1`; one extra SRAM buffer to hide L2 latency |
+| `fp16_manual_pack` | 4+2 scalar `ld.shared` + `mov.b32` | m16n8k16 × 2 | f32 | 2-stage cp.async | No `ldmatrix`; exposes its instruction-count cost |
+
+---
+
 ## Project Structure
 
 TensorCorePTX/
