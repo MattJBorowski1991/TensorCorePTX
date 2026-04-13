@@ -10,8 +10,8 @@
 cmake_minimum_required(VERSION 3.24)
 project(TensorCorePTX LANGUAGES CXX CUDA)
 
-set(CMAKE_CUDA_STANDARD 17)
-set(CMAKE_CXX_STANDARD  17)
+set(CMAKE_CUDA_STANDARD 20)
+set(CMAKE_CXX_STANDARD  20)
 
 set(CUDA_ARCH "89" CACHE STRING "Target SM architecture (e.g. 89 for Ada/L4)")
 set(CMAKE_CUDA_ARCHITECTURES ${CUDA_ARCH})

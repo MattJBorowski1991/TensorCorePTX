@@ -31,8 +31,10 @@ static void run_verify() {
     solver.run(d_A.get(), d_B.get(), d_C.get());
 
     CHECK_CUDA(cudaMemcpy(h_C_out.data(), d_C.get(), Mv * Nv * sizeof(float), cudaMemcpyDeviceToHost));
-    printf("[verify]  M=%d N=%d K=%d  %s\n", Mv, Nv, Kv,
-           verify(h_C_ref.data(), h_C_out.data(), Mv, Nv) ? "PASS" : "FAIL");
+    AccuracyResult acc = measure_accuracy(h_C_ref.data(), h_C_out.data(), Mv, Nv);
+    printf("[verify]  M=%d N=%d K=%d  %s  max_abs=%.4e  rmse=%.4e  rel=%.3f%%\n",
+           Mv, Nv, Kv, acc.pass ? "PASS" : "FAIL",
+           acc.max_abs_err, acc.rmse, acc.real_err_pct);
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────

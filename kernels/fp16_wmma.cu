@@ -97,4 +97,5 @@ void launch_kernel(const half* A, const half* B, float* C,
         cfg.num_batches
     );
     wmma_db<<<blocks, threads, 0, stream>>>(A, B, C, cfg.M, cfg.N, cfg.K);
+    CHECK_CUDA(cudaGetLastError());
 }
