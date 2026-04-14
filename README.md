@@ -15,7 +15,7 @@ This repository collects findings, experiments, and design notes for implementin
 
 ## Overview
 
-Goal: implement a production-grade GEMM entirely in PTX using `cp.async` → `ldmatrix` → `mma.sync` primitives, minimizing host-side transformations and avoiding legacy WMMA paths. Evaluate trade-offs across precisions and pipeline depths.
+Goal: implement a production-grade GEMM entirely in PTX using `cp.async` → `ldmatrix` → `mma.sync` primitives, minimizing host-side transformations. `fp16_wmma` (CUDA WMMA intrinsics) serves as the performance baseline; the PTX-first path is benchmarked against it to determine whether explicit PTX control over instruction selection and scheduling can exceed what the compiler generates. Evaluate trade-offs across precisions and pipeline depths.
 
 ## Data Movement
 
@@ -106,7 +106,7 @@ Notes:
 - Roofline: observe whether kernels move toward compute-bound as precision decreases.
 - NCU counters: `sm__sass_thread_inst_executed_op_hmma_pred_on` for Tensor Core utilization.
 - Memory: track L2 hit rate and DRAM traffic; quantization should reduce bandwidth and footprint.
-- Occupancy: compare achieved vs theoretical — expect register pressure to be the limiter.
+- Occupancy: compare achieved vs theoretical — at small, compute-bound sizes instruction-scheduling overhead and packing cost are the primary limiters; at large sizes (matrices exceed L2) DRAM bandwidth dominates and occupancy differences become irrelevant.
 
 ## Natural Build Order
 
@@ -120,18 +120,28 @@ Where practical, derive the shared-memory swizzle analytically per precision bef
 
 ---
 
-## Run 1
+## Run 1 — Profiling Results
 
-Results pending first build on L4. Table will be populated with measured TFLOPS and accuracy figures.
+> Full data: [`prof/md/run1/ncu_multiple_sizes.md`](prof/md/run1/ncu_multiple_sizes.md) · Chart: [`prof/md/run1/ncu_metrics_chart.png`](prof/md/run1/ncu_metrics_chart.png) · Summary: [`prof/md/run1/ncu_summary.md`](prof/md/run1/ncu_summary.md)
+
+Six FP16 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 512 → 16384 (square, FP16 inputs, FP32 accumulation). The four tracked metrics — GFLOPS, Compute (SM) Throughput %, Achieved Occupancy %, and L1/TEX Cache Throughput % — reveal two distinct operating regimes separated by an L2 capacity cliff between N = 4096 and N = 8192.
+
+**Compute-bound regime (N ≤ 4096):** All kernels sustain 1,280–1,500 GFLOPS. `fp16_ptx_manual_pack` has the highest Compute (SM) % (~57%) and `fp16_ptx_k8` is second (~47%), but both are still slower than `fp16_wmma` — the baseline WMMA intrinsic path. The penalty ranges from +1% (`ptx_mma`, `ptx_k8`) up to +22% (`ptx_manual_pack`) at N = 512 due to unrecovered packing overhead at small tile counts. No hand-written PTX variant outperforms the compiler-optimised WMMA path in this regime.
+
+**Memory-bound regime (N ≥ 8192):** Once the matrices (~537 MB combined at N = 8192, FP16 A/B + FP32 C) exceed L2 capacity, every kernel stalls on DRAM. L1/TEX throughput collapses from ~90% to ~38%, GFLOPS halves to 620–666, and all slowdown differences shrink to < 1%. The instruction mix becomes irrelevant — bandwidth is the sole bottleneck.
+
+**`fp16_ptx_fp16acc` occupancy anomaly:** Using FP16 accumulators halves the accumulator register count, lifting Achieved Occupancy to 70–82% vs 56–66% for all other kernels. Despite this, GFLOPS are not higher — confirming that occupancy alone does not drive throughput when the kernel is not latency-limited by a warp-count shortage.
+
+**Next steps:** (1) verify tensor-core `mma` instructions are actually being issued via `inst_executed_pipe_tensor`; (2) profile DRAM bandwidth to quantify saturation at large sizes; (3) improve shared-memory tiling to recover L1/TEX utilisation in the compute-bound region; (4) extend triple-buffered `cp.async` pipeline (`ptx_3stage`) more aggressively to mask L2 latency at the cliff boundary.
 
 | Kernel | SRAM→Regs | mma.sync shape | Acc type | Pipeline | Notes |
 |---|---|---|---|---|---|
 | `fp16_wmma` | `wmma::load_matrix_sync` | m16n16k16 (WMMA) | f32 | 2-stage cp.async | WMMA baseline; no explicit PTX |
 | `fp16_ptx_mma` | `ldmatrix.x4` / `.x2.trans` | m16n8k16 × 2 | f32 | 2-stage cp.async | First pure-PTX kernel |
 | `fp16_ptx_k8` | `ldmatrix.x2` / `.x1.trans` | m16n8k8 × 4 | f32 | 2-stage cp.async | Narrower K tile; 4 MMA calls per K-step |
-| `fp16_ptx_f16acc` | `ldmatrix.x4` / `.x2.trans` | m16n8k16 × 2 | f16 (packed) | 2-stage cp.async | Half the accumulator registers vs f32 |
+| `fp16_ptx_fp16acc` | `ldmatrix.x4` / `.x2.trans` | m16n8k16 × 2 | f16 (packed) | 2-stage cp.async | Half the accumulator registers vs f32 |
 | `fp16_ptx_3stage` | `ldmatrix.x4` / `.x2.trans` | m16n8k16 × 2 | f32 | **3-stage** cp.async | `wait_group 1`; one extra SRAM buffer to hide L2 latency |
-| `fp16_manual_pack` | 4+2 scalar `ld.shared` + `mov.b32` | m16n8k16 × 2 | f32 | 2-stage cp.async | No `ldmatrix`; exposes its instruction-count cost |
+| `fp16_ptx_manual_pack` | 4+2 scalar `ld.shared` + `mov.b32` | m16n8k16 × 2 | f32 | 2-stage cp.async | No `ldmatrix`; exposes its instruction-count cost |
 
 ---
 

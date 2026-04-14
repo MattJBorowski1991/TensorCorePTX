@@ -47,18 +47,6 @@ Kernels profiled for matrix sizes: 512, 1024, 2048, 4096, 8192, 16384.
 
 ---
 
-## Chart
-
-![NCU Metrics Chart](ncu_metrics_chart.png)
-
-> **Top-left:** GFLOPS vs matrix size — higher is better.  
-> **Top-right:** Kernel duration (log scale) — lower is better.  
-> **Bottom-left:** Compute SM Throughput % (solid) and Achieved Occupancy % (dashed).  
-> **Bottom-right:** L1/TEX Cache Throughput %.  
-> All x-axes are log₂ scale. Legend shared at bottom.
-
----
-
 ## Notes
 - Values will be populated from the TXT reports in `prof/txt/multiple_sizes/`. I can now parse those files and fill the table and produce a CSV if you want.
 
