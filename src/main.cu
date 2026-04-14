@@ -39,10 +39,22 @@ static void run_verify() {
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 int main() {
-    run_verify();
+    // Allow skipping the small verification run when profiling with Nsight.
+    // Set `SKIP_VERIFY=1` in the environment to bypass the verify phase.
+    if (!getenv("SKIP_VERIFY")) {
+        run_verify();
+    }
 
     // ── Profiling run ─────────────────────────────────────────────────────────
-    GemmConfig cfg{.M=8192, .N=8192, .K=8192, .num_batches=4, .warmups=0, .runs=1};
+        // Allow overriding the profiling size via environment variable
+        // Example: PROFILE_SIZE=4096 ./build/profile_fp16_ptx_fp16acc
+        const char* env_sz = getenv("PROFILE_SIZE");
+        int ProfilingSize = 8192;
+        if (env_sz && env_sz[0] != '\0') {
+            int v = atoi(env_sz);
+            if (v > 0) ProfilingSize = v;
+        }
+        GemmConfig cfg{.M=ProfilingSize, .N=ProfilingSize, .K=ProfilingSize, .num_batches=4, .warmups=0, .runs=1};
 
     size_t szA = (size_t)cfg.num_batches * cfg.M * cfg.K;
     size_t szB = (size_t)cfg.num_batches * cfg.K * cfg.N;

@@ -117,48 +117,48 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named profile_fp16_ptx_manual_pack
+# Target rules for targets named profile_fp16_wmma
 
 # Build rule for target.
-profile_fp16_ptx_manual_pack: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 profile_fp16_ptx_manual_pack
-.PHONY : profile_fp16_ptx_manual_pack
+profile_fp16_wmma: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 profile_fp16_wmma
+.PHONY : profile_fp16_wmma
 
 # fast build rule for target.
-profile_fp16_ptx_manual_pack/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/build
-.PHONY : profile_fp16_ptx_manual_pack/fast
+profile_fp16_wmma/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/build
+.PHONY : profile_fp16_wmma/fast
 
-kernels/fp16_ptx_manual_pack.o: kernels/fp16_ptx_manual_pack.cu.o
-.PHONY : kernels/fp16_ptx_manual_pack.o
+kernels/fp16_wmma.o: kernels/fp16_wmma.cu.o
+.PHONY : kernels/fp16_wmma.o
 
 # target to build an object file
-kernels/fp16_ptx_manual_pack.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/kernels/fp16_ptx_manual_pack.cu.o
-.PHONY : kernels/fp16_ptx_manual_pack.cu.o
+kernels/fp16_wmma.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/kernels/fp16_wmma.cu.o
+.PHONY : kernels/fp16_wmma.cu.o
 
-kernels/fp16_ptx_manual_pack.i: kernels/fp16_ptx_manual_pack.cu.i
-.PHONY : kernels/fp16_ptx_manual_pack.i
+kernels/fp16_wmma.i: kernels/fp16_wmma.cu.i
+.PHONY : kernels/fp16_wmma.i
 
 # target to preprocess a source file
-kernels/fp16_ptx_manual_pack.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/kernels/fp16_ptx_manual_pack.cu.i
-.PHONY : kernels/fp16_ptx_manual_pack.cu.i
+kernels/fp16_wmma.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/kernels/fp16_wmma.cu.i
+.PHONY : kernels/fp16_wmma.cu.i
 
-kernels/fp16_ptx_manual_pack.s: kernels/fp16_ptx_manual_pack.cu.s
-.PHONY : kernels/fp16_ptx_manual_pack.s
+kernels/fp16_wmma.s: kernels/fp16_wmma.cu.s
+.PHONY : kernels/fp16_wmma.s
 
 # target to generate assembly for a file
-kernels/fp16_ptx_manual_pack.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/kernels/fp16_ptx_manual_pack.cu.s
-.PHONY : kernels/fp16_ptx_manual_pack.cu.s
+kernels/fp16_wmma.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/kernels/fp16_wmma.cu.s
+.PHONY : kernels/fp16_wmma.cu.s
 
 src/data.o: src/data.cu.o
 .PHONY : src/data.o
 
 # target to build an object file
 src/data.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/src/data.cu.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/data.cu.o
 .PHONY : src/data.cu.o
 
 src/data.i: src/data.cu.i
@@ -166,7 +166,7 @@ src/data.i: src/data.cu.i
 
 # target to preprocess a source file
 src/data.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/src/data.cu.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/data.cu.i
 .PHONY : src/data.cu.i
 
 src/data.s: src/data.cu.s
@@ -174,7 +174,7 @@ src/data.s: src/data.cu.s
 
 # target to generate assembly for a file
 src/data.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/src/data.cu.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/data.cu.s
 .PHONY : src/data.cu.s
 
 src/main.o: src/main.cu.o
@@ -182,7 +182,7 @@ src/main.o: src/main.cu.o
 
 # target to build an object file
 src/main.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/src/main.cu.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/main.cu.o
 .PHONY : src/main.cu.o
 
 src/main.i: src/main.cu.i
@@ -190,7 +190,7 @@ src/main.i: src/main.cu.i
 
 # target to preprocess a source file
 src/main.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/src/main.cu.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/main.cu.i
 .PHONY : src/main.cu.i
 
 src/main.s: src/main.cu.s
@@ -198,7 +198,7 @@ src/main.s: src/main.cu.s
 
 # target to generate assembly for a file
 src/main.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/src/main.cu.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/main.cu.s
 .PHONY : src/main.cu.s
 
 src/solver.o: src/solver.cu.o
@@ -206,7 +206,7 @@ src/solver.o: src/solver.cu.o
 
 # target to build an object file
 src/solver.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/src/solver.cu.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/solver.cu.o
 .PHONY : src/solver.cu.o
 
 src/solver.i: src/solver.cu.i
@@ -214,7 +214,7 @@ src/solver.i: src/solver.cu.i
 
 # target to preprocess a source file
 src/solver.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/src/solver.cu.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/solver.cu.i
 .PHONY : src/solver.cu.i
 
 src/solver.s: src/solver.cu.s
@@ -222,7 +222,7 @@ src/solver.s: src/solver.cu.s
 
 # target to generate assembly for a file
 src/solver.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/src/solver.cu.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/solver.cu.s
 .PHONY : src/solver.cu.s
 
 # Help Target
@@ -233,10 +233,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... profile_fp16_ptx_manual_pack"
-	@echo "... kernels/fp16_ptx_manual_pack.o"
-	@echo "... kernels/fp16_ptx_manual_pack.i"
-	@echo "... kernels/fp16_ptx_manual_pack.s"
+	@echo "... profile_fp16_wmma"
+	@echo "... kernels/fp16_wmma.o"
+	@echo "... kernels/fp16_wmma.i"
+	@echo "... kernels/fp16_wmma.s"
 	@echo "... src/data.o"
 	@echo "... src/data.i"
 	@echo "... src/data.s"

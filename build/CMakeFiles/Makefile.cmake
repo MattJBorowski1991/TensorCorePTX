@@ -44,5 +44,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/profile_fp16_ptx_manual_pack.dir/DependInfo.cmake"
+  "CMakeFiles/profile_fp16_wmma.dir/DependInfo.cmake"
   )

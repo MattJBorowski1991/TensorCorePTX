@@ -1,0 +1,92 @@
+==PROF== Connected to process 34769 (/teamspace/studios/this_studio/TensorCorePTX/build/profile_fp16_ptx_manual_pack)
+==PROF== Profiling "manual_pack_db" - 0: 0%....50%....100% - 8 passes
+[profile] fp16_ptx_manual_pack | M=512 N=512 K=512 B=4 | 673.823 ms avg | 0.00 TFLOPS
+==PROF== Disconnected from process 34769
+[34769] profile_fp16_ptx_manual_pack@127.0.0.1
+  manual_pack_db(const __half *, const __half *, float *, int, int, int) (8, 16, 4)x(256, 1, 1), Context 1, Stream 13, Device 0, CC 8.9
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz         6.24
+    SM Frequency                    Mhz       794.85
+    Elapsed Cycles                cycle       179264
+    Memory Throughput                 %        84.73
+    DRAM Throughput                   %        11.68
+    Duration                         us       225.50
+    L1/TEX Cache Throughput           %        87.82
+    L2 Cache Throughput               %        53.11
+    SM Active Cycles              cycle    172093.79
+    Compute (SM) Throughput           %        56.07
+    ----------------------- ----------- ------------
+
+    INF   This workload is utilizing greater than 80.0% of the available compute or memory performance of the device.   
+          To further improve performance, work will likely need to be shifted from the most utilized to another unit.   
+          Start by analyzing L1 in the Memory Workload Analysis section.                                                
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   256
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                    512
+    Registers Per Thread             register/thread              56
+    Shared Memory Configuration Size           Kbyte          102.40
+    Driver Shared Memory Per Block       Kbyte/block            1.02
+    Dynamic Shared Memory Per Block       byte/block               0
+    Static Shared Memory Per Block       Kbyte/block           16.38
+    # SMs                                         SM              58
+    Stack Size                                                  1024
+    Threads                                   thread          131072
+    # TPCs                                                        29
+    Enabled TPC IDs                                              all
+    Uses Green Context                                             0
+    Waves Per SM                                                2.21
+    -------------------------------- --------------- ---------------
+
+    OPT   Est. Speedup: 33.33%                                                                                          
+          A wave of thread blocks is defined as the maximum number of blocks that can be executed in parallel on the    
+          target GPU. The number of blocks in a wave depends on the number of multiprocessors and the theoretical       
+          occupancy of the kernel. This kernel launch results in 2 full waves and a partial wave of 48 thread blocks.   
+          Under the assumption of a uniform execution duration of all thread blocks, this partial wave may account for  
+          up to 33.3% of the total runtime of this kernel. Try launching a grid with no partial wave. The overall       
+          impact of this tail effect also lessens with the number of full waves executed for a grid. See the Hardware   
+          Model (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-hw-model) description for     
+          more details on launch configurations.                                                                        
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Block Limit SM                        block           24
+    Block Limit Registers                 block            4
+    Block Limit Shared Mem                block            5
+    Block Limit Warps                     block            6
+    Theoretical Active Warps per SM        warp           32
+    Theoretical Occupancy                     %        66.67
+    Achieved Occupancy                        %        57.58
+    Achieved Active Warps Per SM           warp        27.64
+    ------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 33.33%                                                                                    
+          The 8.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the       
+          hardware maximum of 12. This kernel's theoretical occupancy (66.7%) is limited by the number of required      
+          registers.                                                                                                    
+
+    Section: GPU and Memory Workload Distribution
+    -------------------------- ----------- ------------
+    Metric Name                Metric Unit Metric Value
+    -------------------------- ----------- ------------
+    Average DRAM Active Cycles       cycle    164437.33
+    Total DRAM Elapsed Cycles        cycle      8445952
+    Average L1 Active Cycles         cycle    172093.79
+    Total L1 Elapsed Cycles          cycle     10344842
+    Average L2 Active Cycles         cycle    181116.88
+    Total L2 Elapsed Cycles          cycle      4463712
+    Average SM Active Cycles         cycle    172093.79
+    Total SM Elapsed Cycles          cycle     10344842
+    Average SMSP Active Cycles       cycle    171408.83
+    Total SMSP Elapsed Cycles        cycle     41379368
+    -------------------------- ----------- ------------
+

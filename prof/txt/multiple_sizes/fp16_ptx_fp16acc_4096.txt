@@ -1,0 +1,77 @@
+==PROF== Connected to process 42502 (/teamspace/studios/this_studio/TensorCorePTX/build/profile_fp16_ptx_fp16acc)
+==PROF== Profiling "ptx_f16acc_db" - 0: 0%....50%....100% - 8 passes
+[profile] fp16_ptx_fp16acc | M=4096 N=4096 K=4096 B=4 | 1555.479 ms avg | 0.35 TFLOPS
+==PROF== Disconnected from process 42502
+[42502] profile_fp16_ptx_fp16acc@127.0.0.1
+  ptx_f16acc_db(const __half *, const __half *, float *, int, int, int) (64, 128, 4)x(256, 1, 1), Context 1, Stream 13, Device 0, CC 8.9
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz         6.24
+    SM Frequency                    Mhz       795.00
+    Elapsed Cycles                cycle     82213374
+    Memory Throughput                 %        94.09
+    DRAM Throughput                   %         2.76
+    Duration                         ms       103.41
+    L1/TEX Cache Throughput           %        80.93
+    L2 Cache Throughput               %        94.09
+    SM Active Cycles              cycle  82113221.24
+    Compute (SM) Throughput           %        34.16
+    ----------------------- ----------- ------------
+
+    INF   This workload is utilizing greater than 80.0% of the available compute or memory performance of the device.   
+          To further improve performance, work will likely need to be shifted from the most utilized to another unit.   
+          Start by analyzing workloads in the Memory Workload Analysis section.                                         
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   256
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                  32768
+    Registers Per Thread             register/thread              48
+    Shared Memory Configuration Size           Kbyte          102.40
+    Driver Shared Memory Per Block       Kbyte/block            1.02
+    Dynamic Shared Memory Per Block       byte/block               0
+    Static Shared Memory Per Block       Kbyte/block           16.38
+    # SMs                                         SM              58
+    Stack Size                                                  1024
+    Threads                                   thread         8388608
+    # TPCs                                                        29
+    Enabled TPC IDs                                              all
+    Uses Green Context                                             0
+    Waves Per SM                                              112.99
+    -------------------------------- --------------- ---------------
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Block Limit SM                        block           24
+    Block Limit Registers                 block            5
+    Block Limit Shared Mem                block            5
+    Block Limit Warps                     block            6
+    Theoretical Active Warps per SM        warp           40
+    Theoretical Occupancy                     %        83.33
+    Achieved Occupancy                        %        82.09
+    Achieved Active Warps Per SM           warp        39.41
+    ------------------------------- ----------- ------------
+
+    Section: GPU and Memory Workload Distribution
+    -------------------------- ----------- ------------
+    Metric Name                Metric Unit Metric Value
+    -------------------------- ----------- ------------
+    Average DRAM Active Cycles       cycle     17852600
+    Total DRAM Elapsed Cycles        cycle   3874732032
+    Average L1 Active Cycles         cycle  82113221.24
+    Total L1 Elapsed Cycles          cycle   4772766114
+    Average L2 Active Cycles         cycle  85291504.42
+    Total L2 Elapsed Cycles          cycle   2047577976
+    Average SM Active Cycles         cycle  82113221.24
+    Total SM Elapsed Cycles          cycle   4772766114
+    Average SMSP Active Cycles       cycle  82110470.07
+    Total SMSP Elapsed Cycles        cycle  19091064456
+    -------------------------- ----------- ------------
+

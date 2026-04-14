@@ -63,7 +63,7 @@ CMAKE_BINARY_DIR = /teamspace/studios/this_studio/TensorCorePTX/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/profile_fp16_ptx_manual_pack.dir/all
+all: CMakeFiles/profile_fp16_wmma.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,34 +71,34 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/profile_fp16_ptx_manual_pack.dir/clean
+clean: CMakeFiles/profile_fp16_wmma.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/profile_fp16_ptx_manual_pack.dir
+# Target rules for target CMakeFiles/profile_fp16_wmma.dir
 
 # All Build rule for target.
-CMakeFiles/profile_fp16_ptx_manual_pack.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/teamspace/studios/this_studio/TensorCorePTX/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target profile_fp16_ptx_manual_pack"
-.PHONY : CMakeFiles/profile_fp16_ptx_manual_pack.dir/all
+CMakeFiles/profile_fp16_wmma.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/teamspace/studios/this_studio/TensorCorePTX/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target profile_fp16_wmma"
+.PHONY : CMakeFiles/profile_fp16_wmma.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/profile_fp16_ptx_manual_pack.dir/rule: cmake_check_build_system
+CMakeFiles/profile_fp16_wmma.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /teamspace/studios/this_studio/TensorCorePTX/build/CMakeFiles 5
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/profile_fp16_ptx_manual_pack.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/profile_fp16_wmma.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /teamspace/studios/this_studio/TensorCorePTX/build/CMakeFiles 0
-.PHONY : CMakeFiles/profile_fp16_ptx_manual_pack.dir/rule
+.PHONY : CMakeFiles/profile_fp16_wmma.dir/rule
 
 # Convenience name for target.
-profile_fp16_ptx_manual_pack: CMakeFiles/profile_fp16_ptx_manual_pack.dir/rule
-.PHONY : profile_fp16_ptx_manual_pack
+profile_fp16_wmma: CMakeFiles/profile_fp16_wmma.dir/rule
+.PHONY : profile_fp16_wmma
 
 # clean rule for target.
-CMakeFiles/profile_fp16_ptx_manual_pack.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_ptx_manual_pack.dir/build.make CMakeFiles/profile_fp16_ptx_manual_pack.dir/clean
-.PHONY : CMakeFiles/profile_fp16_ptx_manual_pack.dir/clean
+CMakeFiles/profile_fp16_wmma.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/clean
+.PHONY : CMakeFiles/profile_fp16_wmma.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

@@ -1,0 +1,80 @@
+==PROF== Connected to process 42742 (/teamspace/studios/this_studio/TensorCorePTX/build/profile_fp16_ptx_fp16acc)
+==PROF== Profiling "ptx_f16acc_db" - 0: 0%..
+==WARNING== Launching the workload is taking more time than expected. If this continues to hang, terminate the profile and re-try by profiling the range of all related launches using '--replay-mode range'. See https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#replay for more details.
+..50%....100% - 8 passes
+[profile] fp16_ptx_fp16acc | M=16384 N=16384 K=16384 B=4 | 112874.984 ms avg | 0.31 TFLOPS
+==PROF== Disconnected from process 42742
+[42742] profile_fp16_ptx_fp16acc@127.0.0.1
+  ptx_f16acc_db(const __half *, const __half *, float *, int, int, int) (256, 512, 4)x(256, 1, 1), Context 1, Stream 13, Device 0, CC 8.9
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- --------------
+    Metric Name             Metric Unit   Metric Value
+    ----------------------- ----------- --------------
+    DRAM Frequency                  Ghz           6.24
+    SM Frequency                    Mhz         795.00
+    Elapsed Cycles                cycle    11082101198
+    Memory Throughput                 %          52.28
+    DRAM Throughput                   %          52.28
+    Duration                          s          13.94
+    L1/TEX Cache Throughput           %          37.30
+    L2 Cache Throughput               %          40.57
+    SM Active Cycles              cycle 11081058951.33
+    Compute (SM) Throughput           %          16.09
+    ----------------------- ----------- --------------
+
+    OPT   This workload exhibits low compute throughput and memory bandwidth utilization relative to the peak           
+          performance of this device. Achieved compute throughput and/or memory bandwidth below 60.0% of peak           
+          typically indicate latency issues. Look at Scheduler Statistics and Warp State Statistics for potential       
+          reasons.                                                                                                      
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   256
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                 524288
+    Registers Per Thread             register/thread              48
+    Shared Memory Configuration Size           Kbyte          102.40
+    Driver Shared Memory Per Block       Kbyte/block            1.02
+    Dynamic Shared Memory Per Block       byte/block               0
+    Static Shared Memory Per Block       Kbyte/block           16.38
+    # SMs                                         SM              58
+    Stack Size                                                  1024
+    Threads                                   thread       134217728
+    # TPCs                                                        29
+    Enabled TPC IDs                                              all
+    Uses Green Context                                             0
+    Waves Per SM                                             1807.89
+    -------------------------------- --------------- ---------------
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Block Limit SM                        block           24
+    Block Limit Registers                 block            5
+    Block Limit Shared Mem                block            5
+    Block Limit Warps                     block            6
+    Theoretical Active Warps per SM        warp           40
+    Theoretical Occupancy                     %        83.33
+    Achieved Occupancy                        %        82.72
+    Achieved Active Warps Per SM           warp        39.71
+    ------------------------------- ----------- ------------
+
+    Section: GPU and Memory Workload Distribution
+    -------------------------- ----------- --------------
+    Metric Name                Metric Unit   Metric Value
+    -------------------------- ----------- --------------
+    Average DRAM Active Cycles       cycle 45511979906.67
+    Total DRAM Elapsed Cycles        cycle   522301682688
+    Average L1 Active Cycles         cycle 11081058951.33
+    Total L1 Elapsed Cycles          cycle   642619736746
+    Average L2 Active Cycles         cycle 11499509842.96
+    Total L2 Elapsed Cycles          cycle   276007048536
+    Average SM Active Cycles         cycle 11081058951.33
+    Total SM Elapsed Cycles          cycle   642619736746
+    Average SMSP Active Cycles       cycle 11081051303.82
+    Total SMSP Elapsed Cycles        cycle  2570478946984
+    -------------------------- ----------- --------------
+

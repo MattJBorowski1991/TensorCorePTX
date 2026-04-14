@@ -1,0 +1,82 @@
+==PROF== Connected to process 46549 (/teamspace/studios/this_studio/TensorCorePTX/build/profile_fp16_wmma)
+==PROF== Profiling "wmma_db" - 0: 0%....50%....100% - 8 passes
+[profile] fp16_wmma | M=1024 N=1024 K=1024 B=4 | 684.000 ms avg | 0.01 TFLOPS
+==PROF== Disconnected from process 46549
+[46549] profile_fp16_wmma@127.0.0.1
+  wmma_db(const __half *, const __half *, float *, int, int, int) (16, 32, 4)x(256, 1, 1), Context 1, Stream 13, Device 0, CC 8.9
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz         6.24
+    SM Frequency                    Mhz       794.96
+    Elapsed Cycles                cycle      1139158
+    Memory Throughput                 %        92.41
+    DRAM Throughput                   %         7.68
+    Duration                         ms         1.43
+    L1/TEX Cache Throughput           %        94.26
+    L2 Cache Throughput               %        84.67
+    SM Active Cycles              cycle   1113896.52
+    Compute (SM) Throughput           %        36.69
+    ----------------------- ----------- ------------
+
+    INF   This workload is utilizing greater than 80.0% of the available compute or memory performance of the device.   
+          To further improve performance, work will likely need to be shifted from the most utilized to another unit.   
+          Start by analyzing L1 in the Memory Workload Analysis section.                                                
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   256
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                   2048
+    Registers Per Thread             register/thread              56
+    Shared Memory Configuration Size           Kbyte          102.40
+    Driver Shared Memory Per Block       Kbyte/block            1.02
+    Dynamic Shared Memory Per Block       byte/block               0
+    Static Shared Memory Per Block       Kbyte/block           16.38
+    # SMs                                         SM              58
+    Stack Size                                                  1024
+    Threads                                   thread          524288
+    # TPCs                                                        29
+    Enabled TPC IDs                                              all
+    Uses Green Context                                             0
+    Waves Per SM                                                8.83
+    -------------------------------- --------------- ---------------
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Block Limit SM                        block           24
+    Block Limit Registers                 block            4
+    Block Limit Shared Mem                block            5
+    Block Limit Warps                     block            6
+    Theoretical Active Warps per SM        warp           32
+    Theoretical Occupancy                     %        66.67
+    Achieved Occupancy                        %        63.81
+    Achieved Active Warps Per SM           warp        30.63
+    ------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 33.33%                                                                                    
+          The 8.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the       
+          hardware maximum of 12. This kernel's theoretical occupancy (66.7%) is limited by the number of required      
+          registers.                                                                                                    
+
+    Section: GPU and Memory Workload Distribution
+    -------------------------- ----------- ------------
+    Metric Name                Metric Unit Metric Value
+    -------------------------- ----------- ------------
+    Average DRAM Active Cycles       cycle    687042.67
+    Total DRAM Elapsed Cycles        cycle     53683200
+    Average L1 Active Cycles         cycle   1113896.52
+    Total L1 Elapsed Cycles          cycle     65905152
+    Average L2 Active Cycles         cycle   1174935.21
+    Total L2 Elapsed Cycles          cycle     28368576
+    Average SM Active Cycles         cycle   1113896.52
+    Total SM Elapsed Cycles          cycle     65905152
+    Average SMSP Active Cycles       cycle   1113250.83
+    Total SMSP Elapsed Cycles        cycle    263620608
+    -------------------------- ----------- ------------
+
