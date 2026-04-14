@@ -134,3 +134,10 @@ Results pending first build on L4. Table will be populated with measured TFLOPS 
 | `fp16_manual_pack` | 4+2 scalar `ld.shared` + `mov.b32` | m16n8k16 × 2 | f32 | 2-stage cp.async | No `ldmatrix`; exposes its instruction-count cost |
 
 ---
+
+## Compile & Run
+```
+cmake -B build -DKERNEL=fp16_ptx_fp16acc -DCUDA_ARCH=89 && cmake --build build -j$(nproc)
+./build/profile_fp16_ptx_fp16acc > fp16_ptx_fp16acc.txt
+ncu --set full --target-processes all ./build/profile_fp16_ptx_fp16acc > fp16_ptx_fp16acc_ncu.txt
+```

@@ -34,8 +34,45 @@
 //            d[2]@(t/4+8,(t%4)*2) d[3]@(t/4+8,(t%4)*2+1)
 // ─────────────────────────────────────────────────────────────────────────────
 #include <cuda_runtime.h>
+#include <cuda_fp16.h>
+#include <stdint.h>
 #include "include/config.h"
 #include "include/cuda_utils.h"
+
+#define DBG_TRACE_TILES 16
+
+#define DBG_PRINT_TILE_FRAG(tag, tile_idx, lane, ra, rb0)                          \
+    do {                                                                            \
+        half _ra0_lo  = __ushort_as_half((uint16_t)((ra)[0] & 0xFFFF));            \
+        half _ra0_hi  = __ushort_as_half((uint16_t)((ra)[0] >> 16));               \
+        half _rb0_lo  = __ushort_as_half((uint16_t)((rb0)[0] & 0xFFFF));           \
+        half _rb0_hi  = __ushort_as_half((uint16_t)((rb0)[0] >> 16));              \
+        half _rb0b_lo = __ushort_as_half((uint16_t)((rb0)[1] & 0xFFFF));           \
+        half _rb0b_hi = __ushort_as_half((uint16_t)((rb0)[1] >> 16));              \
+        printf("[DBG-LOAD] %s tile=%d lane=%d ra[0]={%.6f,%.6f} rb0[0]={%.6f,%.6f} rb0[1]={%.6f,%.6f}\n", \
+            tag, tile_idx, lane,                                                    \
+            __half2float(_ra0_lo), __half2float(_ra0_hi),                          \
+            __half2float(_rb0_lo), __half2float(_rb0_hi),                          \
+            __half2float(_rb0b_lo), __half2float(_rb0b_hi));                       \
+    } while (0)
+
+#define DBG_PRINT_TILE_HEADER(tag, tile_idx, lane)                                  \
+    do {                                                                            \
+        if ((lane) == 0) {                                                         \
+            printf("\n[DBG-TILE] %s tile=%d\n", tag, tile_idx);                 \
+        }                                                                           \
+    } while (0)
+
+#define DBG_PRINT_TILE_ALL_LANES(tag, tile_idx, lane, ra, rb0)                      \
+    do {                                                                            \
+        DBG_PRINT_TILE_HEADER(tag, tile_idx, lane);                                 \
+        for (int _dbg_lane = 0; _dbg_lane < THREADS_PER_WARP; ++_dbg_lane) {       \
+            if ((lane) == _dbg_lane) {                                              \
+                DBG_PRINT_TILE_FRAG(tag, tile_idx, lane, ra, rb0);                  \
+            }                                                                       \
+            __syncwarp();                                                           \
+        }                                                                           \
+    } while (0)
 
 // ── pack_half2: pack two adjacent FP16 values into a uint32 register ─────────
 // Uses PTX mov.b32 so the compiler cannot split it into two 16-bit moves.
@@ -142,6 +179,10 @@ __global__ void manual_pack_db(
     MANUAL_PACK_B(rb0, Bs[buf][warp_id], lane_id, 0);   // B cols 0-7
     MANUAL_PACK_B(rb1, Bs[buf][warp_id], lane_id, 8);   // B cols 8-15
 
+    // ── DEBUG: print loaded fragments for first DBG_TRACE_TILES tiles, all lanes
+    if (blockIdx.x == 0 && blockIdx.y == 0 && blockIdx.z == 0 && warp_id == 0) {
+        DBG_PRINT_TILE_ALL_LANES("manual_pack", 0, lane_id, ra, rb0);
+    }
     // ── Main K loop — cp.async double-buffer identical to fp16_ptx_mma ───────
     for (int k = WMMA_K; k < K; k += WMMA_K) {
         int next = 1 - buf;
@@ -168,6 +209,7 @@ __global__ void manual_pack_db(
         MMA_SYNC(rc0, ra, rb0);   // N cols 0-7
         MMA_SYNC(rc1, ra, rb1);   // N cols 8-15
 
+        (void)0;
         // Drain — cp.async.wait_group 0 ensures this thread's smem writes are
         // complete. Because all 32 threads in the warp execute wait_group 0
         // before any can reach MANUAL_PACK (warp convergence), ALL threads'
@@ -179,11 +221,18 @@ __global__ void manual_pack_db(
         MANUAL_PACK_A(ra,  As[buf][warp_id], lane_id);
         MANUAL_PACK_B(rb0, Bs[buf][warp_id], lane_id, 0);
         MANUAL_PACK_B(rb1, Bs[buf][warp_id], lane_id, 8);
+        int loaded_tile = k / WMMA_K;
+        if (loaded_tile < DBG_TRACE_TILES &&
+            blockIdx.x == 0 && blockIdx.y == 0 && blockIdx.z == 0 && warp_id == 0) {
+            DBG_PRINT_TILE_ALL_LANES("manual_pack", loaded_tile, lane_id, ra, rb0);
+        }
     }
 
     // ── Tail compute ──────────────────────────────────────────────────────────
     MMA_SYNC(rc0, ra, rb0);
     MMA_SYNC(rc1, ra, rb1);
+
+    (void)0;
 
     // ── Epilogue: scatter D-fragment to global — identical to fp16_ptx_mma ───
     float* c_dst  = C_b + tile_row * N + tile_col;
@@ -202,6 +251,7 @@ __global__ void manual_pack_db(
     c_dst[out_row1 * N + out_col0 + 8] = rc1[2];
     c_dst[out_row1 * N + out_col1 + 8] = rc1[3];
 }
+
 
 // ── Kernel launch wrapper ─────────────────────────────────────────────────────
 void launch_kernel(const half* A, const half* B, float* C,

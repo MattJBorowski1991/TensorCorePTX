@@ -2,6 +2,7 @@
 #include <mma.h>
 using namespace nvcuda;
 #include "include/config.h"
+#include "include/cuda_utils.h"
 
 
 __global__ void wmma_db(
@@ -72,7 +73,7 @@ __global__ void wmma_db(
         asm volatile("cp.async.commit_group;");
 
         wmma::mma_sync(c_frag, a_frag, b_frag, c_frag);
-        asm volatile("cp.async.wait_group 0");
+        asm volatile("cp.async.wait_group 0;");
 
         buf = next;
         wmma::load_matrix_sync(a_frag, &As[buf][warp_id][0][0], WMMA_K + PAD);

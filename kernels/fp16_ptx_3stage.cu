@@ -29,6 +29,8 @@
 //  Epilogue: compute second-to-last → wait_group 0 → load+compute last
 // ─────────────────────────────────────────────────────────────────────────────
 #include <cuda_runtime.h>
+#include <cuda_fp16.h>
+#include <stdint.h>
 #include "include/config.h"
 #include "include/cuda_utils.h"
 

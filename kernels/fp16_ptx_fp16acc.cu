@@ -26,6 +26,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 #include <cuda_runtime.h>
 #include <cuda_fp16.h>
+#include <stdint.h>
 #include "include/config.h"
 #include "include/cuda_utils.h"
 

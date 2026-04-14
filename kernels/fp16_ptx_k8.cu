@@ -25,6 +25,8 @@
 //            d[2]@(t/4+8,(t%4)*2) d[3]@(t/4+8,(t%4)*2+1)
 // ─────────────────────────────────────────────────────────────────────────────
 #include <cuda_runtime.h>
+#include <cuda_fp16.h>
+#include <stdint.h>
 #include "include/config.h"
 #include "include/cuda_utils.h"
 

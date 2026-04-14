@@ -42,7 +42,7 @@ int main() {
     run_verify();
 
     // ── Profiling run ─────────────────────────────────────────────────────────
-    GemmConfig cfg{.M=8192, .N=8192, .K=8192, .num_batches=4, .warmups=2, .runs=10};
+    GemmConfig cfg{.M=8192, .N=8192, .K=8192, .num_batches=4, .warmups=0, .runs=1};
 
     size_t szA = (size_t)cfg.num_batches * cfg.M * cfg.K;
     size_t szB = (size_t)cfg.num_batches * cfg.K * cfg.N;
@@ -65,8 +65,8 @@ int main() {
 
     double tflops = 2.0 * cfg.num_batches * (double)cfg.M * cfg.N * cfg.K
                     / (avg_ms * 1e-3) / 1e12;
-    printf("[profile] fp16_wmma | M=%d N=%d K=%d B=%d | %.3f ms avg | %.2f TFLOPS\n",
-           cfg.M, cfg.N, cfg.K, cfg.num_batches, avg_ms, tflops);
+        printf("[profile] %s | M=%d N=%d K=%d B=%d | %.3f ms avg | %.2f TFLOPS\n",
+            KERNEL_VARIANT, cfg.M, cfg.N, cfg.K, cfg.num_batches, avg_ms, tflops);
 
     return 0;
 }
