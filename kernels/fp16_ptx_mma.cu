@@ -23,41 +23,6 @@
 #include "include/config.h"
 #include "include/cuda_utils.h"
 
-#define DBG_TRACE_TILES 16
-
-#define DBG_PRINT_TILE_FRAG(tag, tile_idx, lane, ra, rb0)                          \
-    do {                                                                            \
-        half _ra0_lo  = __ushort_as_half((uint16_t)((ra)[0] & 0xFFFF));            \
-        half _ra0_hi  = __ushort_as_half((uint16_t)((ra)[0] >> 16));               \
-        half _rb0_lo  = __ushort_as_half((uint16_t)((rb0)[0] & 0xFFFF));           \
-        half _rb0_hi  = __ushort_as_half((uint16_t)((rb0)[0] >> 16));              \
-        half _rb0b_lo = __ushort_as_half((uint16_t)((rb0)[1] & 0xFFFF));           \
-        half _rb0b_hi = __ushort_as_half((uint16_t)((rb0)[1] >> 16));              \
-        printf("[DBG-LOAD] %s tile=%d lane=%d ra[0]={%.6f,%.6f} rb0[0]={%.6f,%.6f} rb0[1]={%.6f,%.6f}\n", \
-            tag, tile_idx, lane,                                                    \
-            __half2float(_ra0_lo), __half2float(_ra0_hi),                          \
-            __half2float(_rb0_lo), __half2float(_rb0_hi),                          \
-            __half2float(_rb0b_lo), __half2float(_rb0b_hi));                       \
-    } while (0)
-
-#define DBG_PRINT_TILE_HEADER(tag, tile_idx, lane)                                  \
-    do {                                                                            \
-        if ((lane) == 0) {                                                         \
-            printf("\n[DBG-TILE] %s tile=%d\n", tag, tile_idx);                 \
-        }                                                                           \
-    } while (0)
-
-#define DBG_PRINT_TILE_ALL_LANES(tag, tile_idx, lane, ra, rb0)                      \
-    do {                                                                            \
-        DBG_PRINT_TILE_HEADER(tag, tile_idx, lane);                                 \
-        for (int _dbg_lane = 0; _dbg_lane < THREADS_PER_WARP; ++_dbg_lane) {       \
-            if ((lane) == _dbg_lane) {                                              \
-                DBG_PRINT_TILE_FRAG(tag, tile_idx, lane, ra, rb0);                  \
-            }                                                                       \
-            __syncwarp();                                                           \
-        }                                                                           \
-    } while (0)
-
 // ── ldmatrix helper macros ────────────────────────────────────────────────────
 // Load A: ldmatrix.x4 for a 16×16 FP16 tile (row-major in SRAM).
 // Thread lane t → points to As[row = t%16][col = (t/16)*8].
@@ -151,11 +116,6 @@ __global__ void ptx_mma_db(
     LDMATRIX_B(rb0, Bs[buf][warp_id], lane_id, 0);   // B cols 0-7
     LDMATRIX_B(rb1, Bs[buf][warp_id], lane_id, 8);   // B cols 8-15
 
-    // ── DEBUG: print loaded fragments for first DBG_TRACE_TILES tiles, all lanes
-    if (blockIdx.x == 0 && blockIdx.y == 0 && blockIdx.z == 0 && warp_id == 0) {
-        DBG_PRINT_TILE_ALL_LANES("ldmatrix", 0, lane_id, ra, rb0);
-    }
-
     // ── Main K loop — structure identical to fp16_wmma ────────────────────────
     for (int k = WMMA_K; k < K; k += WMMA_K) {
         int next = 1 - buf;
@@ -184,8 +144,6 @@ __global__ void ptx_mma_db(
         MMA_SYNC(rc0, ra, rb0);   // cols 0-7
         MMA_SYNC(rc1, ra, rb1);   // cols 8-15
 
-        (void)0;
-
         asm volatile("cp.async.wait_group 0;");
 
         // Swap buffer and reload fragments (replaces wmma::load_matrix_sync)
@@ -193,11 +151,6 @@ __global__ void ptx_mma_db(
         LDMATRIX_A(ra,  As[buf][warp_id], lane_id);
         LDMATRIX_B(rb0, Bs[buf][warp_id], lane_id, 0);
         LDMATRIX_B(rb1, Bs[buf][warp_id], lane_id, 8);
-        int loaded_tile = k / WMMA_K;
-        if (loaded_tile < DBG_TRACE_TILES &&
-            blockIdx.x == 0 && blockIdx.y == 0 && blockIdx.z == 0 && warp_id == 0) {
-            DBG_PRINT_TILE_ALL_LANES("ldmatrix", loaded_tile, lane_id, ra, rb0);
-        }
     }
 
     // ── Tail compute ──────────────────────────────────────────────────────────
