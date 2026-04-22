@@ -38,9 +38,59 @@ static void run_verify() {
            acc.max_abs_err, acc.rmse);
 }
 
+// ── Precision-loss measurement (512³, always runs) ───────────────────────────
+// Full round-trip: FP32 → quantize → INT8 GEMM → dequantize → compare vs FP32 ref.
+static void run_precision_loss() {
+    constexpr int M = 512, N = 512, K = 512;
+
+    std::vector<float>   h_A_fp32(M * K), h_BT_fp32(N * K);
+    std::vector<float>   h_C_ref(M * N, 0.f), h_C_dequant(M * N, 0.f);
+    std::vector<int8_t>  h_A_q(M * K), h_BT_q(N * K);
+    std::vector<int32_t> h_C_int32(M * N, 0);
+
+    // 1. Generate FP32 inputs.
+    generate_fp32(h_A_fp32.data(), h_BT_fp32.data(), M, N, K, 1);
+
+    // 2. CPU FP32 reference on original inputs.
+    cpu_gemm_fp32(h_A_fp32.data(), h_BT_fp32.data(), h_C_ref.data(), M, N, K);
+
+    // 3. Quantize: FP32 → INT8, per-tensor absmax. Save scales.
+    float scale_A  = quantize_absmax(h_A_fp32.data(),  h_A_q.data(),  M * K);
+    float scale_BT = quantize_absmax(h_BT_fp32.data(), h_BT_q.data(), N * K);
+
+    // 4. Upload INT8 matrices and run GPU kernel.
+    DeviceBuffer<int8_t>  d_A(M * K);
+    DeviceBuffer<int8_t>  d_BT(N * K);
+    DeviceBuffer<int32_t> d_C(M * N);
+
+    CHECK_CUDA(cudaMemcpy(d_A.get(),  h_A_q.data(),  M * K * sizeof(int8_t), cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemcpy(d_BT.get(), h_BT_q.data(), N * K * sizeof(int8_t), cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemset(d_C.get(), 0, M * N * sizeof(int32_t)));
+
+    GemmConfig vcfg{.M=M, .N=N, .K=K, .num_batches=1, .warmups=0, .runs=1};
+    SolverInt8 solver;
+    solver.configure(vcfg);
+    solver.run(d_A.get(), d_BT.get(), d_C.get());
+
+    // 5. Download INT32 output.
+    CHECK_CUDA(cudaMemcpy(h_C_int32.data(), d_C.get(), M * N * sizeof(int32_t), cudaMemcpyDeviceToHost));
+
+    // 6. Dequantize on CPU: C_fp32[i] = scale_A * scale_BT * C_int32[i].
+    dequantize(h_C_int32.data(), h_C_dequant.data(), M * N, scale_A, scale_BT);
+
+    // 7. Measure and print precision loss vs FP32 reference.
+    AccuracyResultQuant acc = measure_accuracy_quant(h_C_ref.data(), h_C_dequant.data(), M, N);
+    printf("[quant]   M=%d N=%d K=%d  scale_A=%.4e scale_BT=%.4e  "
+           "max_abs=%.4e  rmse=%.4e  rel=%.3f%%  %s\n",
+           M, N, K, scale_A, scale_BT,
+           acc.max_abs_err, acc.rmse, acc.real_err_pct,
+           acc.pass ? "PASS" : "FAIL");
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 int main() {
     run_verify();
+    run_precision_loss();
 
     // ── Profiling run ─────────────────────────────────────────────────────────
     const char* env_sz = getenv("PROFILE_SIZE");

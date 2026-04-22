@@ -18,6 +18,11 @@ struct DeviceBuffer {
     ~DeviceBuffer() {cudaFree(ptr); }
     DeviceBuffer(const DeviceBuffer&) = delete; // disable the copy constructor (eg DeviceBuffer<float> buf2 = buf1;) = force unique memory ownership
     DeviceBuffer& operator=(const DeviceBuffer&) = delete; // disable copy assignment operator (eg bufA = bufB;)
+    DeviceBuffer(DeviceBuffer&& other) noexcept : ptr(other.ptr) {other.ptr = nullptr; }
+    DeviceBuffer& operator=(DeviceBuffer&& other) noexcept {
+        if(this != other) { cudaFree(ptr); ptr = other.ptr; other.ptr = nullptr; }
+        return *this;
+    }
     T* get() const {return ptr; } // allow to use .get() also on const objects
 };
 

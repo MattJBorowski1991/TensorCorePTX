@@ -106,6 +106,20 @@ Notes:
 - Byte packing / unpacking: `prmt` instructions enable efficient 4×INT8 → INT32 packing.
 - Watch for INT32 accumulator overflow for typical activation ranges using `mma.sync.m16n8k32`.
 
+#### INT8 Precision Loss Measurement
+
+Quantization error is measured via the full round-trip pipeline, fixed at 512³ (single batch):
+
+1. **Generate FP32 inputs** A (M×K) and B_T (N×K) with uniform values in [−1, 1].
+2. **CPU FP32 reference GEMM** on the original inputs — this is the ground truth.
+3. **Quantize per-tensor (absmax)**: `scale = max(|x|) / 127`, `x_int8 = round(x / scale)`, clamped to [−127, 127]. Separate scales for A and B.
+4. **Upload** int8 matrices to GPU. Scales are scalar floats kept on the host.
+5. **Run INT8 GEMM** → INT32 accumulator. No dequant inside the kernel — the kernel stays a pure integer compute unit so throughput measurements are not skewed.
+6. **Download** INT32 output; **dequantize on host**: `C_fp32[i] = scale_A × scale_B × C_int32[i]`.
+7. **Compare** dequantized vs FP32 reference: `max_abs_err`, `rmse`, `mean relative error %`.
+
+Measuring at a single size is sufficient — quantization error is driven by the value distribution and K depth (accumulation length), not matrix dimension.
+
 ### INT4
 - Nibble packing: two INT4 values per byte using `prmt` + shift/mask idioms.
 - High-density arithmetic: `mma.sync.m16n8k64` performs 64 INT4 MACs per MMA instruction.
