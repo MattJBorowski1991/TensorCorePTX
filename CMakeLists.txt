@@ -35,3 +35,16 @@ add_executable(profile_${KERNEL}
 target_include_directories(profile_${KERNEL} PRIVATE ${CMAKE_SOURCE_DIR})
 target_compile_options(profile_${KERNEL} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${CUDA_FLAGS}>)
 target_compile_definitions(profile_${KERNEL} PRIVATE KERNEL_VARIANT="${KERNEL}")
+
+# ── INT8 kernel targets ───────────────────────────────────────────────────────
+set(INT8_KERNEL "int8_wmma" CACHE STRING "INT8 kernel variant (maps to kernels/<INT8_KERNEL>.cu)")
+
+add_executable(profile_${INT8_KERNEL}
+    src/main_int8.cu
+    src/solver_int8.cu
+    src/data_int8.cu
+    kernels/${INT8_KERNEL}.cu
+)
+target_include_directories(profile_${INT8_KERNEL} PRIVATE ${CMAKE_SOURCE_DIR})
+target_compile_options(profile_${INT8_KERNEL} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${CUDA_FLAGS}>)
+target_compile_definitions(profile_${INT8_KERNEL} PRIVATE KERNEL_VARIANT="${INT8_KERNEL}")

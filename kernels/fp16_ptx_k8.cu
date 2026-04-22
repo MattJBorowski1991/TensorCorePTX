@@ -153,8 +153,8 @@ __global__ void ptx_k8_db(
 
         // ── 4× mma.sync.m16n8k8 (replaces 2× mma.sync.m16n8k16) ─────────────
         // Decompose: C[m16,n16] += A[m16,k16] * B[k16,n16]
-        //          = A[m16,k0..7] * B[k0..7, n0..7]   → rc0
-        //          + A[m16,k0..7] * B[k0..7, n8..15]  → rc1
+        //          = A[m16,k0..7] * B[k0..7, n0..7]   → rc0 = accumulation for left-N-half
+        //          + A[m16,k0..7] * B[k0..7, n8..15]  → rc1 = accumulation for right-N-half
         //          + A[m16,k8..15] * B[k8..15, n0..7] → rc0
         //          + A[m16,k8..15] * B[k8..15, n8..15]→ rc1
         MMA_K8(rc0, ra_k0, rb0_k0);

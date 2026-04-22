@@ -1,4 +1,13 @@
 // fp16_ptx_mma.cu
+
+// ldmatrix is a warp-cooperative not per-lane independent!
+// !!!! for both LDMATRIX_A/B: 
+// !!!! Each lane before ldmatrix.sync provides a pointer to SRAM
+// !!!! But after ldmatrix.sync the lane holds the actual data in registers
+// !!!! These are different locations (before/after) of the input tile
+// !!!! These per-lane inputs & outputs are enforced by PTX ISA
+
+
 // ── What changed vs fp16_wmma.cu ─────────────────────────────────────────────
 //  Global→SRAM  : identical  (same cp.async double-buffer loop)
 //  SRAM→regs    : wmma::load_matrix_sync  →  ldmatrix.sync PTX
@@ -24,9 +33,26 @@
 #include "include/cuda_utils.h"
 
 // ── ldmatrix helper macros ────────────────────────────────────────────────────
+// ldmatrix is a warp-cooperative not per-lane independent!
+// The hardware reads all 32 addresses in parallel, loads (for A) all 4 × 8×8 sub-tiles, 
+// then redistributes the data so every lane ends up with 2 FP16 per sub-tile → 4 × uint32 total. 
+
 // Load A: ldmatrix.x4 for a 16×16 FP16 tile (row-major in SRAM).
-// Thread lane t → points to As[row = t%16][col = (t/16)*8].
-// Produces 4 × uint32 in ra[0..3].
+// Lane t:
+// i. Before ldmatrix is called: points to As[row = t%16][col = (t/16)*8].
+// (each lane provides one address pointing to one row of one 8x8 (m8n8) subtile)
+
+// ii. After ldmatrix is called: holds 4 × uint32 in ra[0], ra[1], r[2], r[3].
+// The hardware reads all 32 addresses in parallel, loads (for A) all 4 × 8×8 sub-tiles, 
+// then redistributes the data so every lane ends up with 2 FP16 per sub-tile → 4 × uint32 total. 
+// More specifically after ldmatrix is called each lane t holds what mma.sync requires:
+// reg	    contents (2 FP16 packed):
+// ra[0]	A[t/4][(t%4)*2], A[t/4][(t%4)*2+1]
+// ra[1]	A[t/4][(t%4)*2+8], A[t/4][(t%4)*2+9]
+// ra[2]	A[t/4+8][(t%4)*2], A[t/4+8][(t%4)*2+1]
+// ra[3]	A[t/4+8][(t%4)*2+8], A[t/4+8][(t%4)*2+9]
+// The address each lane supplies is just its input pointer, not a description of what it will receive.
+
 #define LDMATRIX_A(ra, smem_ptr, lane)                                          \
     do {                                                                        \
         int _r = (lane) % 16;                                                   \
@@ -39,10 +65,17 @@
     } while(0)
 
 // Load B half: ldmatrix.x2.trans for a 16×8 FP16 tile stored [K=16][N=8].
+// (as mma.sync.m16n8k16 only computes one 16x8 output tile)
+// (so B must be 16x8 = exactly one x2 load)
 // .trans transposes during load → gives col-major layout expected by mma.sync B.
+// B is stored row-major in SRAM KxN=16x8, so we need to transpose when doing SRAM->Reg
 // Thread lane t → K-row = t%16, N-col = n_base.
 // Threads 16-31 provide don't-care addresses (t%16 keeps them safely in-bounds).
-// Produces 2 × uint32 in rb[0..1].
+// Produces 2 × uint32 in rb[0], r[1]
+// More specifically after ldmatrix is called each lane t holds what mma.sync requires:
+// reg	    contents (2 FP16 packed):
+// rb[0]	B[(t%4)*2][t/4] and B[(t%4)*2+1][t/4]
+// rb[1]	B[(t%4)*2+8][t/4] and B[(t%4)*2+9][t/4]
 #define LDMATRIX_B(rb, smem_ptr, lane, n_base)                                  \
     do {                                                                        \
         int _r = (lane) % 16;                                                   \
@@ -56,6 +89,12 @@
 // ── mma.sync helper macro ─────────────────────────────────────────────────────
 // mma.sync.aligned.m16n8k16.row.col.f32.f16.f16.f32
 // rd[4] = ra[4] * rb[2] + rc[4]   (all in-place: rc → rd writes back to rc)
+// After mma.sync lane t holds: 
+// rc[0] → row = t/4, col = (t%4)*2
+// rc[1] → row = t/4, col = (t%4)*2 + 1
+// rc[2] → row = t/4 + 8, col = (t%4)*2
+// rc[3] → row = t/4 + 8, col = (t%4)2 + 1
+
 #define MMA_SYNC(rc, ra, rb)                                                    \
     asm volatile(                                                               \
         "mma.sync.aligned.m16n8k16.row.col.f32.f16.f16.f32 "                   \

@@ -1,4 +1,15 @@
 // fp16_ptx_3stage.cu
+
+// In double buffering, you overlap GMEM→SMEM (async global load of tile N+1) with compute on tile N.
+// In triple buffering, you add a third stage and overlap all three simultaneously:
+// GMEM→SMEM: loading tile N+2 from global memory
+// SMEM→registers: pre-fetching tile N+1 operands into registers
+// Compute (MMA): executing on tile N
+// The new overlap is register pre-fetch (SMEM→reg) of the next tile 
+// while the current tile is computing — hiding the latency of shared memory
+// reads on top of global memory latency.
+
+
 // ── What changed vs fp16_ptx_mma.cu (2-stage) ────────────────────────────────
 //  Shared mem    : As/Bs[2][...] → As/Bs[3][...]  (third buffer)
 //  Prolog        : scalar store + __syncthreads for buf=0
@@ -14,7 +25,8 @@
 //  On Ada (L4) L2 latency ~200 cycles; 2-stage exposes this stall if MMA
 //  finishes before the next tile arrives. 3-stage hides it.
 //  If L2 is already fast enough, 3-stage just wastes 512 extra bytes of SRAM.
-//  NCU l2_hit_rate + sm__stall_wait_group will tell the story.
+//  NCU l2_hit_rate + sm__stall_wait_group will tell the story. 
+//  If sm__stall_wait_group is high in 2-stage, 3-stage will help. If it's near zero, 2-stage is already hiding everything
 //
 // ── Shared memory size ────────────────────────────────────────────────────────
 //  WARPS_PER_BLOCK=8, WMMA_M/K/N=16, PAD=0, dtype=half (2B)
@@ -115,7 +127,10 @@ __global__ void ptx_3stage_db(
         int row = i / WMMA_N, col = i % WMMA_N;
         cp_async16(&Bs[0][warp_id][row][col], &B_b[row * N + (tile_col + col)]);
     }
-    asm volatile("cp.async.commit_group;");   // group 0 in flight
+    asm volatile("cp.async.commit_group;");   // group 0 in flight = 
+    // = The cp.async instructions issued so far have been bundled into a named 
+    // group (group 0) that is now executing asynchronously in the background 
+    // — the GPU's DMA engine is copying data from global memory to shared memory without the warp waiting for it.
 
     // Stage 1: global k-offset = WMMA_K
     for (int i = 8 * lane_id; i < WMMA_M * WMMA_K; i += 8 * THREADS_PER_WARP) {
@@ -130,7 +145,8 @@ __global__ void ptx_3stage_db(
 
     // Wait for group 0; group 1 may remain in flight — this is the extra slack
     // that 3-stage adds vs 2-stage (where we would wait_group 0 here).
-    asm volatile("cp.async.wait_group 1;");
+    asm volatile("cp.async.wait_group 1;"); 
+    // wait_group N = wait until at most 1 group is in flight. Drains oldest groups first
 
     // Load fragments from stage 0
     uint32_t ra[4], rb0[2], rb1[2];

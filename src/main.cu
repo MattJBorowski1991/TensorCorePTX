@@ -39,11 +39,7 @@ static void run_verify() {
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 int main() {
-    // Allow skipping the small verification run when profiling with Nsight.
-    // Set `SKIP_VERIFY=1` in the environment to bypass the verify phase.
-    if (!getenv("SKIP_VERIFY")) {
-        run_verify();
-    }
+    run_verify();
 
     // ── Profiling run ─────────────────────────────────────────────────────────
         // Allow overriding the profiling size via environment variable
