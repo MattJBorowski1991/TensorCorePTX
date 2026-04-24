@@ -164,6 +164,48 @@ Where practical, derive the shared-memory swizzle analytically per precision bef
 
 ---
 
+## PyTorch Bindings
+
+Each kernel can be installed as a standalone Python extension via `setup.py`. One extension = one kernel; the module name matches the kernel name.
+
+```bash
+# Install an INT8 kernel (B must be passed pre-transposed as [N,K])
+INT8_KERNEL=int8_ptx_mma_k16 pip install -e .
+
+# Install an FP16 kernel
+KERNEL=fp16_ptx_3stage pip install -e .
+
+# Rebuild after editing a kernel (editable install re-compiles automatically)
+INT8_KERNEL=int8_ptx_mma_k16 pip install -e . --no-build-isolation
+```
+
+```python
+import torch
+import int8_ptx_mma_k16
+
+M, K, N = 4096, 4096, 4096
+A  = torch.randint(-127, 127, (M, K), dtype=torch.int8,  device="cuda")
+B  = torch.randint(-127, 127, (K, N), dtype=torch.int8,  device="cuda")
+BT = B.t().contiguous()                           # kernel expects B transposed: [N, K]
+
+C  = int8_ptx_mma_k16.gemm_int8(A, BT)           # → [M, N] int32, no dequant inside kernel
+C_fp32 = C.float() * scale_A * scale_B            # dequantize on host if needed
+```
+
+```python
+import torch
+import fp16_ptx_3stage
+
+A = torch.randn(4096, 4096, dtype=torch.float16, device="cuda")
+B = torch.randn(4096, 4096, dtype=torch.float16, device="cuda")
+C = fp16_ptx_3stage.gemm_fp16(A, B)              # → [M, N] float32
+```
+
+The `CUDA_ARCH` env var (default `89`) selects the SM target. For an A100 use `CUDA_ARCH=80`.
+Bindings live in `bindings/bindings_fp16.cpp` and `bindings/bindings_int8.cpp`; `setup.py` wires them to the correct kernel sources.
+
+---
+
 ## Compile & Run
 ```
 cmake -B build -DKERNEL=fp16_ptx_fp16acc -DCUDA_ARCH=89 && cmake --build build -j$(nproc)
