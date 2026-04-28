@@ -117,113 +117,113 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named profile_fp16_wmma
+# Target rules for targets named profile_int8_ptx_mma_k32
 
 # Build rule for target.
-profile_fp16_wmma: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 profile_fp16_wmma
-.PHONY : profile_fp16_wmma
+profile_int8_ptx_mma_k32: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 profile_int8_ptx_mma_k32
+.PHONY : profile_int8_ptx_mma_k32
 
 # fast build rule for target.
-profile_fp16_wmma/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/build
-.PHONY : profile_fp16_wmma/fast
+profile_int8_ptx_mma_k32/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/build
+.PHONY : profile_int8_ptx_mma_k32/fast
 
-kernels/fp16_wmma.o: kernels/fp16_wmma.cu.o
-.PHONY : kernels/fp16_wmma.o
-
-# target to build an object file
-kernels/fp16_wmma.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/kernels/fp16_wmma.cu.o
-.PHONY : kernels/fp16_wmma.cu.o
-
-kernels/fp16_wmma.i: kernels/fp16_wmma.cu.i
-.PHONY : kernels/fp16_wmma.i
-
-# target to preprocess a source file
-kernels/fp16_wmma.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/kernels/fp16_wmma.cu.i
-.PHONY : kernels/fp16_wmma.cu.i
-
-kernels/fp16_wmma.s: kernels/fp16_wmma.cu.s
-.PHONY : kernels/fp16_wmma.s
-
-# target to generate assembly for a file
-kernels/fp16_wmma.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/kernels/fp16_wmma.cu.s
-.PHONY : kernels/fp16_wmma.cu.s
-
-src/data.o: src/data.cu.o
-.PHONY : src/data.o
+kernels/int8_ptx_mma_k32.o: kernels/int8_ptx_mma_k32.cu.o
+.PHONY : kernels/int8_ptx_mma_k32.o
 
 # target to build an object file
-src/data.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/data.cu.o
-.PHONY : src/data.cu.o
+kernels/int8_ptx_mma_k32.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/kernels/int8_ptx_mma_k32.cu.o
+.PHONY : kernels/int8_ptx_mma_k32.cu.o
 
-src/data.i: src/data.cu.i
-.PHONY : src/data.i
+kernels/int8_ptx_mma_k32.i: kernels/int8_ptx_mma_k32.cu.i
+.PHONY : kernels/int8_ptx_mma_k32.i
 
 # target to preprocess a source file
-src/data.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/data.cu.i
-.PHONY : src/data.cu.i
+kernels/int8_ptx_mma_k32.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/kernels/int8_ptx_mma_k32.cu.i
+.PHONY : kernels/int8_ptx_mma_k32.cu.i
 
-src/data.s: src/data.cu.s
-.PHONY : src/data.s
+kernels/int8_ptx_mma_k32.s: kernels/int8_ptx_mma_k32.cu.s
+.PHONY : kernels/int8_ptx_mma_k32.s
 
 # target to generate assembly for a file
-src/data.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/data.cu.s
-.PHONY : src/data.cu.s
+kernels/int8_ptx_mma_k32.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/kernels/int8_ptx_mma_k32.cu.s
+.PHONY : kernels/int8_ptx_mma_k32.cu.s
 
-src/main.o: src/main.cu.o
-.PHONY : src/main.o
+src/data_int8.o: src/data_int8.cu.o
+.PHONY : src/data_int8.o
 
 # target to build an object file
-src/main.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/main.cu.o
-.PHONY : src/main.cu.o
+src/data_int8.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/src/data_int8.cu.o
+.PHONY : src/data_int8.cu.o
 
-src/main.i: src/main.cu.i
-.PHONY : src/main.i
+src/data_int8.i: src/data_int8.cu.i
+.PHONY : src/data_int8.i
 
 # target to preprocess a source file
-src/main.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/main.cu.i
-.PHONY : src/main.cu.i
+src/data_int8.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/src/data_int8.cu.i
+.PHONY : src/data_int8.cu.i
 
-src/main.s: src/main.cu.s
-.PHONY : src/main.s
+src/data_int8.s: src/data_int8.cu.s
+.PHONY : src/data_int8.s
 
 # target to generate assembly for a file
-src/main.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/main.cu.s
-.PHONY : src/main.cu.s
+src/data_int8.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/src/data_int8.cu.s
+.PHONY : src/data_int8.cu.s
 
-src/solver.o: src/solver.cu.o
-.PHONY : src/solver.o
+src/main_int8.o: src/main_int8.cu.o
+.PHONY : src/main_int8.o
 
 # target to build an object file
-src/solver.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/solver.cu.o
-.PHONY : src/solver.cu.o
+src/main_int8.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/src/main_int8.cu.o
+.PHONY : src/main_int8.cu.o
 
-src/solver.i: src/solver.cu.i
-.PHONY : src/solver.i
+src/main_int8.i: src/main_int8.cu.i
+.PHONY : src/main_int8.i
 
 # target to preprocess a source file
-src/solver.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/solver.cu.i
-.PHONY : src/solver.cu.i
+src/main_int8.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/src/main_int8.cu.i
+.PHONY : src/main_int8.cu.i
 
-src/solver.s: src/solver.cu.s
-.PHONY : src/solver.s
+src/main_int8.s: src/main_int8.cu.s
+.PHONY : src/main_int8.s
 
 # target to generate assembly for a file
-src/solver.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_fp16_wmma.dir/build.make CMakeFiles/profile_fp16_wmma.dir/src/solver.cu.s
-.PHONY : src/solver.cu.s
+src/main_int8.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/src/main_int8.cu.s
+.PHONY : src/main_int8.cu.s
+
+src/solver_int8.o: src/solver_int8.cu.o
+.PHONY : src/solver_int8.o
+
+# target to build an object file
+src/solver_int8.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/src/solver_int8.cu.o
+.PHONY : src/solver_int8.cu.o
+
+src/solver_int8.i: src/solver_int8.cu.i
+.PHONY : src/solver_int8.i
+
+# target to preprocess a source file
+src/solver_int8.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/src/solver_int8.cu.i
+.PHONY : src/solver_int8.cu.i
+
+src/solver_int8.s: src/solver_int8.cu.s
+.PHONY : src/solver_int8.s
+
+# target to generate assembly for a file
+src/solver_int8.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_mma_k32.dir/build.make CMakeFiles/profile_int8_ptx_mma_k32.dir/src/solver_int8.cu.s
+.PHONY : src/solver_int8.cu.s
 
 # Help Target
 help:
@@ -233,19 +233,19 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... profile_fp16_wmma"
-	@echo "... kernels/fp16_wmma.o"
-	@echo "... kernels/fp16_wmma.i"
-	@echo "... kernels/fp16_wmma.s"
-	@echo "... src/data.o"
-	@echo "... src/data.i"
-	@echo "... src/data.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
-	@echo "... src/solver.o"
-	@echo "... src/solver.i"
-	@echo "... src/solver.s"
+	@echo "... profile_int8_ptx_mma_k32"
+	@echo "... kernels/int8_ptx_mma_k32.o"
+	@echo "... kernels/int8_ptx_mma_k32.i"
+	@echo "... kernels/int8_ptx_mma_k32.s"
+	@echo "... src/data_int8.o"
+	@echo "... src/data_int8.i"
+	@echo "... src/data_int8.s"
+	@echo "... src/main_int8.o"
+	@echo "... src/main_int8.i"
+	@echo "... src/main_int8.s"
+	@echo "... src/solver_int8.o"
+	@echo "... src/solver_int8.i"
+	@echo "... src/solver_int8.s"
 .PHONY : help
 
 

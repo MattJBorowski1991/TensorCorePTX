@@ -62,49 +62,43 @@ __device__ __forceinline__ uint32_t pack_int8x4(int8_t b0, int8_t b1, int8_t b2,
     return out;
 }
 
-// ── MANUAL_PACK_A ─────────────────────────────────────────────────────────────
-// Fills ra[2] for mma.sync.m16n8k16 A operand from smem_tile[M][K] (int8 M×K).
-// Each ra element packs 4 int8 values at 4 consecutive k-columns.
+// ── Fragment-pack / mma helpers ─────────────────────────────────────────────
+
+// Fills ra[2] for mma.sync.m16n8k16 A operand.
 // Replaces ldmatrix.x2 with 2 × 4 scalar ld.shared + 2 × pack_int8x4.
-//
-//   smem_tile is As[buf][warp_id]
-#define MANUAL_PACK_A(ra, smem_tile, lane)                                      \
-    do {                                                                        \
-        const int _row0 = (lane) / 4;           /* rows 0-7               */   \
-        const int _row1 = _row0 + 8;            /* rows 8-15              */   \
-        const int _col  = ((lane) % 4) * 4;    /* k-col: 0,4,8,12        */   \
-        (ra)[0] = pack_int8x4(                                                 \
-            (smem_tile)[_row0][_col],   (smem_tile)[_row0][_col+1],            \
-            (smem_tile)[_row0][_col+2], (smem_tile)[_row0][_col+3]);           \
-        (ra)[1] = pack_int8x4(                                                 \
-            (smem_tile)[_row1][_col],   (smem_tile)[_row1][_col+1],            \
-            (smem_tile)[_row1][_col+2], (smem_tile)[_row1][_col+3]);           \
-    } while(0)
+__device__ __forceinline__
+void manual_pack_a(uint32_t ra[2], const int8_t smem[][WMMA_K + PAD], int lane) {
+    const int row0 = lane / 4;         // rows 0-7
+    const int row1 = row0 + 8;         // rows 8-15
+    const int col  = (lane % 4) * 4;  // k-col: 0, 4, 8, 12
+    ra[0] = pack_int8x4(smem[row0][col], smem[row0][col+1],
+                        smem[row0][col+2], smem[row0][col+3]);
+    ra[1] = pack_int8x4(smem[row1][col], smem[row1][col+1],
+                        smem[row1][col+2], smem[row1][col+3]);
+}
 
-// ── MANUAL_PACK_B ─────────────────────────────────────────────────────────────
-// Fills rb[1] for mma.sync.m16n8k16 B operand from smem_tile[N][K] (BT int8 N×K).
+// Fills rb[1] for mma.sync.m16n8k16 B operand.
 // Replaces ldmatrix.x1.trans with 1 × 4 scalar ld.shared + pack_int8x4.
-// n_base selects which n8 half: 0 → output cols 0-7, 8 → output cols 8-15.
-//
-//   smem_tile is Bs[buf][warp_id]
-#define MANUAL_PACK_B(rb, smem_tile, lane, n_base)                              \
-    do {                                                                        \
-        const int _n   = (n_base) + (lane) / 4;  /* n-row 0-7 within BT  */   \
-        const int _col = ((lane) % 4) * 4;       /* k-col: 0,4,8,12      */   \
-        (rb)[0] = pack_int8x4(                                                 \
-            (smem_tile)[_n][_col],   (smem_tile)[_n][_col+1],                  \
-            (smem_tile)[_n][_col+2], (smem_tile)[_n][_col+3]);                 \
-    } while(0)
+// n_base selects which n8 half (0 → cols 0-7, 8 → cols 8-15).
+__device__ __forceinline__
+void manual_pack_b(uint32_t rb[1], const int8_t smem[][WMMA_K + PAD], int lane, int n_base) {
+    const int n   = n_base + (lane / 4);
+    const int col = (lane % 4) * 4;
+    rb[0] = pack_int8x4(smem[n][col], smem[n][col+1],
+                        smem[n][col+2], smem[n][col+3]);
+}
 
-// ── mma.sync.m16n8k16 INT8→INT32 — identical to int8_ptx_mma_k16 ─────────────
-#define MMA_INT8(rc, ra, rb)                                                    \
-    asm volatile(                                                               \
-        "mma.sync.aligned.m16n8k16.row.col.s32.s8.s8.s32 "                     \
-        "{%0,%1,%2,%3}, {%4,%5}, {%6}, {%7,%8,%9,%10};"                        \
-        : "=r"((rc)[0]), "=r"((rc)[1]), "=r"((rc)[2]), "=r"((rc)[3])           \
-        : "r"((ra)[0]),  "r"((ra)[1]),                                          \
-          "r"((rb)[0]),                                                         \
-          "r"((rc)[0]),  "r"((rc)[1]),  "r"((rc)[2]),  "r"((rc)[3]))
+// D[4] += A[2] * B[1]  (mma.sync.m16n8k16, INT8→INT32 accumulation, in-place)
+__device__ __forceinline__
+void mma_int8(int32_t rc[4], const uint32_t ra[2], const uint32_t rb[1]) {
+    asm volatile(
+        "mma.sync.aligned.m16n8k16.row.col.s32.s8.s8.s32 "
+        "{%0,%1,%2,%3}, {%4,%5}, {%6}, {%7,%8,%9,%10};"
+        : "=r"(rc[0]), "=r"(rc[1]), "=r"(rc[2]), "=r"(rc[3])
+        : "r"(ra[0]),  "r"(ra[1]),
+          "r"(rb[0]),
+          "r"(rc[0]),  "r"(rc[1]),  "r"(rc[2]),  "r"(rc[3]));
+}
 
 __global__ void int8_manual_pack_db(
     const int8_t* __restrict__ A,    // M×K  row-major int8
@@ -153,9 +147,9 @@ __global__ void int8_manual_pack_db(
 
     // ── Load first fragments — MANUAL_PACK replaces ldmatrix ─────────────────
     uint32_t ra[2], rb0[1], rb1[1];
-    MANUAL_PACK_A(ra,  As[buf][warp_id], lane_id);
-    MANUAL_PACK_B(rb0, Bs[buf][warp_id], lane_id, 0);   // BT rows 0-7  → B cols 0-7
-    MANUAL_PACK_B(rb1, Bs[buf][warp_id], lane_id, 8);   // BT rows 8-15 → B cols 8-15
+    manual_pack_a(ra,  As[buf][warp_id], lane_id);
+    manual_pack_b(rb0, Bs[buf][warp_id], lane_id, 0);   // BT rows 0-7  → B cols 0-7
+    manual_pack_b(rb1, Bs[buf][warp_id], lane_id, 8);   // BT rows 8-15 → B cols 8-15
 
     // ── Main K loop — cp.async double-buffer identical to int8_ptx_mma_k16 ───
     for (int k = WMMA_K; k < K; k += WMMA_K) {
@@ -179,22 +173,22 @@ __global__ void int8_manual_pack_db(
 
         asm volatile("cp.async.commit_group;");
 
-        MMA_INT8(rc0, ra, rb0);   // cols 0-7
-        MMA_INT8(rc1, ra, rb1);   // cols 8-15
+        mma_int8(rc0, ra, rb0);   // cols 0-7
+        mma_int8(rc1, ra, rb1);   // cols 8-15
 
         // wait_group 0 ensures all 32 warp threads' cp.async writes are visible
-        // before MANUAL_PACK reads from the next buffer.
+        // before manual_pack_* reads from the next buffer.
         asm volatile("cp.async.wait_group 0;");
 
         buf = next;
-        MANUAL_PACK_A(ra,  As[buf][warp_id], lane_id);
-        MANUAL_PACK_B(rb0, Bs[buf][warp_id], lane_id, 0);
-        MANUAL_PACK_B(rb1, Bs[buf][warp_id], lane_id, 8);
+        manual_pack_a(ra,  As[buf][warp_id], lane_id);
+        manual_pack_b(rb0, Bs[buf][warp_id], lane_id, 0);
+        manual_pack_b(rb1, Bs[buf][warp_id], lane_id, 8);
     }
 
     // ── Tail compute ──────────────────────────────────────────────────────────
-    MMA_INT8(rc0, ra, rb0);
-    MMA_INT8(rc1, ra, rb1);
+    mma_int8(rc0, ra, rb0);
+    mma_int8(rc1, ra, rb1);
 
     // ── Epilogue: scatter D-fragment to global (int32, no dequant) ───────────
     int32_t* c_dst = C_b + tile_row * N + tile_col;
