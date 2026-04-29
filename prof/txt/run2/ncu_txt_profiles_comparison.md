@@ -1,7 +1,7 @@
 # NCU TXT Profiles Comparison (run2)
 
-This document combines high-level Nsight Compute report tables across six int8 kernels for each matrix size in `prof/txt/run2`.
-Metric names, units, and values are preserved exactly from source reports.
+Combined Nsight Compute high-level sections for six int8 kernels and five matrix sizes.
+Metric names, metric units, metric values, and comments are copied from source txt reports.
 
 ## Matrix Size 512x512x512
 
@@ -27,6 +27,18 @@ Comments:
 - **int8_ptx_mma_k16** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing L1 in the Memory Workload Analysis section.
 - **int8_ptx_mma_k32** [OPT]: Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the L1 bottleneck. Check memory replay (coalescing) metrics to make sure you're efficiently utilizing the bytes transferred. Also consider whether it is possible to do more work per memory access (kernel fusion) or whether there are values you can (re)compute.
 - **int8_wmma** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing L1 in the Memory Workload Analysis section.
+
+### GPU Speed Of Light Roofline Chart
+
+_No metric table in this section for this matrix size._
+
+Comments:
+- **int8_dp4a** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_3stage** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_manual_pack** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_mma_k16** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_mma_k32** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_wmma** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
 
 ### PM Sampling
 
@@ -70,6 +82,21 @@ Comments:
 | L2 Compression Input Sectors | sector | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Hit Rate | % | 96.09 | 97.60 | 93.58 | 92.89 | 93.40 | 95.53 |
 | Mem Pipes Busy | % | 92.63 | 45.52 | 49.71 | 35.90 | 46.74 | 45.07 |
+
+### Memory Workload Analysis Tables
+
+_No metric table in this section for this matrix size._
+
+Comments:
+- **int8_dp4a** [OPT]: Est. Speedup: 46.32% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_3stage** [OPT]: Est. Speedup: 43.35% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_manual_pack** [OPT]: Est. Speedup: 40.14% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_manual_pack** [OPT]: Est. Speedup: 40.14% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k16** [OPT]: Est. Speedup: 80.44% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 1.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_mma_k16** [OPT]: Est. Speedup: 41.52% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k32** [OPT]: Est. Speedup: 37.99% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k32** [OPT]: Est. Speedup: 40.28% The memory access pattern for shared loads might not be optimal and causes on average a 2.7 - way bank conflict across all 393216 shared load requests.This results in 527338 bank conflicts,  which represent 50.14% of the overall 1051711 wavefronts for shared loads. Check the Source Counters section for uncoalesced shared loads.
+- **int8_wmma** [OPT]: Est. Speedup: 41.77% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
 
 ### Scheduler Statistics
 
@@ -233,6 +260,18 @@ Comments:
 - **int8_ptx_mma_k32** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing L1 in the Memory Workload Analysis section.
 - **int8_wmma** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing L1 in the Memory Workload Analysis section.
 
+### GPU Speed Of Light Roofline Chart
+
+_No metric table in this section for this matrix size._
+
+Comments:
+- **int8_dp4a** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_3stage** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_manual_pack** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_mma_k16** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_mma_k32** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_wmma** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+
 ### PM Sampling
 
 | Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
@@ -275,6 +314,21 @@ Comments:
 | L2 Compression Input Sectors | sector | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Hit Rate | % | 98.32 | 97.30 | 96.77 | 96.99 | 96.41 | 97.82 |
 | Mem Pipes Busy | % | 94.00 | 47.31 | 52.40 | 41.99 | 49.02 | 47.06 |
+
+### Memory Workload Analysis Tables
+
+_No metric table in this section for this matrix size._
+
+Comments:
+- **int8_dp4a** [OPT]: Est. Speedup: 47% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_3stage** [OPT]: Est. Speedup: 44.65% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_manual_pack** [OPT]: Est. Speedup: 42.83% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_manual_pack** [OPT]: Est. Speedup: 42.83% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k16** [OPT]: Est. Speedup: 84.26% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 1.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_mma_k16** [OPT]: Est. Speedup: 43.49% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k32** [OPT]: Est. Speedup: 43.11% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k32** [OPT]: Est. Speedup: 44.22% The memory access pattern for shared loads might not be optimal and causes on average a 2.7 - way bank conflict across all 3145728 shared load requests.This results in 4221469 bank conflicts,  which represent 50.16% of the overall 8416558 wavefronts for shared loads. Check the Source Counters section for uncoalesced shared loads.
+- **int8_wmma** [OPT]: Est. Speedup: 44.82% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
 
 ### Scheduler Statistics
 
@@ -429,6 +483,18 @@ Comments:
 - **int8_ptx_mma_k32** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing L1 in the Memory Workload Analysis section.
 - **int8_wmma** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing L1 in the Memory Workload Analysis section.
 
+### GPU Speed Of Light Roofline Chart
+
+_No metric table in this section for this matrix size._
+
+Comments:
+- **int8_dp4a** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_3stage** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_manual_pack** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_mma_k16** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_mma_k32** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_wmma** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+
 ### PM Sampling
 
 | Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
@@ -471,6 +537,21 @@ Comments:
 | L2 Compression Input Sectors | sector | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Hit Rate | % | 99.04 | 99.99 | 98.25 | 98.40 | 98.15 | 99.22 |
 | Mem Pipes Busy | % | 95.10 | 42.64 | 53.93 | 45.86 | 48.87 | 47.81 |
+
+### Memory Workload Analysis Tables
+
+_No metric table in this section for this matrix size._
+
+Comments:
+- **int8_dp4a** [OPT]: Est. Speedup: 47.55% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_3stage** [OPT]: Est. Speedup: 39.98% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_manual_pack** [OPT]: Est. Speedup: 44.34% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_manual_pack** [OPT]: Est. Speedup: 44.34% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k16** [OPT]: Est. Speedup: 86.29% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 1.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_mma_k16** [OPT]: Est. Speedup: 44.54% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k32** [OPT]: Est. Speedup: 44.69% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k32** [OPT]: Est. Speedup: 44.97% The memory access pattern for shared loads might not be optimal and causes on average a 2.7 - way bank conflict across all 25165824 shared load requests.This results in 33673823 bank conflicts,  which represent 50.09% of the overall 67230976 wavefronts for shared loads. Check the Source Counters section for uncoalesced shared loads.
+- **int8_wmma** [OPT]: Est. Speedup: 46.15% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
 
 ### Scheduler Statistics
 
@@ -625,6 +706,18 @@ Comments:
 - **int8_ptx_mma_k32** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing L1 in the Memory Workload Analysis section.
 - **int8_wmma** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing L2 in the Memory Workload Analysis section.
 
+### GPU Speed Of Light Roofline Chart
+
+_No metric table in this section for this matrix size._
+
+Comments:
+- **int8_dp4a** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_3stage** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_manual_pack** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_mma_k16** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_mma_k32** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_wmma** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+
 ### PM Sampling
 
 | Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
@@ -667,6 +760,21 @@ Comments:
 | L2 Compression Input Sectors | sector | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Hit Rate | % | 99.59 | 100.36 | 99.26 | 99.21 | 99.04 | 99.69 |
 | Mem Pipes Busy | % | 94.08 | 37.18 | 54.92 | 47.60 | 48.38 | 47.30 |
+
+### Memory Workload Analysis Tables
+
+_No metric table in this section for this matrix size._
+
+Comments:
+- **int8_dp4a** [OPT]: Est. Speedup: 47.04% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_3stage** [OPT]: Est. Speedup: 40.97% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_manual_pack** [OPT]: Est. Speedup: 45.3% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_manual_pack** [OPT]: Est. Speedup: 45.3% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k16** [OPT]: Est. Speedup: 86.49% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 1.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_mma_k16** [OPT]: Est. Speedup: 44.64% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k32** [OPT]: Est. Speedup: 45.04% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k32** [OPT]: Est. Speedup: 45.13% The memory access pattern for shared loads might not be optimal and causes on average a 2.7 - way bank conflict across all 201326592 shared load requests.This results in 268906527 bank conflicts,  which represent 50.04% of the overall 537353115 wavefronts for shared loads. Check the Source Counters section for uncoalesced shared loads.
+- **int8_wmma** [OPT]: Est. Speedup: 45.96% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
 
 ### Scheduler Statistics
 
@@ -821,6 +929,18 @@ Comments:
 - **int8_ptx_mma_k32** [OPT]: Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the L1 bottleneck. Check memory replay (coalescing) metrics to make sure you're efficiently utilizing the bytes transferred. Also consider whether it is possible to do more work per memory access (kernel fusion) or whether there are values you can (re)compute.
 - **int8_wmma** [OPT]: Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to see where the memory system bottleneck is. Check memory replay (coalescing) metrics to make sure you're efficiently utilizing the bytes transferred. Also consider whether it is possible to do more work per memory access (kernel fusion) or whether there are values you can (re)compute.
 
+### GPU Speed Of Light Roofline Chart
+
+_No metric table in this section for this matrix size._
+
+Comments:
+- **int8_dp4a** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_3stage** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_manual_pack** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_mma_k16** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_ptx_mma_k32** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+- **int8_wmma** [INF]: The ratio of peak float (FP32) to double (FP64) performance on this device is 64:1. The workload achieved 0% of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline analysis.
+
 ### PM Sampling
 
 | Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
@@ -863,6 +983,21 @@ Comments:
 | L2 Compression Input Sectors | sector | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Hit Rate | % | 50.12 | 84.46 | 87.87 | 68.75 | 65.84 | 81.86 |
 | Mem Pipes Busy | % | 94.40 | 33.62 | 48.50 | 47.70 | 36.25 | 29.85 |
+
+### Memory Workload Analysis Tables
+
+_No metric table in this section for this matrix size._
+
+Comments:
+- **int8_dp4a** [OPT]: Est. Speedup: 47.2% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_3stage** [OPT]: Est. Speedup: 34.32% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_manual_pack** [OPT]: Est. Speedup: 40.08% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_manual_pack** [OPT]: Est. Speedup: 40.08% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k16** [OPT]: Est. Speedup: 85.1% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 1.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
+- **int8_ptx_mma_k16** [OPT]: Est. Speedup: 43.92% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k32** [OPT]: Est. Speedup: 33.48% The memory access pattern for global stores to L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global stores.
+- **int8_ptx_mma_k32** [OPT]: Est. Speedup: 33.49% The memory access pattern for shared loads might not be optimal and causes on average a 2.7 - way bank conflict across all 1610612736 shared load requests.This results in 2148946153 bank conflicts,  which represent 50.02% of the overall 4296592062 wavefronts for shared loads. Check the Source Counters section for uncoalesced shared loads.
+- **int8_wmma** [OPT]: Est. Speedup: 29.09% The memory access pattern for global loads from L1TEX might not be optimal. On average, only 16.0 of the 32 bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between threads. Check the Source Counters section for uncoalesced global loads.
 
 ### Scheduler Statistics
 
