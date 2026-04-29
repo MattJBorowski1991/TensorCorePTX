@@ -47,6 +47,7 @@
 
 #include <cuda_runtime.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "include/config.h"
 #include "include/cuda_utils.h"
 
@@ -73,7 +74,7 @@ void ldmatrix_b(uint32_t rb[1], const int8_t smem[][WMMA_K + PAD], int lane, int
     int r = n_base + (lane % 8);
     uint32_t addr = __cvta_generic_to_shared(&smem[r][0]);
     asm volatile(
-        "ldmatrix.sync.aligned.m8n8.x1.trans.shared.b16 {%0}, [%1];"
+        "ldmatrix.sync.aligned.m8n8.x1.shared.b16 {%0}, [%1];"
         : "=r"(rb[0])
         : "r"(addr));
 }
@@ -81,13 +82,15 @@ void ldmatrix_b(uint32_t rb[1], const int8_t smem[][WMMA_K + PAD], int lane, int
 // D[4] += A[2] * B[1]  (mma.sync.m16n8k16, INT8→INT32 accumulation, in-place)
 __device__ __forceinline__
 void mma_int8(int32_t rc[4], const uint32_t ra[2], const uint32_t rb[1]) {
+    int c0 = rc[0], c1 = rc[1], c2 = rc[2], c3 = rc[3];
     asm volatile(
         "mma.sync.aligned.m16n8k16.row.col.s32.s8.s8.s32 "
-        "{%0,%1,%2,%3}, {%4,%5}, {%6}, {%7,%8,%9,%10};"
-        : "=r"(rc[0]), "=r"(rc[1]), "=r"(rc[2]), "=r"(rc[3])
+                "{%0,%1,%2,%3}, {%4,%5}, {%6}, {%7,%8,%9,%10};"
+        : "=r"(c0), "=r"(c1), "=r"(c2), "=r"(c3)
         : "r"(ra[0]),  "r"(ra[1]),
-          "r"(rb[0]),
-          "r"(rc[0]),  "r"(rc[1]),  "r"(rc[2]),  "r"(rc[3]));
+                    "r"(rb[0]),
+          "r"(c0),  "r"(c1),  "r"(c2),  "r"(c3));
+    rc[0] = c0; rc[1] = c1; rc[2] = c2; rc[3] = c3;
 }
 
 __global__ void int8_ptx_mma_k16_db(
@@ -147,6 +150,11 @@ __global__ void int8_ptx_mma_k16_db(
     ldmatrix_a(ra,  As[buf][warp_id], lane_id);
     ldmatrix_b(rb0, Bs[buf][warp_id], lane_id, 0);   // BT rows 0-7  → B cols 0-7
     ldmatrix_b(rb1, Bs[buf][warp_id], lane_id, 8);   // BT rows 8-15 → B cols 8-15
+    if (M == 16 && N == 16 && K == 16 && blockIdx.x == 0 && blockIdx.y == 0 && blockIdx.z == 0 &&
+        warp_id == 0 && lane_id < 16) {
+        printf("[ldm] lane=%2d ra0=%08x ra1=%08x rb0=%08x rb1=%08x\n",
+               lane_id, ra[0], ra[1], rb0[0], rb1[0]);
+    }
 
     // ── Main K loop ───────────────────────────────────────────────────────────
     for (int k = WMMA_K; k < K; k += WMMA_K) {
@@ -174,6 +182,7 @@ __global__ void int8_ptx_mma_k16_db(
         mma_int8(rc1, ra, rb1);   // cols 8-15
 
         asm volatile("cp.async.wait_group 0;");
+        __syncthreads();  // Ensure SMEM visibility across warps before ldmatrix
 
         buf = next;
         ldmatrix_a(ra,  As[buf][warp_id], lane_id);

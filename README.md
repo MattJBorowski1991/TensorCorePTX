@@ -208,7 +208,7 @@ Bindings live in `bindings/bindings_fp16.cpp` and `bindings/bindings_int8.cpp`; 
 
 ## Compile & Run
 ```
-cmake -B build -DKERNEL=fp16_ptx_fp16acc -DCUDA_ARCH=89 && cmake --build build -j$(nproc)
+rm -rf build && cmake -B build -DKERNEL=fp16_ptx_fp16acc -DCUDA_ARCH=89 && cmake --build build -j$(nproc)
 ./build/profile_fp16_ptx_fp16acc > fp16_ptx_fp16acc.txt
 
 # Run NVIDIA Nsight Compute (`ncu`) across a set of 2^N sizes.

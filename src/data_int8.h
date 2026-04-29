@@ -13,6 +13,10 @@ void cpu_gemm_int8(const int8_t* A, const int8_t* BT, int32_t* C, int M, int N, 
 struct AccuracyResultI32 {
     int32_t max_abs_err;  // 0 = bit-exact match
     float   rmse;
+    int     max_row;
+    int     max_col;
+    int32_t ref_at_max;
+    int32_t out_at_max;
     bool    pass;         // true iff max_abs_err == 0
 };
 
@@ -38,6 +42,7 @@ struct AccuracyResultQuant {
     float max_abs_err;
     float rmse;
     float real_err_pct;  // mean relative error %
+    float snr_db;        // 20*log10(||ref||/||ref-out||); higher = better, best over 20 (dB)
     bool  pass;
 };
 

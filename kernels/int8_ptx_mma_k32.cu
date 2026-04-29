@@ -59,49 +59,36 @@
 #include "include/cuda_utils.h"
 
 // ── ldmatrix / mma helpers ───────────────────────────────────────────────────
+// Correctness-first k32 path: each k32 step is decomposed into two k16 MMAs.
 
-// Load A: 16×32 int8 tile → 4 uint32 registers via ldmatrix.x4.
-// ldmatrix.x4 splits 32 lanes into 4 groups of 8 (g = lane/8):
-//   g=0 (lanes  0- 7) → TL: rows 0-7,  int8-col  0
-//   g=1 (lanes  8-15) → TR: rows 0-7,  int8-col 16
-//   g=2 (lanes 16-23) → BL: rows 8-15, int8-col  0
-//   g=3 (lanes 24-31) → BR: rows 8-15, int8-col 16
 __device__ __forceinline__
-void ldmatrix_a(uint32_t ra[4], const int8_t smem[][WMMA_K + PAD], int lane) {
-    int r = (lane % 8) + (lane / 16) * 8;
-    int c = (lane / 8 % 2) * 16;
-    uint32_t addr = __cvta_generic_to_shared(&smem[r][c]);
+void ldmatrix_a_k16(uint32_t ra[2], const int8_t smem[][WMMA_K + PAD], int lane, int k_off) {
+    int r = lane % 16;
+    uint32_t addr = __cvta_generic_to_shared(&smem[r][k_off]);
     asm volatile(
-        "ldmatrix.sync.aligned.m8n8.x4.shared.b16 {%0,%1,%2,%3}, [%4];"
-        : "=r"(ra[0]), "=r"(ra[1]), "=r"(ra[2]), "=r"(ra[3])
+        "ldmatrix.sync.aligned.m8n8.x2.shared.b16 {%0,%1}, [%2];"
+        : "=r"(ra[0]), "=r"(ra[1])
         : "r"(addr));
 }
 
-// Load one n8 half of BT: 8×32 int8 chunk → 2 uint32 registers via ldmatrix.x2.trans.
-// n_base selects which 8-row chunk (0 = output cols 0-7, 8 = output cols 8-15).
-//   Lanes 0-7  → _r = n_base + lane%8, _c =  0
-//   Lanes 8-15 → _r = n_base + lane%8, _c = 16
-//   Lanes 16-31 → don't care (mirror)
 __device__ __forceinline__
-void ldmatrix_b(uint32_t rb[2], const int8_t smem[][WMMA_K + PAD], int lane, int n_base) {
+void ldmatrix_b_k16(uint32_t rb[1], const int8_t smem[][WMMA_K + PAD], int lane, int n_base, int k_off) {
     int r = n_base + (lane % 8);
-    int c = (lane / 8 % 2) * 16;
-    uint32_t addr = __cvta_generic_to_shared(&smem[r][c]);
+    uint32_t addr = __cvta_generic_to_shared(&smem[r][k_off]);
     asm volatile(
-        "ldmatrix.sync.aligned.m8n8.x2.trans.shared.b16 {%0,%1}, [%2];"
-        : "=r"(rb[0]), "=r"(rb[1])
+        "ldmatrix.sync.aligned.m8n8.x1.shared.b16 {%0}, [%1];"
+        : "=r"(rb[0])
         : "r"(addr));
 }
 
-// D[4] += A[4] * B[2]  (mma.sync.m16n8k32, INT8→INT32 accumulation, in-place)
 __device__ __forceinline__
-void mma_int8(int32_t rc[4], const uint32_t ra[4], const uint32_t rb[2]) {
+void mma_int8_k16(int32_t rc[4], const uint32_t ra[2], const uint32_t rb[1]) {
     asm volatile(
-        "mma.sync.aligned.m16n8k32.row.col.s32.s8.s8.s32 "
-        "{%0,%1,%2,%3}, {%4,%5,%6,%7}, {%8,%9}, {%10,%11,%12,%13};"
+        "mma.sync.aligned.m16n8k16.row.col.s32.s8.s8.s32 "
+        "{%0,%1,%2,%3}, {%4,%5}, {%6}, {%7,%8,%9,%10};"
         : "=r"(rc[0]), "=r"(rc[1]), "=r"(rc[2]), "=r"(rc[3])
-        : "r"(ra[0]),  "r"(ra[1]),  "r"(ra[2]),  "r"(ra[3]),
-          "r"(rb[0]),  "r"(rb[1]),
+        : "r"(ra[0]),  "r"(ra[1]),
+          "r"(rb[0]),
           "r"(rc[0]),  "r"(rc[1]),  "r"(rc[2]),  "r"(rc[3]));
 }
 
@@ -153,10 +140,13 @@ __global__ void int8_ptx_mma_k32_db(
     __syncthreads();
 
     // ── Load first fragments ───────────────────────────────────────────────────
-    uint32_t ra[4], rb0[2], rb1[2];
-    ldmatrix_a(ra,  As[buf][warp_id], lane_id);
-    ldmatrix_b(rb0, Bs[buf][warp_id], lane_id, 0);   // BT rows 0-7  → B cols 0-7
-    ldmatrix_b(rb1, Bs[buf][warp_id], lane_id, 8);   // BT rows 8-15 → B cols 8-15
+    uint32_t ra_lo[2], ra_hi[2], rb0_lo[1], rb0_hi[1], rb1_lo[1], rb1_hi[1];
+    ldmatrix_a_k16(ra_lo,  As[buf][warp_id], lane_id, 0);
+    ldmatrix_a_k16(ra_hi,  As[buf][warp_id], lane_id, 16);
+    ldmatrix_b_k16(rb0_lo, Bs[buf][warp_id], lane_id, 0, 0);
+    ldmatrix_b_k16(rb0_hi, Bs[buf][warp_id], lane_id, 0, 16);
+    ldmatrix_b_k16(rb1_lo, Bs[buf][warp_id], lane_id, 8, 0);
+    ldmatrix_b_k16(rb1_hi, Bs[buf][warp_id], lane_id, 8, 16);
 
     // ── Main K loop (step = WMMA_K = 32; K must be a multiple of 32) ─────────
     for (int k = WMMA_K; k < K; k += WMMA_K) {
@@ -184,20 +174,28 @@ __global__ void int8_ptx_mma_k32_db(
 
         asm volatile("cp.async.commit_group;");
 
-        mma_int8(rc0, ra, rb0);   // cols 0-7
-        mma_int8(rc1, ra, rb1);   // cols 8-15
+        mma_int8_k16(rc0, ra_lo, rb0_lo);   // k  0-15, cols 0-7
+        mma_int8_k16(rc1, ra_lo, rb1_lo);   // k  0-15, cols 8-15
+        mma_int8_k16(rc0, ra_hi, rb0_hi);   // k 16-31, cols 0-7
+        mma_int8_k16(rc1, ra_hi, rb1_hi);   // k 16-31, cols 8-15
 
         asm volatile("cp.async.wait_group 0;");
+        __syncthreads();  // Ensure SMEM visibility across warps before ldmatrix
 
         buf = next;
-        ldmatrix_a(ra,  As[buf][warp_id], lane_id);
-        ldmatrix_b(rb0, Bs[buf][warp_id], lane_id, 0);
-        ldmatrix_b(rb1, Bs[buf][warp_id], lane_id, 8);
+        ldmatrix_a_k16(ra_lo,  As[buf][warp_id], lane_id, 0);
+        ldmatrix_a_k16(ra_hi,  As[buf][warp_id], lane_id, 16);
+        ldmatrix_b_k16(rb0_lo, Bs[buf][warp_id], lane_id, 0, 0);
+        ldmatrix_b_k16(rb0_hi, Bs[buf][warp_id], lane_id, 0, 16);
+        ldmatrix_b_k16(rb1_lo, Bs[buf][warp_id], lane_id, 8, 0);
+        ldmatrix_b_k16(rb1_hi, Bs[buf][warp_id], lane_id, 8, 16);
     }
 
     // ── Tail compute ──────────────────────────────────────────────────────────
-    mma_int8(rc0, ra, rb0);
-    mma_int8(rc1, ra, rb1);
+    mma_int8_k16(rc0, ra_lo, rb0_lo);
+    mma_int8_k16(rc1, ra_lo, rb1_lo);
+    mma_int8_k16(rc0, ra_hi, rb0_hi);
+    mma_int8_k16(rc1, ra_hi, rb1_hi);
 
     // ── Epilogue: scatter D-fragment to global (int32, no dequant) ───────────
     int32_t* c_dst = C_b + tile_row * N + tile_col;

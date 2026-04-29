@@ -7,9 +7,18 @@
 #include "src/solver_int8.h"
 #include "src/data_int8.h"
 
+static int env_or_default(const char* name, int fallback) {
+    const char* s = getenv(name);
+    if (!s || s[0] == '\0') return fallback;
+    int v = atoi(s);
+    return v > 0 ? v : fallback;
+}
+
 // ── Verification (512³, always runs) ─────────────────────────────────────────
 static void run_verify() {
-    constexpr int Mv = 512, Nv = 512, Kv = 512;
+    int Mv = env_or_default("VERIFY_M", 512);
+    int Nv = env_or_default("VERIFY_N", 512);
+    int Kv = env_or_default("VERIFY_K", 512);
 
     std::vector<int8_t>  h_A(Mv * Kv), h_BT(Nv * Kv);
     std::vector<int32_t> h_C_ref(Mv * Nv, 0), h_C_out(Mv * Nv, 0);
@@ -33,15 +42,18 @@ static void run_verify() {
     CHECK_CUDA(cudaMemcpy(h_C_out.data(), d_C.get(), Mv * Nv * sizeof(int32_t), cudaMemcpyDeviceToHost));
 
     AccuracyResultI32 acc = measure_accuracy_int8(h_C_ref.data(), h_C_out.data(), Mv, Nv);
-    printf("[verify]  M=%d N=%d K=%d  %s  max_abs=%d  rmse=%.4e\n",
+        printf("[verify]  M=%d N=%d K=%d  %s  max_abs=%d  rmse=%.4e  at=(%d,%d) ref=%d out=%d\n",
            Mv, Nv, Kv, acc.pass ? "PASS" : "FAIL",
-           acc.max_abs_err, acc.rmse);
+            acc.max_abs_err, acc.rmse,
+            acc.max_row, acc.max_col, acc.ref_at_max, acc.out_at_max);
 }
 
 // ── Precision-loss measurement (512³, always runs) ───────────────────────────
 // Full round-trip: FP32 → quantize → INT8 GEMM → dequantize → compare vs FP32 ref.
 static void run_precision_loss() {
-    constexpr int M = 512, N = 512, K = 512;
+    int M = env_or_default("QUANT_M", 512);
+    int N = env_or_default("QUANT_N", 512);
+    int K = env_or_default("QUANT_K", 512);
 
     std::vector<float>   h_A_fp32(M * K), h_BT_fp32(N * K);
     std::vector<float>   h_C_ref(M * N, 0.f), h_C_dequant(M * N, 0.f);
@@ -81,9 +93,9 @@ static void run_precision_loss() {
     // 7. Measure and print precision loss vs FP32 reference.
     AccuracyResultQuant acc = measure_accuracy_quant(h_C_ref.data(), h_C_dequant.data(), M, N);
     printf("[quant]   M=%d N=%d K=%d  scale_A=%.4e scale_BT=%.4e  "
-           "max_abs=%.4e  rmse=%.4e  rel=%.3f%%  %s\n",
+           "max_abs=%.4e  rmse=%.4e  rel=%.3f%%  snr=%.1f dB  %s\n",
            M, N, K, scale_A, scale_BT,
-           acc.max_abs_err, acc.rmse, acc.real_err_pct,
+           acc.max_abs_err, acc.rmse, acc.real_err_pct, acc.snr_db,
            acc.pass ? "PASS" : "FAIL");
 }
 
@@ -91,6 +103,12 @@ static void run_precision_loss() {
 int main() {
     run_verify();
     run_precision_loss();
+
+    // For sanitizer/debug runs, skip the large profiling pass.
+    const char* skip_profile = getenv("SKIP_PROFILE");
+    if (skip_profile && skip_profile[0] != '\0' && skip_profile[0] != '0') {
+        return 0;
+    }
 
     // ── Profiling run ─────────────────────────────────────────────────────────
     const char* env_sz = getenv("PROFILE_SIZE");

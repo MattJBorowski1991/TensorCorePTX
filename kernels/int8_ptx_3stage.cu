@@ -50,20 +50,22 @@ void ldmatrix_b(uint32_t rb[1], const int8_t smem[][WMMA_K + PAD], int lane, int
     int r = n_base + (lane % 8);
     uint32_t addr = __cvta_generic_to_shared(&smem[r][0]);
     asm volatile(
-        "ldmatrix.sync.aligned.m8n8.x1.trans.shared.b16 {%0}, [%1];"
+        "ldmatrix.sync.aligned.m8n8.x1.shared.b16 {%0}, [%1];"
         : "=r"(rb[0])
         : "r"(addr));
 }
 
 __device__ __forceinline__
 void mma_int8(int32_t rc[4], const uint32_t ra[2], const uint32_t rb[1]) {
+    int c0 = rc[0], c1 = rc[1], c2 = rc[2], c3 = rc[3];
     asm volatile(
         "mma.sync.aligned.m16n8k16.row.col.s32.s8.s8.s32 "
-        "{%0,%1,%2,%3}, {%4,%5}, {%6}, {%7,%8,%9,%10};"
-        : "=r"(rc[0]), "=r"(rc[1]), "=r"(rc[2]), "=r"(rc[3])
+                "{%0,%1,%2,%3}, {%4,%5}, {%6}, {%7,%8,%9,%10};"
+                : "=r"(c0), "=r"(c1), "=r"(c2), "=r"(c3)
         : "r"(ra[0]),  "r"(ra[1]),
-          "r"(rb[0]),
-          "r"(rc[0]),  "r"(rc[1]),  "r"(rc[2]),  "r"(rc[3]));
+                    "r"(rb[0]),
+                    "r"(c0),  "r"(c1),  "r"(c2),  "r"(c3));
+    rc[0] = c0; rc[1] = c1; rc[2] = c2; rc[3] = c3;
 }
 
 // ── cp_async16 helper — identical to fp16_ptx_3stage.cu ─────────────────────

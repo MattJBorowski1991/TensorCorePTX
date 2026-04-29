@@ -41,6 +41,7 @@
 
 #include <cuda_runtime.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "include/config.h"
 #include "include/cuda_utils.h"
 
@@ -93,11 +94,11 @@ __device__ __forceinline__
 void mma_int8(int32_t rc[4], const uint32_t ra[2], const uint32_t rb[1]) {
     asm volatile(
         "mma.sync.aligned.m16n8k16.row.col.s32.s8.s8.s32 "
-        "{%0,%1,%2,%3}, {%4,%5}, {%6}, {%7,%8,%9,%10};"
-        : "=r"(rc[0]), "=r"(rc[1]), "=r"(rc[2]), "=r"(rc[3])
+                "{%0,%1,%2,%3}, {%4,%5}, {%6}, {%7,%8,%9,%10};"
+                : "=r"(rc[0]), "=r"(rc[1]), "=r"(rc[2]), "=r"(rc[3])
         : "r"(ra[0]),  "r"(ra[1]),
-          "r"(rb[0]),
-          "r"(rc[0]),  "r"(rc[1]),  "r"(rc[2]),  "r"(rc[3]));
+                    "r"(rb[0]),
+                    "r"(rc[0]),  "r"(rc[1]),  "r"(rc[2]),  "r"(rc[3]));
 }
 
 __global__ void int8_manual_pack_db(
@@ -150,6 +151,11 @@ __global__ void int8_manual_pack_db(
     manual_pack_a(ra,  As[buf][warp_id], lane_id);
     manual_pack_b(rb0, Bs[buf][warp_id], lane_id, 0);   // BT rows 0-7  → B cols 0-7
     manual_pack_b(rb1, Bs[buf][warp_id], lane_id, 8);   // BT rows 8-15 → B cols 8-15
+    if (M == 16 && N == 16 && K == 16 && blockIdx.x == 0 && blockIdx.y == 0 && blockIdx.z == 0 &&
+        warp_id == 0 && lane_id < 16) {
+        printf("[man] lane=%2d ra0=%08x ra1=%08x rb0=%08x rb1=%08x\n",
+               lane_id, ra[0], ra[1], rb0[0], rb1[0]);
+    }
 
     // ── Main K loop — cp.async double-buffer identical to int8_ptx_mma_k16 ───
     for (int k = WMMA_K; k < K; k += WMMA_K) {

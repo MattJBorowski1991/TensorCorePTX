@@ -28,15 +28,23 @@ void cpu_gemm_int8(const int8_t* A, const int8_t* BT, int32_t* C, int M, int N, 
 AccuracyResultI32 measure_accuracy_int8(const int32_t* ref, const int32_t* out, int M, int N) {
     int64_t max_abs = 0;
     double  sse     = 0.0;
+    int     max_i   = 0;
     for (int i = 0; i < M * N; ++i) {
         int64_t diff = (int64_t)ref[i] - (int64_t)out[i];
         int64_t abs_diff = diff < 0 ? -diff : diff;
-        if (abs_diff > max_abs) max_abs = abs_diff;
+        if (abs_diff > max_abs) {
+            max_abs = abs_diff;
+            max_i = i;
+        }
         sse += (double)diff * (double)diff;
     }
     AccuracyResultI32 r;
     r.max_abs_err = (int32_t)max_abs;
     r.rmse        = (float)sqrt(sse / (M * N));
+    r.max_row     = max_i / N;
+    r.max_col     = max_i % N;
+    r.ref_at_max  = ref[max_i];
+    r.out_at_max  = out[max_i];
     r.pass        = (max_abs == 0);   // INT8 mma.sync accumulates exactly into int32
     return r;
 }
@@ -98,18 +106,20 @@ void cpu_gemm_fp32(const float* A, const float* BT, float* C, int M, int N, int 
 
 AccuracyResultQuant measure_accuracy_quant(const float* ref, const float* out, int M, int N,
                                            float pass_tol) {
-    double max_abs = 0.0, sse = 0.0, sum_rel = 0.0;
+    double max_abs = 0.0, sse = 0.0, sum_rel = 0.0, sig_sq = 0.0;
     for (int i = 0; i < M * N; ++i) {
         double diff = (double)ref[i] - (double)out[i];
         double abs_diff = diff < 0.0 ? -diff : diff;
         if (abs_diff > max_abs) max_abs = abs_diff;
         sse     += diff * diff;
+        sig_sq  += (double)ref[i] * (double)ref[i];
         sum_rel += abs_diff / ((double)(ref[i] < 0.f ? -ref[i] : ref[i]) + 1e-6);
     }
     AccuracyResultQuant r;
     r.max_abs_err  = (float)max_abs;
     r.rmse         = (float)sqrt(sse / (M * N));
     r.real_err_pct = (float)(sum_rel / (M * N) * 100.0);
+    r.snr_db       = (sse > 0.0) ? (float)(10.0 * log10(sig_sq / sse)) : 999.f;
     r.pass         = (r.max_abs_err < pass_tol);
     return r;
 }
