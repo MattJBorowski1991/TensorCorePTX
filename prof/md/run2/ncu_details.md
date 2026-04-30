@@ -31,7 +31,7 @@
 | 4096 | **−33%** | +7% | +2% | +37% | +333% |
 | 8192 | **−43%** | −32% | −28% | −4% | +175% |
 
-![Duration (ms) — bars = elapsed time, markers = % vs int8_wmma](../../charts/run2/gpu_speed_of_light_throughput__duration_ms.png)
+![Average DRAM Active Cycles — flat at N≤4096 (compute-bound), diverges at N=8192 mirroring the speedup ranking](prof/charts/run2/gpu_and_memory_workload_distribution__average_dram_active_cycles_cycle.png)
 
 ### Observations
 
