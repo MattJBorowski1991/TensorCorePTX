@@ -7,18 +7,18 @@ Metric names, metric units, metric values, and comments are copied from source t
 
 ### GPU Speed Of Light Throughput
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | DRAM Frequency | Ghz | 6.24 | 6.24 | 6.24 | 6.24 | 6.24 | 6.24 |
-| SM Frequency | Mhz | 801.76 | 803.02 | 805.05 | 804.14 | 798.45 | 795.87 |
-| Elapsed Cycles | cycle | 474808 | 122639 | 129159 | 165614 | 93542 | 121418 |
-| Memory Throughput | % | 92.63 | 86.70 | 80.28 | 83.03 | 75.98 | 83.54 |
-| DRAM Throughput | % | 2.09 | 8.19 | 7.76 | 6.04 | 10.65 | 8.14 |
-| Duration | us | 588.80 | 151.87 | 159.55 | 204.54 | 116.58 | 152 |
-| L1/TEX Cache Throughput | % | 93.73 | 90.60 | 84.02 | 86.37 | 80.33 | 87.13 |
-| L2 Cache Throughput | % | 17.30 | 63.67 | 30.28 | 24.38 | 40.17 | 33.83 |
-| SM Active Cycles | cycle | 466540.59 | 116686.60 | 122713.38 | 158121.90 | 88041.86 | 115989.07 |
-| Compute (SM) Throughput | % | 92.63 | 45.52 | 49.71 | 35.90 | 46.74 | 45.07 |
+| SM Frequency | Mhz | 795.87 | 798.45 | 804.14 | 805.05 | 803.02 | 801.76 |
+| Elapsed Cycles | cycle | 121418 | 93542 | 165614 | 129159 | 122639 | 474808 |
+| Memory Throughput | % | 83.54 | 75.98 | 83.03 | 80.28 | 86.70 | 92.63 |
+| DRAM Throughput | % | 8.14 | 10.65 | 6.04 | 7.76 | 8.19 | 2.09 |
+| Duration | us | 152 | 116.58 | 204.54 | 159.55 | 151.87 | 588.80 |
+| L1/TEX Cache Throughput | % | 87.13 | 80.33 | 86.37 | 84.02 | 90.60 | 93.73 |
+| L2 Cache Throughput | % | 33.83 | 40.17 | 24.38 | 30.28 | 63.67 | 17.30 |
+| SM Active Cycles | cycle | 115989.07 | 88041.86 | 158121.90 | 122713.38 | 116686.60 | 466540.59 |
+| Compute (SM) Throughput | % | 45.07 | 46.74 | 35.90 | 49.71 | 45.52 | 92.63 |
 
 Comments:
 - **int8_dp4a** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing workloads in the Compute Workload Analysis section.
@@ -42,21 +42,21 @@ Comments:
 
 ### PM Sampling
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Maximum Buffer Size | Mbyte | 16.32 | 16.25 | 16.25 | 16.25 | 16.25 | 16.25 |
+| Maximum Buffer Size | Mbyte | 16.25 | 16.25 | 16.25 | 16.25 | 16.25 | 16.32 |
 | Maximum Sampling Interval | us | 1 | 1 | 1 | 1 | 1 | 1 |
 | # Pass Groups |  | 2 | 2 | 2 | 2 | 2 | 2 |
 
 ### Compute Workload Analysis
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Executed Ipc Active | inst/cycle | 1.11 | 1.46 | 1.93 | 1.11 | 1.46 | 1.47 |
-| Executed Ipc Elapsed | inst/cycle | 1.09 | 1.40 | 1.84 | 1.07 | 1.38 | 1.41 |
-| Issue Slots Busy | % | 27.35 | 34.99 | 46.10 | 26.81 | 34.57 | 35.34 |
-| Issued Ipc Active | inst/cycle | 1.11 | 1.46 | 1.93 | 1.12 | 1.46 | 1.47 |
-| SM Busy | % | 36.22 | 34.99 | 46.10 | 26.81 | 34.57 | 35.34 |
+| Executed Ipc Active | inst/cycle | 1.47 | 1.46 | 1.11 | 1.93 | 1.46 | 1.11 |
+| Executed Ipc Elapsed | inst/cycle | 1.41 | 1.38 | 1.07 | 1.84 | 1.40 | 1.09 |
+| Issue Slots Busy | % | 35.34 | 34.57 | 26.81 | 46.10 | 34.99 | 27.35 |
+| Issued Ipc Active | inst/cycle | 1.47 | 1.46 | 1.12 | 1.93 | 1.46 | 1.11 |
+| SM Busy | % | 35.34 | 34.57 | 26.81 | 46.10 | 34.99 | 36.22 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Local Speedup: 82.83% All compute pipelines are under-utilized. Either this workload is very small or it doesn't issue enough warps per scheduler. Check the Launch Statistics and Scheduler Statistics sections for further details.
@@ -68,20 +68,20 @@ Comments:
 
 ### Memory Workload Analysis
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Local Memory Spilling Requests |  | 0 | 0 | 0 | 0 | 0 | 0 |
 | Local Memory Spilling Request Overhead | % | 0 | 0 | 0 | 0 | 0 | 0 |
-| Memory Throughput | Gbyte/s | 6.27 | 24.54 | 23.26 | 18.09 | 31.88 | 24.40 |
-| Mem Busy | % | 57.21 | 86.70 | 80.28 | 83.03 | 75.98 | 83.54 |
-| Max Bandwidth | % | 92.63 | 45.52 | 49.71 | 35.90 | 46.74 | 45.07 |
-| L1/TEX Hit Rate | % | 52.28 | 58.74 | 79.98 | 85.98 | 63.64 | 77.60 |
+| Memory Throughput | Gbyte/s | 24.40 | 31.88 | 18.09 | 23.26 | 24.54 | 6.27 |
+| Mem Busy | % | 83.54 | 75.98 | 83.03 | 80.28 | 86.70 | 57.21 |
+| Max Bandwidth | % | 45.07 | 46.74 | 35.90 | 49.71 | 45.52 | 92.63 |
+| L1/TEX Hit Rate | % | 77.60 | 63.64 | 85.98 | 79.98 | 58.74 | 52.28 |
 | L2 Persisting Size | Mbyte | 9.44 | 9.44 | 9.44 | 9.44 | 9.44 | 9.44 |
 | L2 Compression Success Rate | % | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Compression Ratio |  | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Compression Input Sectors | sector | 0 | 0 | 0 | 0 | 0 | 0 |
-| L2 Hit Rate | % | 96.09 | 97.60 | 93.58 | 92.89 | 93.40 | 95.53 |
-| Mem Pipes Busy | % | 92.63 | 45.52 | 49.71 | 35.90 | 46.74 | 45.07 |
+| L2 Hit Rate | % | 95.53 | 93.40 | 92.89 | 93.58 | 97.60 | 96.09 |
+| Mem Pipes Busy | % | 45.07 | 46.74 | 35.90 | 49.71 | 45.52 | 92.63 |
 
 ### Memory Workload Analysis Tables
 
@@ -100,13 +100,13 @@ Comments:
 
 ### Scheduler Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| One or More Eligible | % | 27.68 | 36.69 | 48.41 | 27.89 | 36.60 | 37.09 |
-| Issued Warp Per Scheduler |  | 0.28 | 0.37 | 0.48 | 0.28 | 0.37 | 0.37 |
-| No Eligible | % | 72.32 | 63.31 | 51.59 | 72.11 | 63.40 | 62.91 |
-| Active Warps Per Scheduler | warp | 11.57 | 8.06 | 8.29 | 8.86 | 6.93 | 9.68 |
-| Eligible Warps Per Scheduler | warp | 1.31 | 1.12 | 1.39 | 0.59 | 0.85 | 0.99 |
+| One or More Eligible | % | 37.09 | 36.60 | 27.89 | 48.41 | 36.69 | 27.68 |
+| Issued Warp Per Scheduler |  | 0.37 | 0.37 | 0.28 | 0.48 | 0.37 | 0.28 |
+| No Eligible | % | 62.91 | 63.40 | 72.11 | 51.59 | 63.31 | 72.32 |
+| Active Warps Per Scheduler | warp | 9.68 | 6.93 | 8.86 | 8.29 | 8.06 | 11.57 |
+| Eligible Warps Per Scheduler | warp | 0.99 | 0.85 | 0.59 | 1.39 | 1.12 | 1.31 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Local Speedup: 7.367% Every scheduler is capable of issuing one instruction per cycle, but for this workload each scheduler only issues an instruction every 3.6 cycles. This might leave hardware resources underutilized and may lead to less optimal performance. Out of the maximum of 12 warps per scheduler, this workload allocates an average of 11.57 active warps per scheduler, but only an average of 1.31 warps were eligible per cycle. Eligible warps are the subset of active warps that are ready to issue their next instruction. Every cycle with no eligible warp results in no instruction being issued and the issue slot remains unused. To increase the number of eligible warps, avoid possible load imbalances due to highly different execution durations per warp. Reducing stalls indicated on the Warp State Statistics and Source Counters sections can help, too.
@@ -118,12 +118,12 @@ Comments:
 
 ### Warp State Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Warp Cycles Per Issued Instruction | cycle | 41.80 | 21.97 | 17.12 | 31.75 | 18.95 | 26.11 |
-| Warp Cycles Per Executed Instruction | cycle | 41.84 | 22.01 | 17.15 | 31.81 | 19.00 | 26.16 |
-| Avg. Active Threads Per Warp |  | 32 | 22.93 | 25.93 | 23.26 | 32 | 23.38 |
-| Avg. Not Predicated Off Threads Per Warp |  | 31.86 | 20.99 | 24.26 | 21.41 | 29.27 | 21.07 |
+| Warp Cycles Per Issued Instruction | cycle | 26.11 | 18.95 | 31.75 | 17.12 | 21.97 | 41.80 |
+| Warp Cycles Per Executed Instruction | cycle | 26.16 | 19.00 | 31.81 | 17.15 | 22.01 | 41.84 |
+| Avg. Active Threads Per Warp |  | 23.38 | 32 | 23.26 | 25.93 | 22.93 | 32 |
+| Avg. Not Predicated Off Threads Per Warp |  | 21.07 | 29.27 | 21.41 | 24.26 | 20.99 | 31.86 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Speedup: 7.367% On average, each warp of this workload spends 20.8 cycles being stalled waiting for the MIO (memory input/output) instruction queue to be not full. This stall reason is high in cases of extreme utilization of the MIO pipelines, which include special math instructions, dynamic branches, as well as shared memory instructions. When caused by shared memory accesses, trying to use fewer but wider loads can reduce pipeline pressure. This stall type represents about 49.8% of the total average of 41.8 cycles between issuing two instructions.
@@ -143,33 +143,33 @@ Comments:
 
 ### Instruction Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Avg. Executed Instructions Per Scheduler | inst | 128953.38 | 42584.28 | 59127.17 | 44014.34 | 32097.10 | 42654.90 |
-| Executed Instructions | inst | 29917184 | 9879552 | 13717504 | 10211328 | 7446528 | 9895936 |
-| Avg. Issued Instructions Per Scheduler | inst | 129087.65 | 42668.74 | 59213.79 | 44094.47 | 32179.87 | 42751.85 |
-| Issued Instructions | inst | 29948334 | 9899147 | 13737600 | 10229918 | 7465730 | 9918430 |
+| Avg. Executed Instructions Per Scheduler | inst | 42654.90 | 32097.10 | 44014.34 | 59127.17 | 42584.28 | 128953.38 |
+| Executed Instructions | inst | 9895936 | 7446528 | 10211328 | 13717504 | 9879552 | 29917184 |
+| Avg. Issued Instructions Per Scheduler | inst | 42751.85 | 32179.87 | 44094.47 | 59213.79 | 42668.74 | 129087.65 |
+| Issued Instructions | inst | 9918430 | 7465730 | 10229918 | 13737600 | 9899147 | 29948334 |
 
 ### Launch Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Block Size |  | 256 | 256 | 256 | 256 | 256 | 256 |
 | Function Cache Configuration |  | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone |
-| Grid Size |  | 4096 | 512 | 512 | 512 | 512 | 512 |
-| Registers Per Thread | register/thread | 40 | 48 | 48 | 48 | 54 | 39 |
-| Shared Memory Configuration Size | Kbyte | 32.77 | 102.40 | 65.54 | 65.54 | 102.40 | 65.54 |
+| Grid Size |  | 512 | 512 | 512 | 512 | 512 | 4096 |
+| Registers Per Thread | register/thread | 39 | 54 | 48 | 48 | 48 | 40 |
+| Shared Memory Configuration Size | Kbyte | 65.54 | 102.40 | 65.54 | 65.54 | 102.40 | 32.77 |
 | Driver Shared Memory Per Block | Kbyte/block | 1.02 | 1.02 | 1.02 | 1.02 | 1.02 | 1.02 |
 | Dynamic Shared Memory Per Block | byte/block | 0 | 0 | 0 | 0 | 0 | 0 |
-| Static Shared Memory Per Block | byte/block | 640 |  |  |  |  |  |
+| Static Shared Memory Per Block | byte/block |  |  |  |  |  | 640 |
 | # SMs | SM | 58 | 58 | 58 | 58 | 58 | 58 |
 | Stack Size |  | 1024 | 1024 | 1024 | 1024 | 1024 | 1024 |
-| Threads | thread | 1048576 | 131072 | 131072 | 131072 | 131072 | 131072 |
+| Threads | thread | 131072 | 131072 | 131072 | 131072 | 131072 | 1048576 |
 | # TPCs |  | 29 | 29 | 29 | 29 | 29 | 29 |
 | Enabled TPC IDs |  | all | all | all | all | all | all |
 | Uses Green Context |  | 0 | 0 | 0 | 0 | 0 | 0 |
-| Waves Per SM |  | 11.77 | 1.77 | 1.77 | 1.77 | 2.21 | 1.47 |
-| Static Shared Memory Per Block | Kbyte/block |  | 12.29 | 8.19 | 8.19 | 16.38 | 8.19 |
+| Waves Per SM |  | 1.47 | 2.21 | 1.77 | 1.77 | 1.77 | 11.77 |
+| Static Shared Memory Per Block | Kbyte/block | 8.19 | 16.38 | 8.19 | 8.19 | 12.29 |  |
 
 Comments:
 - **int8_ptx_3stage** [OPT]: Est. Speedup: 50% A wave of thread blocks is defined as the maximum number of blocks that can be executed in parallel on the target GPU. The number of blocks in a wave depends on the number of multiprocessors and the theoretical occupancy of the kernel. This kernel launch results in 1 full waves and a partial wave of 222 thread blocks. Under the assumption of a uniform execution duration of all thread blocks, this partial wave may account for up to 50.0% of the total runtime of this kernel. Try launching a grid with no partial wave. The overall impact of this tail effect also lessens with the number of full waves executed for a grid. See the Hardware Model (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-hw-model) description for more details on launch configurations.
@@ -180,16 +180,16 @@ Comments:
 
 ### Occupancy
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Block Limit SM | block | 24 | 24 | 24 | 24 | 24 | 24 |
-| Block Limit Registers | block | 6 | 5 | 5 | 5 | 4 | 6 |
-| Block Limit Shared Mem | block | 19 | 7 | 7 | 7 | 5 | 7 |
+| Block Limit Registers | block | 6 | 4 | 5 | 5 | 5 | 6 |
+| Block Limit Shared Mem | block | 7 | 5 | 7 | 7 | 7 | 19 |
 | Block Limit Warps | block | 6 | 6 | 6 | 6 | 6 | 6 |
-| Theoretical Active Warps per SM | warp | 48 | 40 | 40 | 40 | 32 | 48 |
-| Theoretical Occupancy | % | 100 | 83.33 | 83.33 | 83.33 | 66.67 | 100 |
-| Achieved Occupancy | % | 96.43 | 66.94 | 68.91 | 73.77 | 57.77 | 80.22 |
-| Achieved Active Warps Per SM | warp | 46.28 | 32.13 | 33.08 | 35.41 | 27.73 | 38.50 |
+| Theoretical Active Warps per SM | warp | 48 | 32 | 40 | 40 | 40 | 48 |
+| Theoretical Occupancy | % | 100 | 66.67 | 83.33 | 83.33 | 83.33 | 100 |
+| Achieved Occupancy | % | 80.22 | 57.77 | 73.77 | 68.91 | 66.94 | 96.43 |
+| Achieved Active Warps Per SM | warp | 38.50 | 27.73 | 35.41 | 33.08 | 32.13 | 46.28 |
 
 Comments:
 - **int8_ptx_3stage** [OPT]: Est. Speedup: 13.3% The difference between calculated theoretical (83.3%) and measured achieved occupancy (66.9%) can be the result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on optimizing occupancy.
@@ -199,27 +199,27 @@ Comments:
 
 ### GPU and Memory Workload Distribution
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Average DRAM Active Cycles | cycle | 76952 | 77642.67 | 77317.33 | 77072 | 77416 | 77269.33 |
-| Total DRAM Elapsed Cycles | cycle | 22056960 | 5687296 | 5975040 | 7657472 | 4363264 | 5692416 |
-| Average L1 Active Cycles | cycle | 466540.59 | 116686.60 | 122713.38 | 158121.90 | 88041.86 | 115989.07 |
-| Total L1 Elapsed Cycles | cycle | 27379366 | 7072818 | 7449468 | 9539160 | 5398376 | 7016324 |
-| Average L2 Active Cycles | cycle | 441688.58 | 122199.29 | 127685.96 | 156559.12 | 91590.04 | 120888.08 |
-| Total L2 Elapsed Cycles | cycle | 11674368 | 3015024 | 3176040 | 4053528 | 2306832 | 3008040 |
-| Average SM Active Cycles | cycle | 466540.59 | 116686.60 | 122713.38 | 158121.90 | 88041.86 | 115989.07 |
-| Total SM Elapsed Cycles | cycle | 27379366 | 7072818 | 7449468 | 9539160 | 5398376 | 7016324 |
-| Average SMSP Active Cycles | cycle | 466300.07 | 116284.22 | 122309.28 | 158091.97 | 87925.10 | 115273.86 |
-| Total SMSP Elapsed Cycles | cycle | 109517464 | 28291272 | 29797872 | 38156640 | 21593504 | 28065296 |
+| Average DRAM Active Cycles | cycle | 77269.33 | 77416 | 77072 | 77317.33 | 77642.67 | 76952 |
+| Total DRAM Elapsed Cycles | cycle | 5692416 | 4363264 | 7657472 | 5975040 | 5687296 | 22056960 |
+| Average L1 Active Cycles | cycle | 115989.07 | 88041.86 | 158121.90 | 122713.38 | 116686.60 | 466540.59 |
+| Total L1 Elapsed Cycles | cycle | 7016324 | 5398376 | 9539160 | 7449468 | 7072818 | 27379366 |
+| Average L2 Active Cycles | cycle | 120888.08 | 91590.04 | 156559.12 | 127685.96 | 122199.29 | 441688.58 |
+| Total L2 Elapsed Cycles | cycle | 3008040 | 2306832 | 4053528 | 3176040 | 3015024 | 11674368 |
+| Average SM Active Cycles | cycle | 115989.07 | 88041.86 | 158121.90 | 122713.38 | 116686.60 | 466540.59 |
+| Total SM Elapsed Cycles | cycle | 7016324 | 5398376 | 9539160 | 7449468 | 7072818 | 27379366 |
+| Average SMSP Active Cycles | cycle | 115273.86 | 87925.10 | 158091.97 | 122309.28 | 116284.22 | 466300.07 |
+| Total SMSP Elapsed Cycles | cycle | 28065296 | 21593504 | 38156640 | 29797872 | 28291272 | 109517464 |
 
 ### Source Counters
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Branch Instructions Ratio | % | 0.01 | 0.17 | 0.14 | 0.18 | 0.10 | 0.17 |
-| Branch Instructions | inst | 425984 | 1708032 | 1859584 | 1826816 | 761856 | 1720320 |
-| Branch Efficiency | % | 100 | 87.35 | 87.98 | 87.35 | 100 | 87.94 |
-| Avg. Divergent Branches | branches | 0 | 564.97 | 547.31 | 564.97 | 0 | 547.31 |
+| Branch Instructions Ratio | % | 0.17 | 0.10 | 0.18 | 0.14 | 0.17 | 0.01 |
+| Branch Instructions | inst | 1720320 | 761856 | 1826816 | 1859584 | 1708032 | 425984 |
+| Branch Efficiency | % | 87.94 | 100 | 87.35 | 87.98 | 87.35 | 100 |
+| Avg. Divergent Branches | branches | 547.31 | 0 | 564.97 | 547.31 | 564.97 | 0 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Speedup: 44.03% This kernel has uncoalesced global accesses resulting in a total of 2097152 excessive sectors (48% of the total 4325376 sectors). Check the L2 Theoretical Sectors Global Excessive table for the primary source locations. The CUDA Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses) has additional information on reducing uncoalesced device memory accesses.
@@ -238,19 +238,19 @@ Comments:
 
 ### GPU Speed Of Light Throughput
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | DRAM Frequency | Ghz | 6.24 | 6.24 | 6.24 | 6.24 | 6.24 | 6.24 |
-| SM Frequency | Mhz | 797.86 | 808.03 | 797.81 | 809.15 | 800.78 | 801.79 |
-| Elapsed Cycles | cycle | 3715954 | 934381 | 938693 | 1087000 | 635020 | 889297 |
-| Memory Throughput | % | 94.00 | 89.30 | 85.65 | 86.97 | 86.21 | 89.64 |
-| DRAM Throughput | % | 1.21 | 4.94 | 4.83 | 4.26 | 7.21 | 5.14 |
-| Duration | ms | 4.65 | 1.15 | 1.17 | 1.33 |  | 1.11 |
-| L1/TEX Cache Throughput | % | 94.21 | 90.84 | 87.56 | 88.76 | 88.16 | 91.93 |
-| L2 Cache Throughput | % | 17.68 | 84.14 | 37.75 | 33.24 | 47.35 | 64.83 |
-| SM Active Cycles | cycle | 3698740.91 | 912240.24 | 915557.84 | 1057492.14 | 617689.88 | 863883.81 |
-| Compute (SM) Throughput | % | 94.00 | 47.31 | 52.40 | 41.99 | 49.02 | 47.06 |
-| Duration | us |  |  |  |  | 788.83 |  |
+| SM Frequency | Mhz | 801.79 | 800.78 | 809.15 | 797.81 | 808.03 | 797.86 |
+| Elapsed Cycles | cycle | 889297 | 635020 | 1087000 | 938693 | 934381 | 3715954 |
+| Memory Throughput | % | 89.64 | 86.21 | 86.97 | 85.65 | 89.30 | 94.00 |
+| DRAM Throughput | % | 5.14 | 7.21 | 4.26 | 4.83 | 4.94 | 1.21 |
+| Duration | ms | 1.11 |  | 1.33 | 1.17 | 1.15 | 4.65 |
+| L1/TEX Cache Throughput | % | 91.93 | 88.16 | 88.76 | 87.56 | 90.84 | 94.21 |
+| L2 Cache Throughput | % | 64.83 | 47.35 | 33.24 | 37.75 | 84.14 | 17.68 |
+| SM Active Cycles | cycle | 863883.81 | 617689.88 | 1057492.14 | 915557.84 | 912240.24 | 3698740.91 |
+| Compute (SM) Throughput | % | 47.06 | 49.02 | 41.99 | 52.40 | 47.31 | 94.00 |
+| Duration | us |  | 788.83 |  |  |  |  |
 
 Comments:
 - **int8_dp4a** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing workloads in the Compute Workload Analysis section.
@@ -274,21 +274,21 @@ Comments:
 
 ### PM Sampling
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Maximum Buffer Size | Mbyte | 19.79 | 16.32 | 16.32 | 32.51 | 16.32 | 16.32 |
-| Maximum Sampling Interval | us | 2 | 1 | 1 | 1 | 1 | 1 |
+| Maximum Buffer Size | Mbyte | 16.32 | 16.32 | 32.51 | 16.32 | 16.32 | 19.79 |
+| Maximum Sampling Interval | us | 1 | 1 | 1 | 1 | 1 | 2 |
 | # Pass Groups |  | 2 | 2 | 2 | 2 | 2 | 2 |
 
 ### Compute Workload Analysis
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Executed Ipc Active | inst/cycle | 1.09 | 1.46 | 1.94 | 1.29 | 1.35 | 1.46 |
-| Executed Ipc Elapsed | inst/cycle | 1.08 | 1.44 | 1.90 | 1.26 | 1.32 | 1.42 |
-| Issue Slots Busy | % | 27.08 | 35.90 | 47.49 | 31.61 | 33.04 | 35.59 |
-| Issued Ipc Active | inst/cycle | 1.09 | 1.46 | 1.94 | 1.29 | 1.35 | 1.46 |
-| SM Busy | % | 36.66 | 35.90 | 47.49 | 31.61 | 33.04 | 35.59 |
+| Executed Ipc Active | inst/cycle | 1.46 | 1.35 | 1.29 | 1.94 | 1.46 | 1.09 |
+| Executed Ipc Elapsed | inst/cycle | 1.42 | 1.32 | 1.26 | 1.90 | 1.44 | 1.08 |
+| Issue Slots Busy | % | 35.59 | 33.04 | 31.61 | 47.49 | 35.90 | 27.08 |
+| Issued Ipc Active | inst/cycle | 1.46 | 1.35 | 1.29 | 1.94 | 1.46 | 1.09 |
+| SM Busy | % | 35.59 | 33.04 | 31.61 | 47.49 | 35.90 | 36.66 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Local Speedup: 82.96% All compute pipelines are under-utilized. Either this workload is very small or it doesn't issue enough warps per scheduler. Check the Launch Statistics and Scheduler Statistics sections for further details.
@@ -300,20 +300,20 @@ Comments:
 
 ### Memory Workload Analysis
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Local Memory Spilling Requests |  | 0 | 0 | 0 | 0 | 0 | 0 |
 | Local Memory Spilling Request Overhead | % | 0 | 0 | 0 | 0 | 0 | 0 |
-| Memory Throughput | Gbyte/s | 3.64 | 14.80 | 14.48 | 12.78 | 21.62 | 15.42 |
-| Mem Busy | % | 57.96 | 89.30 | 85.65 | 86.97 | 86.21 | 89.64 |
-| Max Bandwidth | % | 94.00 | 82.82 | 52.40 | 41.99 | 49.02 | 63.93 |
-| L1/TEX Hit Rate | % | 52.20 | 44.59 | 75.76 | 81.05 | 61.82 | 58.72 |
+| Memory Throughput | Gbyte/s | 15.42 | 21.62 | 12.78 | 14.48 | 14.80 | 3.64 |
+| Mem Busy | % | 89.64 | 86.21 | 86.97 | 85.65 | 89.30 | 57.96 |
+| Max Bandwidth | % | 63.93 | 49.02 | 41.99 | 52.40 | 82.82 | 94.00 |
+| L1/TEX Hit Rate | % | 58.72 | 61.82 | 81.05 | 75.76 | 44.59 | 52.20 |
 | L2 Persisting Size | Mbyte | 9.44 | 9.44 | 9.44 | 9.44 | 9.44 | 9.44 |
 | L2 Compression Success Rate | % | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Compression Ratio |  | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Compression Input Sectors | sector | 0 | 0 | 0 | 0 | 0 | 0 |
-| L2 Hit Rate | % | 98.32 | 97.30 | 96.77 | 96.99 | 96.41 | 97.82 |
-| Mem Pipes Busy | % | 94.00 | 47.31 | 52.40 | 41.99 | 49.02 | 47.06 |
+| L2 Hit Rate | % | 97.82 | 96.41 | 96.99 | 96.77 | 97.30 | 98.32 |
+| Mem Pipes Busy | % | 47.06 | 49.02 | 41.99 | 52.40 | 47.31 | 94.00 |
 
 ### Memory Workload Analysis Tables
 
@@ -332,13 +332,13 @@ Comments:
 
 ### Scheduler Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| One or More Eligible | % | 27.15 | 36.50 | 48.60 | 32.26 | 33.75 | 36.52 |
-| Issued Warp Per Scheduler |  | 0.27 | 0.36 | 0.49 | 0.32 | 0.34 | 0.37 |
-| No Eligible | % | 72.85 | 63.50 | 51.40 | 67.74 | 66.25 | 63.48 |
-| Active Warps Per Scheduler | warp | 11.87 | 9.40 | 9.45 | 9.65 | 7.70 | 11.42 |
-| Eligible Warps Per Scheduler | warp | 1.34 | 1.29 | 1.47 | 0.69 | 0.72 | 0.66 |
+| One or More Eligible | % | 36.52 | 33.75 | 32.26 | 48.60 | 36.50 | 27.15 |
+| Issued Warp Per Scheduler |  | 0.37 | 0.34 | 0.32 | 0.49 | 0.36 | 0.27 |
+| No Eligible | % | 63.48 | 66.25 | 67.74 | 51.40 | 63.50 | 72.85 |
+| Active Warps Per Scheduler | warp | 11.42 | 7.70 | 9.65 | 9.45 | 9.40 | 11.87 |
+| Eligible Warps Per Scheduler | warp | 0.66 | 0.72 | 0.69 | 1.47 | 1.29 | 1.34 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Local Speedup: 6.001% Every scheduler is capable of issuing one instruction per cycle, but for this workload each scheduler only issues an instruction every 3.7 cycles. This might leave hardware resources underutilized and may lead to less optimal performance. Out of the maximum of 12 warps per scheduler, this workload allocates an average of 11.87 active warps per scheduler, but only an average of 1.34 warps were eligible per cycle. Eligible warps are the subset of active warps that are ready to issue their next instruction. Every cycle with no eligible warp results in no instruction being issued and the issue slot remains unused. To increase the number of eligible warps, avoid possible load imbalances due to highly different execution durations per warp. Reducing stalls indicated on the Warp State Statistics and Source Counters sections can help, too.
@@ -350,12 +350,12 @@ Comments:
 
 ### Warp State Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Warp Cycles Per Issued Instruction | cycle | 43.74 | 25.76 | 19.45 | 29.92 | 22.80 | 31.28 |
-| Warp Cycles Per Executed Instruction | cycle | 43.74 | 25.76 | 19.45 | 29.92 | 22.81 | 31.29 |
-| Avg. Active Threads Per Warp |  | 32 | 22.80 | 25.43 | 23.14 | 32 | 22.52 |
-| Avg. Not Predicated Off Threads Per Warp |  | 31.93 | 20.83 | 23.81 | 21.23 | 28.93 | 20.23 |
+| Warp Cycles Per Issued Instruction | cycle | 31.28 | 22.80 | 29.92 | 19.45 | 25.76 | 43.74 |
+| Warp Cycles Per Executed Instruction | cycle | 31.29 | 22.81 | 29.92 | 19.45 | 25.76 | 43.74 |
+| Avg. Active Threads Per Warp |  | 22.52 | 32 | 23.14 | 25.43 | 22.80 | 32 |
+| Avg. Not Predicated Off Threads Per Warp |  | 20.23 | 28.93 | 21.23 | 23.81 | 20.83 | 31.93 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Speedup: 6.001% On average, each warp of this workload spends 22.4 cycles being stalled waiting for the MIO (memory input/output) instruction queue to be not full. This stall reason is high in cases of extreme utilization of the MIO pipelines, which include special math instructions, dynamic branches, as well as shared memory instructions. When caused by shared memory accesses, trying to use fewer but wider loads can reduce pipeline pressure. This stall type represents about 51.2% of the total average of 43.7 cycles between issuing two instructions.
@@ -377,73 +377,73 @@ Comments:
 
 ### Instruction Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Avg. Executed Instructions Per Scheduler | inst | 1003943.72 | 333047.17 | 444416 | 341027.31 | 208613.52 | 315250.76 |
-| Executed Instructions | inst | 232914944 | 77266944 | 103104512 | 79118336 | 48398336 | 73138176 |
-| Avg. Issued Instructions Per Scheduler | inst | 1004078.39 | 333131.31 | 444502.69 | 341107.45 | 208696.19 | 315347.44 |
-| Issued Instructions | inst | 232946187 | 77286464 | 103124624 | 79136929 | 48417517 | 73160607 |
+| Avg. Executed Instructions Per Scheduler | inst | 315250.76 | 208613.52 | 341027.31 | 444416 | 333047.17 | 1003943.72 |
+| Executed Instructions | inst | 73138176 | 48398336 | 79118336 | 103104512 | 77266944 | 232914944 |
+| Avg. Issued Instructions Per Scheduler | inst | 315347.44 | 208696.19 | 341107.45 | 444502.69 | 333131.31 | 1004078.39 |
+| Issued Instructions | inst | 73160607 | 48417517 | 79136929 | 103124624 | 77286464 | 232946187 |
 
 ### Launch Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Block Size |  | 256 | 256 | 256 | 256 | 256 | 256 |
 | Function Cache Configuration |  | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone |
-| Grid Size |  | 16384 | 2048 | 2048 | 2048 | 2048 | 2048 |
-| Registers Per Thread | register/thread | 40 | 48 | 48 | 48 | 54 | 39 |
-| Shared Memory Configuration Size | Kbyte | 32.77 | 102.40 | 65.54 | 65.54 | 102.40 | 65.54 |
+| Grid Size |  | 2048 | 2048 | 2048 | 2048 | 2048 | 16384 |
+| Registers Per Thread | register/thread | 39 | 54 | 48 | 48 | 48 | 40 |
+| Shared Memory Configuration Size | Kbyte | 65.54 | 102.40 | 65.54 | 65.54 | 102.40 | 32.77 |
 | Driver Shared Memory Per Block | Kbyte/block | 1.02 | 1.02 | 1.02 | 1.02 | 1.02 | 1.02 |
 | Dynamic Shared Memory Per Block | byte/block | 0 | 0 | 0 | 0 | 0 | 0 |
-| Static Shared Memory Per Block | byte/block | 640 |  |  |  |  |  |
+| Static Shared Memory Per Block | byte/block |  |  |  |  |  | 640 |
 | # SMs | SM | 58 | 58 | 58 | 58 | 58 | 58 |
 | Stack Size |  | 1024 | 1024 | 1024 | 1024 | 1024 | 1024 |
-| Threads | thread | 4194304 | 524288 | 524288 | 524288 | 524288 | 524288 |
+| Threads | thread | 524288 | 524288 | 524288 | 524288 | 524288 | 4194304 |
 | # TPCs |  | 29 | 29 | 29 | 29 | 29 | 29 |
 | Enabled TPC IDs |  | all | all | all | all | all | all |
 | Uses Green Context |  | 0 | 0 | 0 | 0 | 0 | 0 |
-| Waves Per SM |  | 47.08 | 7.06 | 7.06 | 7.06 | 8.83 | 5.89 |
-| Static Shared Memory Per Block | Kbyte/block |  | 12.29 | 8.19 | 8.19 | 16.38 | 8.19 |
+| Waves Per SM |  | 5.89 | 8.83 | 7.06 | 7.06 | 7.06 | 47.08 |
+| Static Shared Memory Per Block | Kbyte/block | 8.19 | 16.38 | 8.19 | 8.19 | 12.29 |  |
 
 ### Occupancy
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Block Limit SM | block | 24 | 24 | 24 | 24 | 24 | 24 |
-| Block Limit Registers | block | 6 | 5 | 5 | 5 | 4 | 6 |
-| Block Limit Shared Mem | block | 19 | 7 | 7 | 7 | 5 | 7 |
+| Block Limit Registers | block | 6 | 4 | 5 | 5 | 5 | 6 |
+| Block Limit Shared Mem | block | 7 | 5 | 7 | 7 | 7 | 19 |
 | Block Limit Warps | block | 6 | 6 | 6 | 6 | 6 | 6 |
-| Theoretical Active Warps per SM | warp | 48 | 40 | 40 | 40 | 32 | 48 |
-| Theoretical Occupancy | % | 100 | 83.33 | 83.33 | 83.33 | 66.67 | 100 |
-| Achieved Occupancy | % | 98.97 | 78.00 | 78.76 | 80.44 | 64.22 | 95.22 |
-| Achieved Active Warps Per SM | warp | 47.51 | 37.44 | 37.80 | 38.61 | 30.82 | 45.71 |
+| Theoretical Active Warps per SM | warp | 48 | 32 | 40 | 40 | 40 | 48 |
+| Theoretical Occupancy | % | 100 | 66.67 | 83.33 | 83.33 | 83.33 | 100 |
+| Achieved Occupancy | % | 95.22 | 64.22 | 80.44 | 78.76 | 78.00 | 98.97 |
+| Achieved Active Warps Per SM | warp | 45.71 | 30.82 | 38.61 | 37.80 | 37.44 | 47.51 |
 
 Comments:
 - **int8_ptx_mma_k32** [OPT]: Est. Speedup: 13.79% The 8.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the hardware maximum of 12. This kernel's theoretical occupancy (66.7%) is limited by the number of required registers.
 
 ### GPU and Memory Workload Distribution
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Average DRAM Active Cycles | cycle | 352477.33 | 354178.67 | 353856 | 355074.67 | 355232 | 354984 |
-| Total DRAM Elapsed Cycles | cycle | 174091264 | 43030528 | 43951104 | 49973248 | 29550592 | 41400320 |
-| Average L1 Active Cycles | cycle | 3698740.91 | 912240.24 | 915557.84 | 1057492.14 | 617689.88 | 863883.81 |
-| Total L1 Elapsed Cycles | cycle | 215015034 | 53822238 | 54283280 | 62592260 | 36634982 | 51387322 |
-| Average L2 Active Cycles | cycle | 3801874.46 | 942900 | 956946.54 | 1091805.92 | 646369.08 | 906727.83 |
-| Total L2 Elapsed Cycles | cycle | 92071008 | 22876128 | 23234520 | 26553888 | 15630312 | 21945792 |
-| Average SM Active Cycles | cycle | 3698740.91 | 912240.24 | 915557.84 | 1057492.14 | 617689.88 | 863883.81 |
-| Total SM Elapsed Cycles | cycle | 215015034 | 53822238 | 54283280 | 62592260 | 36634982 | 51387322 |
-| Average SMSP Active Cycles | cycle | 3698456.34 | 912712.73 | 914665.85 | 1057337.64 | 618389.19 | 863601.30 |
-| Total SMSP Elapsed Cycles | cycle | 860060136 | 215288952 | 217133120 | 250369040 | 146539928 | 205549288 |
+| Average DRAM Active Cycles | cycle | 354984 | 355232 | 355074.67 | 353856 | 354178.67 | 352477.33 |
+| Total DRAM Elapsed Cycles | cycle | 41400320 | 29550592 | 49973248 | 43951104 | 43030528 | 174091264 |
+| Average L1 Active Cycles | cycle | 863883.81 | 617689.88 | 1057492.14 | 915557.84 | 912240.24 | 3698740.91 |
+| Total L1 Elapsed Cycles | cycle | 51387322 | 36634982 | 62592260 | 54283280 | 53822238 | 215015034 |
+| Average L2 Active Cycles | cycle | 906727.83 | 646369.08 | 1091805.92 | 956946.54 | 942900 | 3801874.46 |
+| Total L2 Elapsed Cycles | cycle | 21945792 | 15630312 | 26553888 | 23234520 | 22876128 | 92071008 |
+| Average SM Active Cycles | cycle | 863883.81 | 617689.88 | 1057492.14 | 915557.84 | 912240.24 | 3698740.91 |
+| Total SM Elapsed Cycles | cycle | 51387322 | 36634982 | 62592260 | 54283280 | 53822238 | 215015034 |
+| Average SMSP Active Cycles | cycle | 863601.30 | 618389.19 | 1057337.64 | 914665.85 | 912712.73 | 3698456.34 |
+| Total SMSP Elapsed Cycles | cycle | 205549288 | 146539928 | 250369040 | 217133120 | 215288952 | 860060136 |
 
 ### Source Counters
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Branch Instructions Ratio | % | 0.01 | 0.18 | 0.14 | 0.19 | 0.12 | 0.19 |
-| Branch Instructions | inst | 2752512 | 13647872 | 14778368 | 14647296 | 5931008 | 13697024 |
-| Branch Efficiency | % | 100 | 87.43 | 87.74 | 87.43 | 100 | 87.72 |
-| Avg. Divergent Branches | branches | 0 | 4519.72 | 4449.10 | 4519.72 | 0 | 4449.10 |
+| Branch Instructions Ratio | % | 0.19 | 0.12 | 0.19 | 0.14 | 0.18 | 0.01 |
+| Branch Instructions | inst | 13697024 | 5931008 | 14647296 | 14778368 | 13647872 | 2752512 |
+| Branch Efficiency | % | 87.72 | 100 | 87.43 | 87.74 | 87.43 | 100 |
+| Avg. Divergent Branches | branches | 4449.10 | 0 | 4519.72 | 4449.10 | 4519.72 | 0 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Speedup: 48.79% This kernel has uncoalesced global accesses resulting in a total of 16777216 excessive sectors (49% of the total 34078720 sectors). Check the L2 Theoretical Sectors Global Excessive table for the primary source locations. The CUDA Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses) has additional information on reducing uncoalesced device memory accesses.
@@ -462,18 +462,18 @@ Comments:
 
 ### GPU Speed Of Light Throughput
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | DRAM Frequency | Ghz | 6.24 | 6.24 | 6.24 | 6.24 | 6.24 | 6.24 |
-| SM Frequency | Mhz | 796.07 | 800.94 | 797.75 | 804.82 | 798.37 | 797.36 |
-| Elapsed Cycles | cycle | 29322720 | 8220400 | 7139230 | 7786894 | 4768959 | 6831783 |
-| Memory Throughput | % | 95.10 | 95.39 | 88.68 | 89.07 | 89.38 | 92.29 |
-| DRAM Throughput | % | 1.14 | 4.10 | 4.69 | 4.32 | 6.96 | 4.89 |
-| Duration | ms | 36.75 | 10.22 | 8.93 | 9.61 | 5.96 | 8.55 |
-| L1/TEX Cache Throughput | % | 95.14 | 80.41 | 89.01 | 89.42 | 89.78 | 92.69 |
-| L2 Cache Throughput | % | 14.53 | 95.39 | 45.37 | 35.75 | 47.50 | 80.81 |
-| SM Active Cycles | cycle | 29243869.10 | 8144326.64 | 7097133.90 | 7706847.91 | 4732894.76 | 6786233.60 |
-| Compute (SM) Throughput | % | 95.10 | 42.64 | 53.93 | 45.86 | 48.87 | 47.81 |
+| SM Frequency | Mhz | 797.36 | 798.37 | 804.82 | 797.75 | 800.94 | 796.07 |
+| Elapsed Cycles | cycle | 6831783 | 4768959 | 7786894 | 7139230 | 8220400 | 29322720 |
+| Memory Throughput | % | 92.29 | 89.38 | 89.07 | 88.68 | 95.39 | 95.10 |
+| DRAM Throughput | % | 4.89 | 6.96 | 4.32 | 4.69 | 4.10 | 1.14 |
+| Duration | ms | 8.55 | 5.96 | 9.61 | 8.93 | 10.22 | 36.75 |
+| L1/TEX Cache Throughput | % | 92.69 | 89.78 | 89.42 | 89.01 | 80.41 | 95.14 |
+| L2 Cache Throughput | % | 80.81 | 47.50 | 35.75 | 45.37 | 95.39 | 14.53 |
+| SM Active Cycles | cycle | 6786233.60 | 4732894.76 | 7706847.91 | 7097133.90 | 8144326.64 | 29243869.10 |
+| Compute (SM) Throughput | % | 47.81 | 48.87 | 45.86 | 53.93 | 42.64 | 95.10 |
 
 Comments:
 - **int8_dp4a** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing workloads in the Compute Workload Analysis section.
@@ -497,21 +497,21 @@ Comments:
 
 ### PM Sampling
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Maximum Buffer Size | Mbyte | 32.44 | 19.46 | 17.30 | 18.42 | 24.31 | 33.23 |
-| Maximum Sampling Interval | us | 8 | 4 | 4 | 4 | 2 | 2 |
+| Maximum Buffer Size | Mbyte | 33.23 | 24.31 | 18.42 | 17.30 | 19.46 | 32.44 |
+| Maximum Sampling Interval | us | 2 | 2 | 4 | 4 | 4 | 8 |
 | # Pass Groups |  | 2 | 2 | 2 | 2 | 2 | 2 |
 
 ### Compute Workload Analysis
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Executed Ipc Active | inst/cycle | 1.08 | 1.29 | 1.94 | 1.39 | 1.25 | 1.43 |
-| Executed Ipc Elapsed | inst/cycle | 1.08 | 1.29 | 1.93 | 1.39 | 1.24 | 1.42 |
-| Issue Slots Busy | % | 27.07 | 32.16 | 48.30 | 34.69 | 31.05 | 35.48 |
-| Issued Ipc Active | inst/cycle | 1.08 | 1.29 | 1.94 | 1.39 | 1.25 | 1.43 |
-| SM Busy | % | 37.03 | 32.16 | 48.30 | 34.69 | 31.05 | 35.48 |
+| Executed Ipc Active | inst/cycle | 1.43 | 1.25 | 1.39 | 1.94 | 1.29 | 1.08 |
+| Executed Ipc Elapsed | inst/cycle | 1.42 | 1.24 | 1.39 | 1.93 | 1.29 | 1.08 |
+| Issue Slots Busy | % | 35.48 | 31.05 | 34.69 | 48.30 | 32.16 | 27.07 |
+| Issued Ipc Active | inst/cycle | 1.43 | 1.25 | 1.39 | 1.94 | 1.29 | 1.08 |
+| SM Busy | % | 35.48 | 31.05 | 34.69 | 48.30 | 32.16 | 37.03 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Local Speedup: 82.96% All compute pipelines are under-utilized. Either this workload is very small or it doesn't issue enough warps per scheduler. Check the Launch Statistics and Scheduler Statistics sections for further details.
@@ -523,20 +523,20 @@ Comments:
 
 ### Memory Workload Analysis
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Local Memory Spilling Requests |  | 0 | 0 | 0 | 0 | 0 | 0 |
 | Local Memory Spilling Request Overhead | % | 0 | 0 | 0 | 0 | 0 | 0 |
-| Memory Throughput | Gbyte/s | 3.42 | 12.30 | 14.06 | 12.94 | 20.87 | 14.66 |
-| Mem Busy | % | 58.57 | 95.39 | 88.68 | 89.07 | 89.38 | 92.29 |
-| Max Bandwidth | % | 95.10 | 91.02 | 53.93 | 45.86 | 48.87 | 77.86 |
-| L1/TEX Hit Rate | % | 60.86 | 29.99 | 71.24 | 78.44 | 60.85 | 49.58 |
+| Memory Throughput | Gbyte/s | 14.66 | 20.87 | 12.94 | 14.06 | 12.30 | 3.42 |
+| Mem Busy | % | 92.29 | 89.38 | 89.07 | 88.68 | 95.39 | 58.57 |
+| Max Bandwidth | % | 77.86 | 48.87 | 45.86 | 53.93 | 91.02 | 95.10 |
+| L1/TEX Hit Rate | % | 49.58 | 60.85 | 78.44 | 71.24 | 29.99 | 60.86 |
 | L2 Persisting Size | Mbyte | 9.44 | 9.44 | 9.44 | 9.44 | 9.44 | 9.44 |
 | L2 Compression Success Rate | % | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Compression Ratio |  | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Compression Input Sectors | sector | 0 | 0 | 0 | 0 | 0 | 0 |
-| L2 Hit Rate | % | 99.04 | 99.99 | 98.25 | 98.40 | 98.15 | 99.22 |
-| Mem Pipes Busy | % | 95.10 | 42.64 | 53.93 | 45.86 | 48.87 | 47.81 |
+| L2 Hit Rate | % | 99.22 | 98.15 | 98.40 | 98.25 | 99.99 | 99.04 |
+| Mem Pipes Busy | % | 47.81 | 48.87 | 45.86 | 53.93 | 42.64 | 95.10 |
 
 ### Memory Workload Analysis Tables
 
@@ -555,13 +555,13 @@ Comments:
 
 ### Scheduler Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| One or More Eligible | % | 27.09 | 31.82 | 48.47 | 34.83 | 31.19 | 35.64 |
-| Issued Warp Per Scheduler |  | 0.27 | 0.32 | 0.48 | 0.35 | 0.31 | 0.36 |
-| No Eligible | % | 72.91 | 68.18 | 51.53 | 65.17 | 68.81 | 64.36 |
-| Active Warps Per Scheduler | warp | 11.96 | 9.51 | 9.78 | 9.90 | 7.91 | 11.77 |
-| Eligible Warps Per Scheduler | warp | 1.35 | 1.16 | 1.46 | 0.75 | 0.65 | 0.63 |
+| One or More Eligible | % | 35.64 | 31.19 | 34.83 | 48.47 | 31.82 | 27.09 |
+| Issued Warp Per Scheduler |  | 0.36 | 0.31 | 0.35 | 0.48 | 0.32 | 0.27 |
+| No Eligible | % | 64.36 | 68.81 | 65.17 | 51.53 | 68.18 | 72.91 |
+| Active Warps Per Scheduler | warp | 11.77 | 7.91 | 9.90 | 9.78 | 9.51 | 11.96 |
+| Eligible Warps Per Scheduler | warp | 0.63 | 0.65 | 0.75 | 1.46 | 1.16 | 1.35 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Local Speedup: 4.905% Every scheduler is capable of issuing one instruction per cycle, but for this workload each scheduler only issues an instruction every 3.7 cycles. This might leave hardware resources underutilized and may lead to less optimal performance. Out of the maximum of 12 warps per scheduler, this workload allocates an average of 11.96 active warps per scheduler, but only an average of 1.35 warps were eligible per cycle. Eligible warps are the subset of active warps that are ready to issue their next instruction. Every cycle with no eligible warp results in no instruction being issued and the issue slot remains unused. To increase the number of eligible warps, avoid possible load imbalances due to highly different execution durations per warp. Reducing stalls indicated on the Warp State Statistics and Source Counters sections can help, too.
@@ -573,12 +573,12 @@ Comments:
 
 ### Warp State Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Warp Cycles Per Issued Instruction | cycle | 44.15 | 29.90 | 20.17 | 28.43 | 25.37 | 33.02 |
-| Warp Cycles Per Executed Instruction | cycle | 44.15 | 29.90 | 20.17 | 28.43 | 25.37 | 33.02 |
-| Avg. Active Threads Per Warp |  | 32 | 22.73 | 25.16 | 23.08 | 32 | 22.03 |
-| Avg. Not Predicated Off Threads Per Warp |  | 31.96 | 20.75 | 23.57 | 21.14 | 28.70 | 19.76 |
+| Warp Cycles Per Issued Instruction | cycle | 33.02 | 25.37 | 28.43 | 20.17 | 29.90 | 44.15 |
+| Warp Cycles Per Executed Instruction | cycle | 33.02 | 25.37 | 28.43 | 20.17 | 29.90 | 44.15 |
+| Avg. Active Threads Per Warp |  | 22.03 | 32 | 23.08 | 25.16 | 22.73 | 32 |
+| Avg. Not Predicated Off Threads Per Warp |  | 19.76 | 28.70 | 21.14 | 23.57 | 20.75 | 31.96 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Speedup: 4.905% On average, each warp of this workload spends 22.7 cycles being stalled waiting for the MIO (memory input/output) instruction queue to be not full. This stall reason is high in cases of extreme utilization of the MIO pipelines, which include special math instructions, dynamic branches, as well as shared memory instructions. When caused by shared memory accesses, trying to use fewer but wider loads can reduce pipeline pressure. This stall type represents about 51.4% of the total average of 44.2 cycles between issuing two instructions.
@@ -600,73 +600,73 @@ Comments:
 
 ### Instruction Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Avg. Executed Instructions Per Scheduler | inst | 7920816.55 | 2633869.24 | 3440922.48 | 2683868.69 | 1476254.90 | 2418052.41 |
-| Executed Instructions | inst | 1837629440 | 611057664 | 798294016 | 622657536 | 342491136 | 560988160 |
-| Avg. Issued Instructions Per Scheduler | inst | 7920951.25 | 2633953.53 | 3441009.31 | 2683948.64 | 1476337.65 | 2418149.25 |
-| Issued Instructions | inst | 1837660689 | 611077219 | 798314161 | 622676085 | 342510334 | 561010627 |
+| Avg. Executed Instructions Per Scheduler | inst | 2418052.41 | 1476254.90 | 2683868.69 | 3440922.48 | 2633869.24 | 7920816.55 |
+| Executed Instructions | inst | 560988160 | 342491136 | 622657536 | 798294016 | 611057664 | 1837629440 |
+| Avg. Issued Instructions Per Scheduler | inst | 2418149.25 | 1476337.65 | 2683948.64 | 3441009.31 | 2633953.53 | 7920951.25 |
+| Issued Instructions | inst | 561010627 | 342510334 | 622676085 | 798314161 | 611077219 | 1837660689 |
 
 ### Launch Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Block Size |  | 256 | 256 | 256 | 256 | 256 | 256 |
 | Function Cache Configuration |  | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone |
-| Grid Size |  | 65536 | 8192 | 8192 | 8192 | 8192 | 8192 |
-| Registers Per Thread | register/thread | 40 | 48 | 48 | 48 | 54 | 39 |
-| Shared Memory Configuration Size | Kbyte | 32.77 | 102.40 | 65.54 | 65.54 | 102.40 | 65.54 |
+| Grid Size |  | 8192 | 8192 | 8192 | 8192 | 8192 | 65536 |
+| Registers Per Thread | register/thread | 39 | 54 | 48 | 48 | 48 | 40 |
+| Shared Memory Configuration Size | Kbyte | 65.54 | 102.40 | 65.54 | 65.54 | 102.40 | 32.77 |
 | Driver Shared Memory Per Block | Kbyte/block | 1.02 | 1.02 | 1.02 | 1.02 | 1.02 | 1.02 |
 | Dynamic Shared Memory Per Block | byte/block | 0 | 0 | 0 | 0 | 0 | 0 |
-| Static Shared Memory Per Block | byte/block | 640 |  |  |  |  |  |
+| Static Shared Memory Per Block | byte/block |  |  |  |  |  | 640 |
 | # SMs | SM | 58 | 58 | 58 | 58 | 58 | 58 |
 | Stack Size |  | 1024 | 1024 | 1024 | 1024 | 1024 | 1024 |
-| Threads | thread | 16777216 | 2097152 | 2097152 | 2097152 | 2097152 | 2097152 |
+| Threads | thread | 2097152 | 2097152 | 2097152 | 2097152 | 2097152 | 16777216 |
 | # TPCs |  | 29 | 29 | 29 | 29 | 29 | 29 |
 | Enabled TPC IDs |  | all | all | all | all | all | all |
 | Uses Green Context |  | 0 | 0 | 0 | 0 | 0 | 0 |
-| Waves Per SM |  | 188.32 | 28.25 | 28.25 | 28.25 | 35.31 | 23.54 |
-| Static Shared Memory Per Block | Kbyte/block |  | 12.29 | 8.19 | 8.19 | 16.38 | 8.19 |
+| Waves Per SM |  | 23.54 | 35.31 | 28.25 | 28.25 | 28.25 | 188.32 |
+| Static Shared Memory Per Block | Kbyte/block | 8.19 | 16.38 | 8.19 | 8.19 | 12.29 |  |
 
 ### Occupancy
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Block Limit SM | block | 24 | 24 | 24 | 24 | 24 | 24 |
-| Block Limit Registers | block | 6 | 5 | 5 | 5 | 4 | 6 |
-| Block Limit Shared Mem | block | 19 | 7 | 7 | 7 | 5 | 7 |
+| Block Limit Registers | block | 6 | 4 | 5 | 5 | 5 | 6 |
+| Block Limit Shared Mem | block | 7 | 5 | 7 | 7 | 7 | 19 |
 | Block Limit Warps | block | 6 | 6 | 6 | 6 | 6 | 6 |
-| Theoretical Active Warps per SM | warp | 48 | 40 | 40 | 40 | 32 | 48 |
-| Theoretical Occupancy | % | 100 | 83.33 | 83.33 | 83.33 | 66.67 | 100 |
-| Achieved Occupancy | % | 99.67 | 81.75 | 81.52 | 82.51 | 65.94 | 98.04 |
-| Achieved Active Warps Per SM | warp | 47.84 | 39.24 | 39.13 | 39.60 | 31.65 | 47.06 |
+| Theoretical Active Warps per SM | warp | 48 | 32 | 40 | 40 | 40 | 48 |
+| Theoretical Occupancy | % | 100 | 66.67 | 83.33 | 83.33 | 83.33 | 100 |
+| Achieved Occupancy | % | 98.04 | 65.94 | 82.51 | 81.52 | 81.75 | 99.67 |
+| Achieved Active Warps Per SM | warp | 47.06 | 31.65 | 39.60 | 39.13 | 39.24 | 47.84 |
 
 Comments:
 - **int8_ptx_mma_k32** [OPT]: Est. Speedup: 10.62% The 8.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the hardware maximum of 12. This kernel's theoretical occupancy (66.7%) is limited by the number of required registers.
 
 ### GPU and Memory Workload Distribution
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Average DRAM Active Cycles | cycle | 2618677.33 | 2619690.67 | 2615098.67 | 2591048 | 2588986.67 | 2611349.33 |
-| Total DRAM Elapsed Cycles | cycle | 1377097728 | 383098880 | 334589952 | 360218624 | 223122432 | 320268288 |
-| Average L1 Active Cycles | cycle | 29243869.10 | 8144326.64 | 7097133.90 | 7706847.91 | 4732894.76 | 6786233.60 |
-| Total L1 Elapsed Cycles | cycle | 1696995058 | 474955706 | 413174428 | 448739432 | 275741850 | 395297356 |
-| Average L2 Active Cycles | cycle | 29948420.04 | 8493262.25 | 7363688.21 | 7946696.79 | 4908174.17 | 7043885.38 |
-| Total L2 Elapsed Cycles | cycle | 727830000 | 202890264 | 176914920 | 190935432 | 117969192 | 169311312 |
-| Average SM Active Cycles | cycle | 29243869.10 | 8144326.64 | 7097133.90 | 7706847.91 | 4732894.76 | 6786233.60 |
-| Total SM Elapsed Cycles | cycle | 1696995058 | 474955706 | 413174428 | 448739432 | 275741850 | 395297356 |
-| Average SMSP Active Cycles | cycle | 29244119.52 | 8278897.96 | 7099437.25 | 7706332.86 | 4733379.12 | 6785638.56 |
-| Total SMSP Elapsed Cycles | cycle | 6787980232 | 1899822824 | 1652697712 | 1794957728 | 1102967400 | 1581189424 |
+| Average DRAM Active Cycles | cycle | 2611349.33 | 2588986.67 | 2591048 | 2615098.67 | 2619690.67 | 2618677.33 |
+| Total DRAM Elapsed Cycles | cycle | 320268288 | 223122432 | 360218624 | 334589952 | 383098880 | 1377097728 |
+| Average L1 Active Cycles | cycle | 6786233.60 | 4732894.76 | 7706847.91 | 7097133.90 | 8144326.64 | 29243869.10 |
+| Total L1 Elapsed Cycles | cycle | 395297356 | 275741850 | 448739432 | 413174428 | 474955706 | 1696995058 |
+| Average L2 Active Cycles | cycle | 7043885.38 | 4908174.17 | 7946696.79 | 7363688.21 | 8493262.25 | 29948420.04 |
+| Total L2 Elapsed Cycles | cycle | 169311312 | 117969192 | 190935432 | 176914920 | 202890264 | 727830000 |
+| Average SM Active Cycles | cycle | 6786233.60 | 4732894.76 | 7706847.91 | 7097133.90 | 8144326.64 | 29243869.10 |
+| Total SM Elapsed Cycles | cycle | 395297356 | 275741850 | 448739432 | 413174428 | 474955706 | 1696995058 |
+| Average SMSP Active Cycles | cycle | 6785638.56 | 4733379.12 | 7706332.86 | 7099437.25 | 8278897.96 | 29244119.52 |
+| Total SMSP Elapsed Cycles | cycle | 1581189424 | 1102967400 | 1794957728 | 1652697712 | 1899822824 | 6787980232 |
 
 ### Source Counters
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Branch Instructions Ratio | % | 0.01 | 0.18 | 0.15 | 0.19 | 0.14 | 0.19 |
-| Branch Instructions | inst | 19398656 | 109117440 | 117833728 | 117309440 | 46792704 | 109314048 |
-| Branch Efficiency | % | 100 | 87.46 | 87.62 | 87.46 | 100 | 87.61 |
-| Avg. Divergent Branches | branches | 0 | 36157.79 | 35875.31 | 36157.79 | 0 | 35875.31 |
+| Branch Instructions Ratio | % | 0.19 | 0.14 | 0.19 | 0.15 | 0.18 | 0.01 |
+| Branch Instructions | inst | 109314048 | 46792704 | 117309440 | 117833728 | 109117440 | 19398656 |
+| Branch Efficiency | % | 87.61 | 100 | 87.46 | 87.62 | 87.46 | 100 |
+| Avg. Divergent Branches | branches | 35875.31 | 0 | 36157.79 | 35875.31 | 36157.79 | 0 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Speedup: 48.99% This kernel has uncoalesced global accesses resulting in a total of 134217728 excessive sectors (50% of the total 270532608 sectors). Check the L2 Theoretical Sectors Global Excessive table for the primary source locations. The CUDA Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses) has additional information on reducing uncoalesced device memory accesses.
@@ -685,18 +685,18 @@ Comments:
 
 ### GPU Speed Of Light Throughput
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | DRAM Frequency | Ghz | 6.24 | 6.24 | 6.24 | 6.24 | 6.24 | 6.24 |
-| SM Frequency | Mhz | 796.21 | 797.92 | 796.20 | 808.89 | 804.17 | 795.53 |
-| Elapsed Cycles | cycle | 237319405 | 75213504 | 55428773 | 59474411 | 37385672 | 54493221 |
-| Memory Throughput | % | 94.08 | 95.96 | 90.59 | 89.28 | 90.08 | 94.58 |
-| DRAM Throughput | % | 0.65 | 2.07 | 2.78 | 2.64 | 4.16 | 2.82 |
-| Duration | ms | 296.86 | 93.88 | 69.54 | 72.93 | 46.19 | 68.47 |
-| L1/TEX Cache Throughput | % | 94.09 | 81.95 | 90.69 | 89.38 | 90.19 | 92.02 |
-| L2 Cache Throughput | % | 17.70 | 95.96 | 62.33 | 36.28 | 47.78 | 94.58 |
-| Compute (SM) Throughput | % | 94.08 | 37.18 | 54.92 | 47.60 | 48.38 | 47.30 |
-| SM Active Cycles | cycle |  | 74811455.50 | 55312771.33 | 58918146.47 | 37099824.48 | 54415000.97 |
+| SM Frequency | Mhz | 795.53 | 804.17 | 808.89 | 796.20 | 797.92 | 796.21 |
+| Elapsed Cycles | cycle | 54493221 | 37385672 | 59474411 | 55428773 | 75213504 | 237319405 |
+| Memory Throughput | % | 94.58 | 90.08 | 89.28 | 90.59 | 95.96 | 94.08 |
+| DRAM Throughput | % | 2.82 | 4.16 | 2.64 | 2.78 | 2.07 | 0.65 |
+| Duration | ms | 68.47 | 46.19 | 72.93 | 69.54 | 93.88 | 296.86 |
+| L1/TEX Cache Throughput | % | 92.02 | 90.19 | 89.38 | 90.69 | 81.95 | 94.09 |
+| L2 Cache Throughput | % | 94.58 | 47.78 | 36.28 | 62.33 | 95.96 | 17.70 |
+| Compute (SM) Throughput | % | 47.30 | 48.38 | 47.60 | 54.92 | 37.18 | 94.08 |
+| SM Active Cycles | cycle | 54415000.97 | 37099824.48 | 58918146.47 | 55312771.33 | 74811455.50 |  |
 
 Comments:
 - **int8_dp4a** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing workloads in the Compute Workload Analysis section.
@@ -720,21 +720,21 @@ Comments:
 
 ### PM Sampling
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Maximum Buffer Size | Mbyte | 31.92 | 20.38 | 30.28 | 31.65 | 20.32 | 29.75 |
-| Maximum Sampling Interval | us | 64 | 32 | 16 | 16 | 16 | 16 |
+| Maximum Buffer Size | Mbyte | 29.75 | 20.32 | 31.65 | 30.28 | 20.38 | 31.92 |
+| Maximum Sampling Interval | us | 16 | 16 | 16 | 16 | 32 | 64 |
 | # Pass Groups |  | 2 | 2 | 2 | 2 | 2 | 2 |
 
 ### Compute Workload Analysis
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Executed Ipc Active | inst/cycle | 1.06 | 1.12 | 1.96 | 1.45 | 1.19 | 1.39 |
-| Executed Ipc Elapsed | inst/cycle | 1.06 | 1.12 | 1.96 | 1.44 | 1.19 | 1.39 |
-| Issue Slots Busy | % | 26.62 | 27.97 | 48.89 | 36.10 | 29.72 | 34.75 |
-| Issued Ipc Active | inst/cycle | 1.06 | 1.12 | 1.96 | 1.45 | 1.19 | 1.39 |
-| SM Busy | % | 36.61 | 27.97 | 48.89 | 36.10 | 29.72 | 34.75 |
+| Executed Ipc Active | inst/cycle | 1.39 | 1.19 | 1.45 | 1.96 | 1.12 | 1.06 |
+| Executed Ipc Elapsed | inst/cycle | 1.39 | 1.19 | 1.44 | 1.96 | 1.12 | 1.06 |
+| Issue Slots Busy | % | 34.75 | 29.72 | 36.10 | 48.89 | 27.97 | 26.62 |
+| Issued Ipc Active | inst/cycle | 1.39 | 1.19 | 1.45 | 1.96 | 1.12 | 1.06 |
+| SM Busy | % | 34.75 | 29.72 | 36.10 | 48.89 | 27.97 | 36.61 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Local Speedup: 83.24% All compute pipelines are under-utilized. Either this workload is very small or it doesn't issue enough warps per scheduler. Check the Launch Statistics and Scheduler Statistics sections for further details.
@@ -746,20 +746,20 @@ Comments:
 
 ### Memory Workload Analysis
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Local Memory Spilling Requests |  | 0 | 0 | 0 | 0 | 0 | 0 |
 | Local Memory Spilling Request Overhead | % | 0 | 0 | 0 | 0 | 0 | 0 |
-| Memory Throughput | Gbyte/s | 1.95 | 6.19 | 8.35 | 7.90 | 12.46 | 8.46 |
-| Mem Busy | % | 57.94 | 95.96 | 90.59 | 89.28 | 90.08 | 94.58 |
-| Max Bandwidth | % | 94.08 | 92.76 | 61.52 | 47.60 | 48.38 | 86.60 |
-| L1/TEX Hit Rate | % | 51.70 | 17.26 | 60.59 | 77.42 | 60.33 | 40.19 |
+| Memory Throughput | Gbyte/s | 8.46 | 12.46 | 7.90 | 8.35 | 6.19 | 1.95 |
+| Mem Busy | % | 94.58 | 90.08 | 89.28 | 90.59 | 95.96 | 57.94 |
+| Max Bandwidth | % | 86.60 | 48.38 | 47.60 | 61.52 | 92.76 | 94.08 |
+| L1/TEX Hit Rate | % | 40.19 | 60.33 | 77.42 | 60.59 | 17.26 | 51.70 |
 | L2 Persisting Size | Mbyte | 9.44 | 9.44 | 9.44 | 9.44 | 9.44 | 9.44 |
 | L2 Compression Success Rate | % | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Compression Ratio |  | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Compression Input Sectors | sector | 0 | 0 | 0 | 0 | 0 | 0 |
-| L2 Hit Rate | % | 99.59 | 100.36 | 99.26 | 99.21 | 99.04 | 99.69 |
-| Mem Pipes Busy | % | 94.08 | 37.18 | 54.92 | 47.60 | 48.38 | 47.30 |
+| L2 Hit Rate | % | 99.69 | 99.04 | 99.21 | 99.26 | 100.36 | 99.59 |
+| Mem Pipes Busy | % | 47.30 | 48.38 | 47.60 | 54.92 | 37.18 | 94.08 |
 
 ### Memory Workload Analysis Tables
 
@@ -778,13 +778,13 @@ Comments:
 
 ### Scheduler Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| One or More Eligible | % | 26.62 | 28.07 | 48.94 | 36.14 | 29.76 | 34.75 |
-| Issued Warp Per Scheduler |  | 0.27 | 0.28 | 0.49 | 0.36 | 0.30 | 0.35 |
-| No Eligible | % | 73.38 | 71.93 | 51.06 | 63.86 | 70.24 | 65.25 |
-| Active Warps Per Scheduler | warp | 11.99 | 9.71 | 9.87 | 9.97 | 7.97 | 11.84 |
-| Eligible Warps Per Scheduler | warp | 1.33 | 1.01 | 1.41 | 0.78 | 0.61 | 0.73 |
+| One or More Eligible | % | 34.75 | 29.76 | 36.14 | 48.94 | 28.07 | 26.62 |
+| Issued Warp Per Scheduler |  | 0.35 | 0.30 | 0.36 | 0.49 | 0.28 | 0.27 |
+| No Eligible | % | 65.25 | 70.24 | 63.86 | 51.06 | 71.93 | 73.38 |
+| Active Warps Per Scheduler | warp | 11.84 | 7.97 | 9.97 | 9.87 | 9.71 | 11.99 |
+| Eligible Warps Per Scheduler | warp | 0.73 | 0.61 | 0.78 | 1.41 | 1.01 | 1.33 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Local Speedup: 5.921% Every scheduler is capable of issuing one instruction per cycle, but for this workload each scheduler only issues an instruction every 3.8 cycles. This might leave hardware resources underutilized and may lead to less optimal performance. Out of the maximum of 12 warps per scheduler, this workload allocates an average of 11.99 active warps per scheduler, but only an average of 1.33 warps were eligible per cycle. Eligible warps are the subset of active warps that are ready to issue their next instruction. Every cycle with no eligible warp results in no instruction being issued and the issue slot remains unused. To increase the number of eligible warps, avoid possible load imbalances due to highly different execution durations per warp. Reducing stalls indicated on the Warp State Statistics and Source Counters sections can help, too.
@@ -796,12 +796,12 @@ Comments:
 
 ### Warp State Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Warp Cycles Per Issued Instruction | cycle | 45.01 | 34.61 | 20.18 | 27.58 | 26.79 | 34.08 |
-| Warp Cycles Per Executed Instruction | cycle | 45.01 | 34.61 | 20.18 | 27.58 | 26.79 | 34.08 |
-| Avg. Active Threads Per Warp |  | 32 | 22.70 | 25.02 | 23.05 | 32 | 21.77 |
-| Avg. Not Predicated Off Threads Per Warp |  | 31.98 | 20.71 | 23.44 | 21.09 | 28.56 | 19.51 |
+| Warp Cycles Per Issued Instruction | cycle | 34.08 | 26.79 | 27.58 | 20.18 | 34.61 | 45.01 |
+| Warp Cycles Per Executed Instruction | cycle | 34.08 | 26.79 | 27.58 | 20.18 | 34.61 | 45.01 |
+| Avg. Active Threads Per Warp |  | 21.77 | 32 | 23.05 | 25.02 | 22.70 | 32 |
+| Avg. Not Predicated Off Threads Per Warp |  | 19.51 | 28.56 | 21.09 | 23.44 | 20.71 | 31.98 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Speedup: 5.921% On average, each warp of this workload spends 23.4 cycles being stalled waiting for the MIO (memory input/output) instruction queue to be not full. This stall reason is high in cases of extreme utilization of the MIO pipelines, which include special math instructions, dynamic branches, as well as shared memory instructions. When caused by shared memory accesses, trying to use fewer but wider loads can reduce pipeline pressure. This stall type represents about 51.9% of the total average of 45.0 cycles between issuing two instructions.
@@ -823,73 +823,73 @@ Comments:
 
 ### Instruction Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Avg. Executed Instructions Per Scheduler | inst | 62923599.45 | 20948921.38 | 27069757.79 | 21293550.34 | 11039426.21 | 18928604.69 |
-| Executed Instructions | inst | 14598275072 | 4860149760 | 6280183808 | 4940103680 | 2561146880 | 4391436288 |
-| Avg. Issued Instructions Per Scheduler | inst | 62923734.17 | 20949005.44 | 27069844.52 | 21293630.30 | 11039508.99 | 18928701.57 |
-| Issued Instructions | inst | 14598306328 | 4860169262 | 6280203928 | 4940122230 | 2561166086 | 4391458765 |
+| Avg. Executed Instructions Per Scheduler | inst | 18928604.69 | 11039426.21 | 21293550.34 | 27069757.79 | 20948921.38 | 62923599.45 |
+| Executed Instructions | inst | 4391436288 | 2561146880 | 4940103680 | 6280183808 | 4860149760 | 14598275072 |
+| Avg. Issued Instructions Per Scheduler | inst | 18928701.57 | 11039508.99 | 21293630.30 | 27069844.52 | 20949005.44 | 62923734.17 |
+| Issued Instructions | inst | 4391458765 | 2561166086 | 4940122230 | 6280203928 | 4860169262 | 14598306328 |
 
 ### Launch Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Block Size |  | 256 | 256 | 256 | 256 | 256 | 256 |
 | Function Cache Configuration |  | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone |
-| Grid Size |  | 262144 | 32768 | 32768 | 32768 | 32768 | 32768 |
-| Registers Per Thread | register/thread | 40 | 48 | 48 | 48 | 54 | 39 |
-| Shared Memory Configuration Size | Kbyte | 32.77 | 102.40 | 65.54 | 65.54 | 102.40 | 65.54 |
+| Grid Size |  | 32768 | 32768 | 32768 | 32768 | 32768 | 262144 |
+| Registers Per Thread | register/thread | 39 | 54 | 48 | 48 | 48 | 40 |
+| Shared Memory Configuration Size | Kbyte | 65.54 | 102.40 | 65.54 | 65.54 | 102.40 | 32.77 |
 | Driver Shared Memory Per Block | Kbyte/block | 1.02 | 1.02 | 1.02 | 1.02 | 1.02 | 1.02 |
 | Dynamic Shared Memory Per Block | byte/block | 0 | 0 | 0 | 0 | 0 | 0 |
-| Static Shared Memory Per Block | byte/block | 640 |  |  |  |  |  |
+| Static Shared Memory Per Block | byte/block |  |  |  |  |  | 640 |
 | # SMs | SM | 58 | 58 | 58 | 58 | 58 | 58 |
 | Stack Size |  | 1024 | 1024 | 1024 | 1024 | 1024 | 1024 |
-| Threads | thread | 67108864 | 8388608 | 8388608 | 8388608 | 8388608 | 8388608 |
+| Threads | thread | 8388608 | 8388608 | 8388608 | 8388608 | 8388608 | 67108864 |
 | # TPCs |  | 29 | 29 | 29 | 29 | 29 | 29 |
 | Enabled TPC IDs |  | all | all | all | all | all | all |
 | Uses Green Context |  | 0 | 0 | 0 | 0 | 0 | 0 |
-| Waves Per SM |  | 753.29 | 112.99 | 112.99 | 112.99 | 141.24 | 94.16 |
-| Static Shared Memory Per Block | Kbyte/block |  | 12.29 | 8.19 | 8.19 | 16.38 | 8.19 |
+| Waves Per SM |  | 94.16 | 141.24 | 112.99 | 112.99 | 112.99 | 753.29 |
+| Static Shared Memory Per Block | Kbyte/block | 8.19 | 16.38 | 8.19 | 8.19 | 12.29 |  |
 
 ### Occupancy
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Block Limit SM | block | 24 | 24 | 24 | 24 | 24 | 24 |
-| Block Limit Registers | block | 6 | 5 | 5 | 5 | 4 | 6 |
-| Block Limit Shared Mem | block | 19 | 7 | 7 | 7 | 5 | 7 |
+| Block Limit Registers | block | 6 | 4 | 5 | 5 | 5 | 6 |
+| Block Limit Shared Mem | block | 7 | 5 | 7 | 7 | 7 | 19 |
 | Block Limit Warps | block | 6 | 6 | 6 | 6 | 6 | 6 |
-| Theoretical Active Warps per SM | warp | 48 | 40 | 40 | 40 | 32 | 48 |
-| Theoretical Occupancy | % | 100 | 83.33 | 83.33 | 83.33 | 66.67 | 100 |
-| Achieved Occupancy | % | 99.88 | 80.93 | 82.31 | 83.08 | 66.43 | 98.77 |
-| Achieved Active Warps Per SM | warp | 47.94 | 38.84 | 39.51 | 39.88 | 31.88 | 47.41 |
+| Theoretical Active Warps per SM | warp | 48 | 32 | 40 | 40 | 40 | 48 |
+| Theoretical Occupancy | % | 100 | 66.67 | 83.33 | 83.33 | 83.33 | 100 |
+| Achieved Occupancy | % | 98.77 | 66.43 | 83.08 | 82.31 | 80.93 | 99.88 |
+| Achieved Active Warps Per SM | warp | 47.41 | 31.88 | 39.88 | 39.51 | 38.84 | 47.94 |
 
 Comments:
 - **int8_ptx_mma_k32** [OPT]: Est. Speedup: 9.924% The 8.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the hardware maximum of 12. This kernel's theoretical occupancy (66.7%) is limited by the number of required registers.
 
 ### GPU and Memory Workload Distribution
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Average DRAM Active Cycles | cycle | 12057986.67 | 12107290.67 | 12092413.33 | 12004962.67 | 11988533.33 | 12074896 |
-| Total DRAM Elapsed Cycles | cycle | 11122804736 | 3517541376 | 2605691904 | 2732504064 | 1730811904 | 2565492736 |
-| Total L1 Elapsed Cycles | cycle | 13709218844 | 4344618554 | 3211466138 | 3421099736 | 2154410518 | 3159274468 |
-| Total L2 Elapsed Cycles | cycle | 5878335984 | 1859584104 | 1377284400 | 1450985448 | 916839960 | 1355931096 |
-| Total SM Elapsed Cycles | cycle | 13709218844 | 4344618554 | 3211466138 | 3421099736 | 2154410518 | 3159274468 |
-| Total SMSP Elapsed Cycles | cycle | 54836875376 | 17378474216 | 12845864552 | 13684398944 | 8617642072 | 12637097872 |
-| Average L1 Active Cycles | cycle |  | 74811455.50 | 55312771.33 | 58918146.47 | 37099824.48 | 54415000.97 |
-| Average L2 Active Cycles | cycle |  | 77565302.62 | 57316526.96 | 60361307.29 | 38190387.25 | 56465759.96 |
-| Average SM Active Cycles | cycle |  | 74811455.50 | 55312771.33 | 58918146.47 | 37099824.48 | 54415000.97 |
-| Average SMSP Active Cycles | cycle |  | 74630553.47 | 55311976.17 | 58918039.12 | 37099573.44 | 54466821.71 |
+| Average DRAM Active Cycles | cycle | 12074896 | 11988533.33 | 12004962.67 | 12092413.33 | 12107290.67 | 12057986.67 |
+| Total DRAM Elapsed Cycles | cycle | 2565492736 | 1730811904 | 2732504064 | 2605691904 | 3517541376 | 11122804736 |
+| Total L1 Elapsed Cycles | cycle | 3159274468 | 2154410518 | 3421099736 | 3211466138 | 4344618554 | 13709218844 |
+| Total L2 Elapsed Cycles | cycle | 1355931096 | 916839960 | 1450985448 | 1377284400 | 1859584104 | 5878335984 |
+| Total SM Elapsed Cycles | cycle | 3159274468 | 2154410518 | 3421099736 | 3211466138 | 4344618554 | 13709218844 |
+| Total SMSP Elapsed Cycles | cycle | 12637097872 | 8617642072 | 13684398944 | 12845864552 | 17378474216 | 54836875376 |
+| Average L1 Active Cycles | cycle | 54415000.97 | 37099824.48 | 58918146.47 | 55312771.33 | 74811455.50 |  |
+| Average L2 Active Cycles | cycle | 56465759.96 | 38190387.25 | 60361307.29 | 57316526.96 | 77565302.62 |  |
+| Average SM Active Cycles | cycle | 54415000.97 | 37099824.48 | 58918146.47 | 55312771.33 | 74811455.50 |  |
+| Average SMSP Active Cycles | cycle | 54466821.71 | 37099573.44 | 58918039.12 | 55311976.17 | 74630553.47 |  |
 
 ### Source Counters
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Branch Instructions Ratio | % | 0.01 | 0.18 | 0.15 | 0.19 | 0.15 | 0.20 |
-| Branch Instructions | inst | 144703488 | 872677376 | 941096960 | 938999808 | 371720192 | 873463808 |
-| Branch Efficiency | % | 100 | 87.48 | 87.56 | 87.48 | 100 | 87.55 |
-| Avg. Divergent Branches | branches | 0 | 289262.34 | 288132.41 | 289262.34 | 0 | 288132.41 |
+| Branch Instructions Ratio | % | 0.20 | 0.15 | 0.19 | 0.15 | 0.18 | 0.01 |
+| Branch Instructions | inst | 873463808 | 371720192 | 938999808 | 941096960 | 872677376 | 144703488 |
+| Branch Efficiency | % | 87.55 | 100 | 87.48 | 87.56 | 87.48 | 100 |
+| Avg. Divergent Branches | branches | 288132.41 | 0 | 289262.34 | 288132.41 | 289262.34 | 0 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Speedup: 49.55% This kernel has uncoalesced global accesses resulting in a total of 1073741824 excessive sectors (50% of the total 2155872256 sectors). Check the L2 Theoretical Sectors Global Excessive table for the primary source locations. The CUDA Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses) has additional information on reducing uncoalesced device memory accesses.
@@ -908,18 +908,18 @@ Comments:
 
 ### GPU Speed Of Light Throughput
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | DRAM Frequency | Ghz | 6.24 | 6.24 | 6.24 | 6.24 | 6.24 | 6.24 |
-| SM Frequency | Mhz | 797.70 | 806.80 | 807.82 | 804.79 | 799.59 | 799.76 |
-| Elapsed Cycles | cycle | 1897534980 | 667548493 | 502956946 | 471921869 | 390675202 | 689414888 |
-| Memory Throughput | % | 94.40 | 80.89 | 92.80 | 87.84 | 66.95 | 69.38 |
-| DRAM Throughput | % | 38.52 | 51.09 | 48.84 | 50.12 | 51.55 | 52.16 |
-| Duration | s | 2.36 |  |  |  |  |  |
-| L1/TEX Cache Throughput | % | 94.40 | 68.64 | 80.18 | 87.86 | 66.97 | 58.20 |
-| L2 Cache Throughput | % | 18.43 | 80.89 | 92.80 | 37.49 | 36.85 | 69.38 |
-| Compute (SM) Throughput | % | 94.40 | 33.62 | 48.50 | 47.70 | 36.25 | 29.85 |
-| Duration | ms |  | 820.32 | 617.68 | 582.00 | 487.57 | 858.30 |
+| SM Frequency | Mhz | 799.76 | 799.59 | 804.79 | 807.82 | 806.80 | 797.70 |
+| Elapsed Cycles | cycle | 689414888 | 390675202 | 471921869 | 502956946 | 667548493 | 1897534980 |
+| Memory Throughput | % | 69.38 | 66.95 | 87.84 | 92.80 | 80.89 | 94.40 |
+| DRAM Throughput | % | 52.16 | 51.55 | 50.12 | 48.84 | 51.09 | 38.52 |
+| Duration | s |  |  |  |  |  | 2.36 |
+| L1/TEX Cache Throughput | % | 58.20 | 66.97 | 87.86 | 80.18 | 68.64 | 94.40 |
+| L2 Cache Throughput | % | 69.38 | 36.85 | 37.49 | 92.80 | 80.89 | 18.43 |
+| Compute (SM) Throughput | % | 29.85 | 36.25 | 47.70 | 48.50 | 33.62 | 94.40 |
+| Duration | ms | 858.30 | 487.57 | 582.00 | 617.68 | 820.32 |  |
 
 Comments:
 - **int8_dp4a** [INF]: This workload is utilizing greater than 80.0% of the available compute or memory performance of the device. To further improve performance, work will likely need to be shifted from the most utilized to another unit. Start by analyzing workloads in the Compute Workload Analysis section.
@@ -943,21 +943,21 @@ Comments:
 
 ### PM Sampling
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Maximum Buffer Size | Mbyte | 31.65 | 22.22 | 33.10 | 31.13 | 25.95 | 23.00 |
-| Maximum Sampling Interval | us | 512 | 256 | 128 | 128 | 128 | 256 |
+| Maximum Buffer Size | Mbyte | 23.00 | 25.95 | 31.13 | 33.10 | 22.22 | 31.65 |
+| Maximum Sampling Interval | us | 256 | 128 | 128 | 128 | 256 | 512 |
 | # Pass Groups |  | 2 | 2 | 2 | 2 | 2 | 2 |
 
 ### Compute Workload Analysis
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Executed Ipc Active | inst/cycle | 1.07 | 1.01 | 1.72 | 1.45 | 0.87 | 0.87 |
-| Executed Ipc Elapsed | inst/cycle | 1.07 | 1.01 | 1.72 | 1.45 | 0.87 | 0.87 |
-| Issue Slots Busy | % | 26.63 | 25.25 | 43.04 | 36.22 | 21.86 | 21.82 |
-| Issued Ipc Active | inst/cycle | 1.07 | 1.01 | 1.72 | 1.45 | 0.87 | 0.87 |
-| SM Busy | % | 36.72 | 25.25 | 43.04 | 36.22 | 21.86 | 21.82 |
+| Executed Ipc Active | inst/cycle | 0.87 | 0.87 | 1.45 | 1.72 | 1.01 | 1.07 |
+| Executed Ipc Elapsed | inst/cycle | 0.87 | 0.87 | 1.45 | 1.72 | 1.01 | 1.07 |
+| Issue Slots Busy | % | 21.82 | 21.86 | 36.22 | 43.04 | 25.25 | 26.63 |
+| Issued Ipc Active | inst/cycle | 0.87 | 0.87 | 1.45 | 1.72 | 1.01 | 1.07 |
+| SM Busy | % | 21.82 | 21.86 | 36.22 | 43.04 | 25.25 | 36.72 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Local Speedup: 83.23% All compute pipelines are under-utilized. Either this workload is very small or it doesn't issue enough warps per scheduler. Check the Launch Statistics and Scheduler Statistics sections for further details.
@@ -969,20 +969,20 @@ Comments:
 
 ### Memory Workload Analysis
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Local Memory Spilling Requests |  | 0 | 0 | 0 | 0 | 0 | 0 |
 | Local Memory Spilling Request Overhead | % | 0 | 0 | 0 | 0 | 0 | 0 |
-| Memory Throughput | Gbyte/s | 115.48 | 153.14 | 146.39 | 150.24 | 154.51 | 156.34 |
-| Mem Busy | % | 58.13 | 80.89 | 92.80 | 87.84 | 66.95 | 69.38 |
-| Max Bandwidth | % | 94.40 | 79.17 | 79.10 | 50.12 | 51.55 | 60.73 |
-| L1/TEX Hit Rate | % | 49.89 | 23.68 | 37.22 | 75.90 | 61.17 | 33.56 |
+| Memory Throughput | Gbyte/s | 156.34 | 154.51 | 150.24 | 146.39 | 153.14 | 115.48 |
+| Mem Busy | % | 69.38 | 66.95 | 87.84 | 92.80 | 80.89 | 58.13 |
+| Max Bandwidth | % | 60.73 | 51.55 | 50.12 | 79.10 | 79.17 | 94.40 |
+| L1/TEX Hit Rate | % | 33.56 | 61.17 | 75.90 | 37.22 | 23.68 | 49.89 |
 | L2 Persisting Size | Mbyte | 9.44 | 9.44 | 9.44 | 9.44 | 9.44 | 9.44 |
 | L2 Compression Success Rate | % | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Compression Ratio |  | 0 | 0 | 0 | 0 | 0 | 0 |
 | L2 Compression Input Sectors | sector | 0 | 0 | 0 | 0 | 0 | 0 |
-| L2 Hit Rate | % | 50.12 | 84.46 | 87.87 | 68.75 | 65.84 | 81.86 |
-| Mem Pipes Busy | % | 94.40 | 33.62 | 48.50 | 47.70 | 36.25 | 29.85 |
+| L2 Hit Rate | % | 81.86 | 65.84 | 68.75 | 87.87 | 84.46 | 50.12 |
+| Mem Pipes Busy | % | 29.85 | 36.25 | 47.70 | 48.50 | 33.62 | 94.40 |
 
 ### Memory Workload Analysis Tables
 
@@ -1001,13 +1001,13 @@ Comments:
 
 ### Scheduler Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| One or More Eligible | % | 26.63 | 24.86 | 34.34 | 36.23 | 21.93 | 21.73 |
-| Issued Warp Per Scheduler |  | 0.27 | 0.25 | 0.34 | 0.36 | 0.22 | 0.22 |
-| No Eligible | % | 73.37 | 75.14 | 65.66 | 63.77 | 78.07 | 78.27 |
-| Active Warps Per Scheduler | warp | 11.99 | 9.70 | 7.26 | 9.98 | 7.99 | 11.82 |
-| Eligible Warps Per Scheduler | warp | 1.31 | 0.89 | 0.73 | 0.69 | 0.34 | 0.53 |
+| One or More Eligible | % | 21.73 | 21.93 | 36.23 | 34.34 | 24.86 | 26.63 |
+| Issued Warp Per Scheduler |  | 0.22 | 0.22 | 0.36 | 0.34 | 0.25 | 0.27 |
+| No Eligible | % | 78.27 | 78.07 | 63.77 | 65.66 | 75.14 | 73.37 |
+| Active Warps Per Scheduler | warp | 11.82 | 7.99 | 9.98 | 7.26 | 9.70 | 11.99 |
+| Eligible Warps Per Scheduler | warp | 0.53 | 0.34 | 0.69 | 0.73 | 0.89 | 1.31 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Local Speedup: 5.604% Every scheduler is capable of issuing one instruction per cycle, but for this workload each scheduler only issues an instruction every 3.8 cycles. This might leave hardware resources underutilized and may lead to less optimal performance. Out of the maximum of 12 warps per scheduler, this workload allocates an average of 11.99 active warps per scheduler, but only an average of 1.31 warps were eligible per cycle. Eligible warps are the subset of active warps that are ready to issue their next instruction. Every cycle with no eligible warp results in no instruction being issued and the issue slot remains unused. To increase the number of eligible warps, avoid possible load imbalances due to highly different execution durations per warp. Reducing stalls indicated on the Warp State Statistics and Source Counters sections can help, too.
@@ -1019,12 +1019,12 @@ Comments:
 
 ### Warp State Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Warp Cycles Per Issued Instruction | cycle | 45.04 | 39.00 | 21.13 | 27.55 | 36.44 | 54.40 |
-| Warp Cycles Per Executed Instruction | cycle | 45.04 | 39.00 | 21.13 | 27.55 | 36.44 | 54.40 |
-| Avg. Active Threads Per Warp |  | 32 | 22.68 | 24.94 | 23.03 | 32 | 21.64 |
-| Avg. Not Predicated Off Threads Per Warp |  | 31.99 | 20.69 | 23.37 | 21.07 | 28.48 | 19.38 |
+| Warp Cycles Per Issued Instruction | cycle | 54.40 | 36.44 | 27.55 | 21.13 | 39.00 | 45.04 |
+| Warp Cycles Per Executed Instruction | cycle | 54.40 | 36.44 | 27.55 | 21.13 | 39.00 | 45.04 |
+| Avg. Active Threads Per Warp |  | 21.64 | 32 | 23.03 | 24.94 | 22.68 | 32 |
+| Avg. Not Predicated Off Threads Per Warp |  | 19.38 | 28.48 | 21.07 | 23.37 | 20.69 | 31.99 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Speedup: 5.604% On average, each warp of this workload spends 23.0 cycles being stalled waiting for the MIO (memory input/output) instruction queue to be not full. This stall reason is high in cases of extreme utilization of the MIO pipelines, which include special math instructions, dynamic branches, as well as shared memory instructions. When caused by shared memory accesses, trying to use fewer but wider loads can reduce pipeline pressure. This stall type represents about 51.2% of the total average of 45.0 cycles between issuing two instructions.
@@ -1047,73 +1047,73 @@ Comments:
 
 ### Instruction Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Avg. Issued Instructions Per Scheduler | inst | 501617198 |  |  |  | 85233040.44 |  |
-| Executed Instructions | inst |  | 38767951872 | 49816797184 | 39356203008 | 19774046208 | 34745614336 |
-| Issued Instructions | inst |  | 38767971417 | 49816817330 | 39356221603 | 19774065381 | 34745636793 |
-| Avg. Executed Instructions Per Scheduler | inst |  |  |  |  | 85232957.79 |  |
+| Avg. Issued Instructions Per Scheduler | inst |  | 85233040.44 |  |  |  | 501617198 |
+| Executed Instructions | inst | 34745614336 | 19774046208 | 39356203008 | 49816797184 | 38767951872 |  |
+| Issued Instructions | inst | 34745636793 | 19774065381 | 39356221603 | 49816817330 | 38767971417 |  |
+| Avg. Executed Instructions Per Scheduler | inst |  | 85232957.79 |  |  |  |  |
 
 ### Launch Statistics
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Block Size |  | 256 | 256 | 256 | 256 | 256 | 256 |
 | Function Cache Configuration |  | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone | CachePreferNone |
-| Grid Size |  | 1048576 | 131072 | 131072 | 131072 | 131072 | 131072 |
-| Registers Per Thread | register/thread | 40 | 48 | 48 | 48 | 54 | 39 |
-| Shared Memory Configuration Size | Kbyte | 32.77 | 102.40 | 65.54 | 65.54 | 102.40 | 65.54 |
+| Grid Size |  | 131072 | 131072 | 131072 | 131072 | 131072 | 1048576 |
+| Registers Per Thread | register/thread | 39 | 54 | 48 | 48 | 48 | 40 |
+| Shared Memory Configuration Size | Kbyte | 65.54 | 102.40 | 65.54 | 65.54 | 102.40 | 32.77 |
 | Driver Shared Memory Per Block | Kbyte/block | 1.02 | 1.02 | 1.02 | 1.02 | 1.02 | 1.02 |
 | Dynamic Shared Memory Per Block | byte/block | 0 | 0 | 0 | 0 | 0 | 0 |
-| Static Shared Memory Per Block | byte/block | 640 |  |  |  |  |  |
+| Static Shared Memory Per Block | byte/block |  |  |  |  |  | 640 |
 | # SMs | SM | 58 | 58 | 58 | 58 | 58 | 58 |
 | Stack Size |  | 1024 | 1024 | 1024 | 1024 | 1024 | 1024 |
-| Threads | thread | 268435456 | 33554432 | 33554432 | 33554432 | 33554432 | 33554432 |
+| Threads | thread | 33554432 | 33554432 | 33554432 | 33554432 | 33554432 | 268435456 |
 | # TPCs |  | 29 | 29 | 29 | 29 | 29 | 29 |
 | Enabled TPC IDs |  | all | all | all | all | all | all |
 | Uses Green Context |  | 0 | 0 | 0 | 0 | 0 | 0 |
-| Waves Per SM |  | 3013.15 | 451.97 | 451.97 | 451.97 | 564.97 | 376.64 |
-| Static Shared Memory Per Block | Kbyte/block |  | 12.29 | 8.19 | 8.19 | 16.38 | 8.19 |
+| Waves Per SM |  | 376.64 | 564.97 | 451.97 | 451.97 | 451.97 | 3013.15 |
+| Static Shared Memory Per Block | Kbyte/block | 8.19 | 16.38 | 8.19 | 8.19 | 12.29 |  |
 
 ### Occupancy
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
 | Block Limit SM | block | 24 | 24 | 24 | 24 | 24 | 24 |
-| Block Limit Registers | block | 6 | 5 | 5 | 5 | 4 | 6 |
-| Block Limit Shared Mem | block | 19 | 7 | 7 | 7 | 5 | 7 |
+| Block Limit Registers | block | 6 | 4 | 5 | 5 | 5 | 6 |
+| Block Limit Shared Mem | block | 7 | 5 | 7 | 7 | 7 | 19 |
 | Block Limit Warps | block | 6 | 6 | 6 | 6 | 6 | 6 |
-| Theoretical Active Warps per SM | warp | 48 | 40 | 40 | 40 | 32 | 48 |
-| Theoretical Occupancy | % | 100 | 83.33 | 83.33 | 83.33 | 66.67 | 100 |
-| Achieved Occupancy | % | 99.95 | 82.07 | 97.28 | 82.92 | 66.40 | 98.66 |
-| Achieved Active Warps Per SM | warp | 47.98 | 39.40 | 46.69 | 39.80 | 31.87 | 47.36 |
+| Theoretical Active Warps per SM | warp | 48 | 32 | 40 | 40 | 40 | 48 |
+| Theoretical Occupancy | % | 100 | 66.67 | 83.33 | 83.33 | 83.33 | 100 |
+| Achieved Occupancy | % | 98.66 | 66.40 | 82.92 | 97.28 | 82.07 | 99.95 |
+| Achieved Active Warps Per SM | warp | 47.36 | 31.87 | 39.80 | 46.69 | 39.40 | 47.98 |
 
 Comments:
 - **int8_ptx_mma_k32** [OPT]: Est. Speedup: 33.05% The 8.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the hardware maximum of 12. This kernel's theoretical occupancy (66.7%) is limited by the number of required registers.
 
 ### GPU and Memory Workload Distribution
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Total DRAM Elapsed Cycles | cycle | 88481901568 | 30736189440 | 23143433216 | 21806853120 | 18268452864 | 32159330304 |
-| Total L1 Elapsed Cycles | cycle | 109252390212 | 38381994908 | 28936962628 | 27164187152 | 22610726802 | 39811947716 |
-| Total L2 Elapsed Cycles | cycle | 46763238360 | 16311382704 | 12291414000 | 11559239040 | 9673158192 | 17011646232 |
-| Total SM Elapsed Cycles | cycle | 109252390212 | 38381994908 | 28936962628 | 27164187152 | 22610726802 | 39811947716 |
-| Total SMSP Elapsed Cycles | cycle | 437009560848 | 153527979632 | 115747850512 | 108656748608 | 90442907208 |  |
-| Average L1 Active Cycles | cycle |  | 661621010.41 | 498798218.09 | 468226612.12 | 389738480.03 |  |
-| Average L2 Active Cycles | cycle |  | 696935813.08 | 657125464 | 479847893.21 | 403437887.96 |  |
-| Average SM Active Cycles | cycle |  | 661621010.41 | 498798218.09 | 468226612.12 | 389738480.03 |  |
-| Average SMSP Active Cycles | cycle |  | 672183198.10 | 625305017.12 | 468242607.74 | 388673723.45 |  |
-| Average DRAM Active Cycles | cycle |  |  |  |  |  | 2795572312 |
+| Total DRAM Elapsed Cycles | cycle | 32159330304 | 18268452864 | 21806853120 | 23143433216 | 30736189440 | 88481901568 |
+| Total L1 Elapsed Cycles | cycle | 39811947716 | 22610726802 | 27164187152 | 28936962628 | 38381994908 | 109252390212 |
+| Total L2 Elapsed Cycles | cycle | 17011646232 | 9673158192 | 11559239040 | 12291414000 | 16311382704 | 46763238360 |
+| Total SM Elapsed Cycles | cycle | 39811947716 | 22610726802 | 27164187152 | 28936962628 | 38381994908 | 109252390212 |
+| Total SMSP Elapsed Cycles | cycle |  | 90442907208 | 108656748608 | 115747850512 | 153527979632 | 437009560848 |
+| Average L1 Active Cycles | cycle |  | 389738480.03 | 468226612.12 | 498798218.09 | 661621010.41 |  |
+| Average L2 Active Cycles | cycle |  | 403437887.96 | 479847893.21 | 657125464 | 696935813.08 |  |
+| Average SM Active Cycles | cycle |  | 389738480.03 | 468226612.12 | 498798218.09 | 661621010.41 |  |
+| Average SMSP Active Cycles | cycle |  | 388673723.45 | 468242607.74 | 625305017.12 | 672183198.10 |  |
+| Average DRAM Active Cycles | cycle | 2795572312 |  |  |  |  |  |
 
 ### Source Counters
 
-| Metric Name | Metric Unit | int8_dp4a | int8_ptx_3stage | int8_ptx_manual_pack | int8_ptx_mma_k16 | int8_ptx_mma_k32 | int8_wmma |
+| Metric Name | Metric Unit | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|---|
-| Branch Instructions Ratio | % | 0.01 | 0.18 | 0.15 | 0.19 | 0.15 | 0.20 |
-| Branch Instructions | inst | 1115684864 | 6980370432 | 7522484224 | 7514095616 | 2963275776 | 6983516160 |
-| Branch Efficiency | % | 100 | 87.49 | 87.53 | 87.49 | 100 | 87.53 |
-| Avg. Divergent Branches | branches | 0 | 2314098.76 | 2309579.03 | 2314098.76 | 0 | 2309579.03 |
+| Branch Instructions Ratio | % | 0.20 | 0.15 | 0.19 | 0.15 | 0.18 | 0.01 |
+| Branch Instructions | inst | 6983516160 | 2963275776 | 7514095616 | 7522484224 | 6980370432 | 1115684864 |
+| Branch Efficiency | % | 87.53 | 100 | 87.49 | 87.53 | 87.49 | 100 |
+| Avg. Divergent Branches | branches | 2309579.03 | 0 | 2314098.76 | 2309579.03 | 2314098.76 | 0 |
 
 Comments:
 - **int8_dp4a** [OPT]: Est. Speedup: 49.85% This kernel has uncoalesced global accesses resulting in a total of 8589934592 excessive sectors (50% of the total 17213423616 sectors). Check the L2 Theoretical Sectors Global Excessive table for the primary source locations. The CUDA Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses) has additional information on reducing uncoalesced device memory accesses.
