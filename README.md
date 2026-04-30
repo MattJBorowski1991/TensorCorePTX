@@ -54,9 +54,9 @@ Six FP16 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 
 
 Six INT8 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 512 → 8192 (square, INT8 A/B inputs, INT32 accumulation, no in-kernel dequant). Performance is measured relative to `int8_wmma` (the WMMA-API baseline).
 
-![Duration (ms) — bars = elapsed time, markers = % vs int8_wmma](prof/charts/run2/gpu_speed_of_light_throughput__duration_ms.png)
+![Compute (SM) Throughput % — all sizes equally visible](prof/charts/run2/gpu_speed_of_light_throughput__compute_sm_throughput.png)
 
-![Executed Instructions — markers = % vs int8_wmma](prof/charts/run2/instruction_statistics__executed_instructions_inst.png)
+![L1/TEX Hit Rate % — shows memory regime shift across sizes](prof/charts/run2/memory_workload_analysis__l1_tex_hit_rate.png)
 
 **`int8_ptx_mma_k32` is the fastest kernel at every size**, ranging from 23% faster than `int8_wmma` at N=512 up to 43% faster at N=8192. Its advantage is rooted in instruction count: it executes 25–43% fewer instructions than wmma by decomposing each K=32 tile step into two tightly unrolled `m16n8k16` MMA calls, eliminating most of the overhead present in the other kernels. Its coalescing is also exceptional — only 0.4% wasted global sectors at N=8192, vs ~50% for every other kernel.
 
