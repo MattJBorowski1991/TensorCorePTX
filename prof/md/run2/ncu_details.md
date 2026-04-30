@@ -148,6 +148,27 @@
 - **L2 hit rate at 8192:** `manual_pack` tops at 87.9%, `k32` drops to 65.8% — `k32` pushes data to DRAM more but compensates with fewer total loads
 - **`dp4a` has the highest Max Bandwidth % at both sizes (93–94%)** — it saturates DRAM because its scalar memory-heavy code hammers the memory subsystem without the compute hiding that MMA provides
 
+### Average DRAM Active Cycles — the N=8192 performance fingerprint
+
+| Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage |
+|---|---|---|---|---|---|
+| 512 | 77,269 | 77,416 | 77,072 | 77,317 | 77,643 |
+| 1024 | 354,984 | 355,232 | 355,075 | 353,856 | 354,179 |
+| 2048 | 2,611,349 | 2,588,987 | 2,591,048 | 2,615,099 | 2,619,691 |
+| 4096 | 12,074,896 | 11,988,533 | 12,004,963 | 12,092,413 | 12,107,291 |
+| 8192 | **2,795,572,312** | **1,569,477,901** | **1,821,660,829** | **1,883,737,747** | **2,617,198,477** |
+
+**vs wmma at N=8192 (DRAM cycles / wall-clock):**
+
+| Kernel | DRAM cycles vs wmma | Wall-clock vs wmma |
+|---|---|---|
+| `int8_ptx_mma_k32` | −43.9% | −43% |
+| `int8_ptx_mma_k16` | −34.8% | −32% |
+| `int8_ptx_manual_pack` | −32.6% | −28% |
+| `int8_ptx_3stage` | −6.4% | −4% |
+
+At N ≤ 4096 all kernels show almost identical DRAM active cycle counts (within ~1%), confirming the compute-bound regime: DRAM is not the bottleneck and instruction efficiency determines performance. At N=8192 the spread becomes enormous — **Average DRAM Active Cycles tracks wall-clock elapsed time almost exactly** (within 1–4 percentage points across all kernels). This is the clearest single piece of evidence that N=8192 is purely DRAM-latency-bound: the kernel that spends the fewest cycles waiting on DRAM wins, and that ranking matches the coalescing quality ranking (`k32` wastes 0.4% of global sectors vs ~50% for the others). Fixing the coalescing defect in any of the slower kernels would be expected to close most of the gap with `k32`.
+
 ---
 
 ## 5. Occupancy

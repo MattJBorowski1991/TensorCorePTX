@@ -54,9 +54,17 @@ Six FP16 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 
 
 Six INT8 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 512 → 8192 (square, INT8 A/B inputs, INT32 accumulation, no in-kernel dequant). Performance is measured relative to `int8_wmma` (the WMMA-API baseline).
 
-![Compute (SM) Throughput % — all sizes equally visible](prof/charts/run2/gpu_speed_of_light_throughput__compute_sm_throughput.png)
+![Average DRAM Active Cycles — flat at N≤4096 (compute-bound), diverges at N=8192 mirroring the speedup ranking](prof/charts/run2/gpu_and_memory_workload_distribution__average_dram_active_cycles_cycle.png)
 
-![L1/TEX Hit Rate % — shows memory regime shift across sizes](prof/charts/run2/memory_workload_analysis__l1_tex_hit_rate.png)
+**Speedup / slowdown vs `int8_wmma` (negative = faster):**
+
+| Size | k32 | k16 | manual_pack | 3stage |
+|---|---|---|---|---|
+| 512 | **−23%** | +35% | +5% | ~0% |
+| 1024 | **−29%** | +20% | +5% | +4% |
+| 2048 | **−30%** | +12% | +4% | +20% |
+| 4096 | **−33%** | +7% | +2% | +37% |
+| 8192 | **−43%** | −32% | −28% | −4% |
 
 **`int8_ptx_mma_k32` is the fastest kernel at every size**, ranging from 23% faster than `int8_wmma` at N=512 up to 43% faster at N=8192. Its advantage is rooted in instruction count: it executes 25–43% fewer instructions than wmma by decomposing each K=32 tile step into two tightly unrolled `m16n8k16` MMA calls, eliminating most of the overhead present in the other kernels. Its coalescing is also exceptional — only 0.4% wasted global sectors at N=8192, vs ~50% for every other kernel.
 
@@ -69,6 +77,8 @@ Six INT8 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 
 **`int8_dp4a` is never competitive** — even at N=8192 it is 175% slower than wmma (4.8×). Scalar DP4A instructions emit 3–5× more instructions per unit of arithmetic work than MMA, saturate the MIO queue, and cannot exploit tensor cores.
 
 **Occupancy is not the performance predictor.** `int8_wmma` achieves the highest occupancy at every size yet is consistently outrun by `k32` (which is register-capped at 66.7% theoretical). The bottleneck is instruction efficiency and memory latency, not warp count.
+
+**Average DRAM Active Cycles is the N=8192 performance fingerprint.** At N ≤ 4096 all kernels show essentially identical DRAM active cycle counts (within ~1% of each other), confirming the compute-bound regime. At N=8192 the spread becomes enormous: `k32` logs 1.57B DRAM-active cycles vs `wmma`'s 2.80B — a −43.9% reduction that tracks almost exactly with its −43% wall-clock speedup. The same correspondence holds for every kernel (k16: −34.8% DRAM / −32% wall-clock; manual_pack: −32.6% / −28%; 3stage: −6.4% / −4%). This is the clearest evidence that N=8192 is purely DRAM-latency-bound and that the performance ranking is entirely explained by coalescing quality: `k32` wastes only 0.4% of global sectors vs ~50% for the others.
 
 | Kernel | SRAM→Regs | mma.sync shape | Acc type | Pipeline | Notes |
 |---|---|---|---|---|---|
