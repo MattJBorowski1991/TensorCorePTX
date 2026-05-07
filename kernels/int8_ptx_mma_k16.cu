@@ -51,8 +51,6 @@
 #include "include/config.h"
 #include "include/cuda_utils.h"
 
-// ── ldmatrix macros ───────────────────────────────────────────────────────────
-
 // ── ldmatrix / mma helpers ──────────────────────────────────────────────────────
 
 // Load A: 16×16 int8 tile from SMEM into 2 uint32 registers (ldmatrix.x2).
@@ -150,11 +148,6 @@ __global__ void int8_ptx_mma_k16_db(
     ldmatrix_a(ra,  As[buf][warp_id], lane_id);
     ldmatrix_b(rb0, Bs[buf][warp_id], lane_id, 0);   // BT rows 0-7  → B cols 0-7
     ldmatrix_b(rb1, Bs[buf][warp_id], lane_id, 8);   // BT rows 8-15 → B cols 8-15
-    if (M == 16 && N == 16 && K == 16 && blockIdx.x == 0 && blockIdx.y == 0 && blockIdx.z == 0 &&
-        warp_id == 0 && lane_id < 16) {
-        printf("[ldm] lane=%2d ra0=%08x ra1=%08x rb0=%08x rb1=%08x\n",
-               lane_id, ra[0], ra[1], rb0[0], rb1[0]);
-    }
 
     // ── Main K loop ───────────────────────────────────────────────────────────
     for (int k = WMMA_K; k < K; k += WMMA_K) {
