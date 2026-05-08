@@ -133,5 +133,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/profile_int4_ptx_mma_k64.dir/DependInfo.cmake"
+  "CMakeFiles/profile_int4_ptx_mma_k32.dir/DependInfo.cmake"
   )

@@ -1,3 +1,3 @@
-/teamspace/studios/this_studio/TensorCorePTX/build/CMakeFiles/profile_int4_ptx_mma_k64.dir
+/teamspace/studios/this_studio/TensorCorePTX/build/CMakeFiles/profile_int4_ptx_mma_k32.dir
 /teamspace/studios/this_studio/TensorCorePTX/build/CMakeFiles/edit_cache.dir
 /teamspace/studios/this_studio/TensorCorePTX/build/CMakeFiles/rebuild_cache.dir
