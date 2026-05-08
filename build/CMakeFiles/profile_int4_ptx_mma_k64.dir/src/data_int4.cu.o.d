@@ -1,4 +1,4 @@
-CMakeFiles/profile_int8_ptx_3stage.dir/src/main_int8.cu.o : /teamspace/studios/this_studio/TensorCorePTX/src/main_int8.cu \
+CMakeFiles/profile_int4_ptx_mma_k64.dir/src/data_int4.cu.o : /teamspace/studios/this_studio/TensorCorePTX/src/data_int4.cu \
     /usr/include/stdc-predef.h \
     /usr/local/cuda/bin/../targets/x86_64-linux/include/cuda_runtime.h \
     /usr/local/cuda/bin/../targets/x86_64-linux/include/crt/host_config.h \
@@ -199,39 +199,9 @@ CMakeFiles/profile_int8_ptx_3stage.dir/src/main_int8.cu.o : /teamspace/studios/t
     /usr/include/c++/13/utility \
     /usr/include/c++/13/bits/stl_relops.h \
     /usr/include/c++/13/initializer_list \
-    /usr/include/c++/13/vector \
-    /usr/include/c++/13/bits/allocator.h \
-    /usr/include/x86_64-linux-gnu/c++/13/bits/c++allocator.h \
-    /usr/include/c++/13/bits/new_allocator.h \
-    /usr/include/c++/13/bits/memoryfwd.h \
-    /usr/include/c++/13/bits/stl_uninitialized.h \
-    /usr/include/c++/13/ext/alloc_traits.h \
-    /usr/include/c++/13/bits/alloc_traits.h \
-    /usr/include/c++/13/bits/stl_vector.h \
-    /usr/include/c++/13/bits/stl_bvector.h \
-    /usr/include/c++/13/bits/functional_hash.h \
-    /usr/include/c++/13/bits/hash_bytes.h \
-    /usr/include/c++/13/bits/refwrap.h \
-    /usr/include/c++/13/bits/invoke.h \
-    /usr/include/c++/13/bits/stl_function.h \
-    /usr/include/c++/13/backward/binders.h \
-    /usr/include/c++/13/bits/range_access.h \
-    /usr/include/c++/13/bits/vector.tcc \
-    /usr/include/c++/13/bits/memory_resource.h \
-    /usr/include/c++/13/cstddef \
-    /usr/include/c++/13/bits/uses_allocator.h \
-    /usr/include/c++/13/bits/uses_allocator_args.h \
-    /usr/include/c++/13/tuple \
-    /usr/include/c++/13/bits/ranges_util.h \
-    /usr/include/c++/13/bits/ranges_base.h \
-    /usr/include/c++/13/bits/max_size_type.h \
-    /usr/include/c++/13/numbers \
+    /teamspace/studios/this_studio/TensorCorePTX/src/data_int4.h \
     /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h \
     /usr/include/stdint.h \
     /usr/include/x86_64-linux-gnu/bits/wchar.h \
     /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
-    /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
-    /teamspace/studios/this_studio/TensorCorePTX/include/config.h \
-    /teamspace/studios/this_studio/TensorCorePTX/include/cuda_utils.h \
-    /teamspace/studios/this_studio/TensorCorePTX/src/solver_int8.h \
-    /teamspace/studios/this_studio/TensorCorePTX/src/data_int8.h
+    /usr/include/x86_64-linux-gnu/bits/stdint-least.h

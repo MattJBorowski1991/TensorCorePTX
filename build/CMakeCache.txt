@@ -215,7 +215,7 @@ CUDA_ARCH:STRING=89
 
 //Kernel variant (maps to kernels/<KERNEL>.cu). Prefix int8_ →
 // INT8 build, fp16_ → FP16 build.
-KERNEL:STRING=int8_ptx_3stage
+KERNEL:STRING=int4_ptx_mma_k64
 
 //Optional max registers per thread (e.g. 128)
 MAXRREGCOUNT:STRING=

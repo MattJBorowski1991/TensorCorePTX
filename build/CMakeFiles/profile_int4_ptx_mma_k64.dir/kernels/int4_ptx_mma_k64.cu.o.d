@@ -1,4 +1,4 @@
-CMakeFiles/profile_int8_ptx_3stage.dir/src/solver_int8.cu.o : /teamspace/studios/this_studio/TensorCorePTX/src/solver_int8.cu \
+CMakeFiles/profile_int4_ptx_mma_k64.dir/kernels/int4_ptx_mma_k64.cu.o : /teamspace/studios/this_studio/TensorCorePTX/kernels/int4_ptx_mma_k64.cu \
     /usr/include/stdc-predef.h \
     /usr/local/cuda/bin/../targets/x86_64-linux/include/cuda_runtime.h \
     /usr/local/cuda/bin/../targets/x86_64-linux/include/crt/host_config.h \
@@ -199,7 +199,6 @@ CMakeFiles/profile_int8_ptx_3stage.dir/src/solver_int8.cu.o : /teamspace/studios
     /usr/include/c++/13/utility \
     /usr/include/c++/13/bits/stl_relops.h \
     /usr/include/c++/13/initializer_list \
-    /teamspace/studios/this_studio/TensorCorePTX/src/solver_int8.h \
     /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h \
     /usr/include/stdint.h \
     /usr/include/x86_64-linux-gnu/bits/wchar.h \

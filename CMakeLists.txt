@@ -24,11 +24,21 @@ if(MAXRREGCOUNT)
     list(APPEND CUDA_FLAGS -maxrregcount=${MAXRREGCOUNT})
 endif()
 
-# Route sources automatically: kernels starting with "int8_" use the INT8
-# pipeline (main_int8.cu / solver_int8.cu / data_int8.cu); everything else
-# uses the FP16 pipeline.
+# Route sources automatically:
+#   int4_ prefix → INT4 pipeline (main_int4.cu / solver_int4.cu / data_int4.cu)
+#   int8_ prefix → INT8 pipeline (main_int8.cu / solver_int8.cu / data_int8.cu)
+#   everything else → FP16 pipeline
+string(FIND "${KERNEL}" "int4_" _int4_prefix)
 string(FIND "${KERNEL}" "int8_" _int8_prefix)
-if(_int8_prefix EQUAL 0)
+if(_int4_prefix EQUAL 0)
+    message(STATUS "INT4 build: profile_${KERNEL}")
+    add_executable(profile_${KERNEL}
+        src/main_int4.cu
+        src/solver_int4.cu
+        src/data_int4.cu
+        kernels/${KERNEL}.cu
+    )
+elseif(_int8_prefix EQUAL 0)
     message(STATUS "INT8 build: profile_${KERNEL}")
     add_executable(profile_${KERNEL}
         src/main_int8.cu

@@ -117,113 +117,113 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named profile_int8_ptx_3stage
+# Target rules for targets named profile_int4_ptx_mma_k64
 
 # Build rule for target.
-profile_int8_ptx_3stage: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 profile_int8_ptx_3stage
-.PHONY : profile_int8_ptx_3stage
+profile_int4_ptx_mma_k64: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 profile_int4_ptx_mma_k64
+.PHONY : profile_int4_ptx_mma_k64
 
 # fast build rule for target.
-profile_int8_ptx_3stage/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/build
-.PHONY : profile_int8_ptx_3stage/fast
+profile_int4_ptx_mma_k64/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/build
+.PHONY : profile_int4_ptx_mma_k64/fast
 
-kernels/int8_ptx_3stage.o: kernels/int8_ptx_3stage.cu.o
-.PHONY : kernels/int8_ptx_3stage.o
-
-# target to build an object file
-kernels/int8_ptx_3stage.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/kernels/int8_ptx_3stage.cu.o
-.PHONY : kernels/int8_ptx_3stage.cu.o
-
-kernels/int8_ptx_3stage.i: kernels/int8_ptx_3stage.cu.i
-.PHONY : kernels/int8_ptx_3stage.i
-
-# target to preprocess a source file
-kernels/int8_ptx_3stage.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/kernels/int8_ptx_3stage.cu.i
-.PHONY : kernels/int8_ptx_3stage.cu.i
-
-kernels/int8_ptx_3stage.s: kernels/int8_ptx_3stage.cu.s
-.PHONY : kernels/int8_ptx_3stage.s
-
-# target to generate assembly for a file
-kernels/int8_ptx_3stage.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/kernels/int8_ptx_3stage.cu.s
-.PHONY : kernels/int8_ptx_3stage.cu.s
-
-src/data_int8.o: src/data_int8.cu.o
-.PHONY : src/data_int8.o
+kernels/int4_ptx_mma_k64.o: kernels/int4_ptx_mma_k64.cu.o
+.PHONY : kernels/int4_ptx_mma_k64.o
 
 # target to build an object file
-src/data_int8.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/src/data_int8.cu.o
-.PHONY : src/data_int8.cu.o
+kernels/int4_ptx_mma_k64.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/kernels/int4_ptx_mma_k64.cu.o
+.PHONY : kernels/int4_ptx_mma_k64.cu.o
 
-src/data_int8.i: src/data_int8.cu.i
-.PHONY : src/data_int8.i
+kernels/int4_ptx_mma_k64.i: kernels/int4_ptx_mma_k64.cu.i
+.PHONY : kernels/int4_ptx_mma_k64.i
 
 # target to preprocess a source file
-src/data_int8.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/src/data_int8.cu.i
-.PHONY : src/data_int8.cu.i
+kernels/int4_ptx_mma_k64.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/kernels/int4_ptx_mma_k64.cu.i
+.PHONY : kernels/int4_ptx_mma_k64.cu.i
 
-src/data_int8.s: src/data_int8.cu.s
-.PHONY : src/data_int8.s
+kernels/int4_ptx_mma_k64.s: kernels/int4_ptx_mma_k64.cu.s
+.PHONY : kernels/int4_ptx_mma_k64.s
 
 # target to generate assembly for a file
-src/data_int8.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/src/data_int8.cu.s
-.PHONY : src/data_int8.cu.s
+kernels/int4_ptx_mma_k64.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/kernels/int4_ptx_mma_k64.cu.s
+.PHONY : kernels/int4_ptx_mma_k64.cu.s
 
-src/main_int8.o: src/main_int8.cu.o
-.PHONY : src/main_int8.o
+src/data_int4.o: src/data_int4.cu.o
+.PHONY : src/data_int4.o
 
 # target to build an object file
-src/main_int8.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/src/main_int8.cu.o
-.PHONY : src/main_int8.cu.o
+src/data_int4.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/src/data_int4.cu.o
+.PHONY : src/data_int4.cu.o
 
-src/main_int8.i: src/main_int8.cu.i
-.PHONY : src/main_int8.i
+src/data_int4.i: src/data_int4.cu.i
+.PHONY : src/data_int4.i
 
 # target to preprocess a source file
-src/main_int8.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/src/main_int8.cu.i
-.PHONY : src/main_int8.cu.i
+src/data_int4.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/src/data_int4.cu.i
+.PHONY : src/data_int4.cu.i
 
-src/main_int8.s: src/main_int8.cu.s
-.PHONY : src/main_int8.s
+src/data_int4.s: src/data_int4.cu.s
+.PHONY : src/data_int4.s
 
 # target to generate assembly for a file
-src/main_int8.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/src/main_int8.cu.s
-.PHONY : src/main_int8.cu.s
+src/data_int4.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/src/data_int4.cu.s
+.PHONY : src/data_int4.cu.s
 
-src/solver_int8.o: src/solver_int8.cu.o
-.PHONY : src/solver_int8.o
+src/main_int4.o: src/main_int4.cu.o
+.PHONY : src/main_int4.o
 
 # target to build an object file
-src/solver_int8.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/src/solver_int8.cu.o
-.PHONY : src/solver_int8.cu.o
+src/main_int4.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/src/main_int4.cu.o
+.PHONY : src/main_int4.cu.o
 
-src/solver_int8.i: src/solver_int8.cu.i
-.PHONY : src/solver_int8.i
+src/main_int4.i: src/main_int4.cu.i
+.PHONY : src/main_int4.i
 
 # target to preprocess a source file
-src/solver_int8.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/src/solver_int8.cu.i
-.PHONY : src/solver_int8.cu.i
+src/main_int4.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/src/main_int4.cu.i
+.PHONY : src/main_int4.cu.i
 
-src/solver_int8.s: src/solver_int8.cu.s
-.PHONY : src/solver_int8.s
+src/main_int4.s: src/main_int4.cu.s
+.PHONY : src/main_int4.s
 
 # target to generate assembly for a file
-src/solver_int8.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int8_ptx_3stage.dir/build.make CMakeFiles/profile_int8_ptx_3stage.dir/src/solver_int8.cu.s
-.PHONY : src/solver_int8.cu.s
+src/main_int4.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/src/main_int4.cu.s
+.PHONY : src/main_int4.cu.s
+
+src/solver_int4.o: src/solver_int4.cu.o
+.PHONY : src/solver_int4.o
+
+# target to build an object file
+src/solver_int4.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/src/solver_int4.cu.o
+.PHONY : src/solver_int4.cu.o
+
+src/solver_int4.i: src/solver_int4.cu.i
+.PHONY : src/solver_int4.i
+
+# target to preprocess a source file
+src/solver_int4.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/src/solver_int4.cu.i
+.PHONY : src/solver_int4.cu.i
+
+src/solver_int4.s: src/solver_int4.cu.s
+.PHONY : src/solver_int4.s
+
+# target to generate assembly for a file
+src/solver_int4.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_mma_k64.dir/build.make CMakeFiles/profile_int4_ptx_mma_k64.dir/src/solver_int4.cu.s
+.PHONY : src/solver_int4.cu.s
 
 # Help Target
 help:
@@ -233,19 +233,19 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... profile_int8_ptx_3stage"
-	@echo "... kernels/int8_ptx_3stage.o"
-	@echo "... kernels/int8_ptx_3stage.i"
-	@echo "... kernels/int8_ptx_3stage.s"
-	@echo "... src/data_int8.o"
-	@echo "... src/data_int8.i"
-	@echo "... src/data_int8.s"
-	@echo "... src/main_int8.o"
-	@echo "... src/main_int8.i"
-	@echo "... src/main_int8.s"
-	@echo "... src/solver_int8.o"
-	@echo "... src/solver_int8.i"
-	@echo "... src/solver_int8.s"
+	@echo "... profile_int4_ptx_mma_k64"
+	@echo "... kernels/int4_ptx_mma_k64.o"
+	@echo "... kernels/int4_ptx_mma_k64.i"
+	@echo "... kernels/int4_ptx_mma_k64.s"
+	@echo "... src/data_int4.o"
+	@echo "... src/data_int4.i"
+	@echo "... src/data_int4.s"
+	@echo "... src/main_int4.o"
+	@echo "... src/main_int4.i"
+	@echo "... src/main_int4.s"
+	@echo "... src/solver_int4.o"
+	@echo "... src/solver_int4.i"
+	@echo "... src/solver_int4.s"
 .PHONY : help
 
 
