@@ -117,48 +117,48 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named profile_int4_ptx_manual_pack
+# Target rules for targets named profile_int4_wmma
 
 # Build rule for target.
-profile_int4_ptx_manual_pack: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 profile_int4_ptx_manual_pack
-.PHONY : profile_int4_ptx_manual_pack
+profile_int4_wmma: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 profile_int4_wmma
+.PHONY : profile_int4_wmma
 
 # fast build rule for target.
-profile_int4_ptx_manual_pack/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/build
-.PHONY : profile_int4_ptx_manual_pack/fast
+profile_int4_wmma/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/build
+.PHONY : profile_int4_wmma/fast
 
-kernels/int4_ptx_manual_pack.o: kernels/int4_ptx_manual_pack.cu.o
-.PHONY : kernels/int4_ptx_manual_pack.o
+kernels/int4_wmma.o: kernels/int4_wmma.cu.o
+.PHONY : kernels/int4_wmma.o
 
 # target to build an object file
-kernels/int4_ptx_manual_pack.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/kernels/int4_ptx_manual_pack.cu.o
-.PHONY : kernels/int4_ptx_manual_pack.cu.o
+kernels/int4_wmma.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/kernels/int4_wmma.cu.o
+.PHONY : kernels/int4_wmma.cu.o
 
-kernels/int4_ptx_manual_pack.i: kernels/int4_ptx_manual_pack.cu.i
-.PHONY : kernels/int4_ptx_manual_pack.i
+kernels/int4_wmma.i: kernels/int4_wmma.cu.i
+.PHONY : kernels/int4_wmma.i
 
 # target to preprocess a source file
-kernels/int4_ptx_manual_pack.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/kernels/int4_ptx_manual_pack.cu.i
-.PHONY : kernels/int4_ptx_manual_pack.cu.i
+kernels/int4_wmma.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/kernels/int4_wmma.cu.i
+.PHONY : kernels/int4_wmma.cu.i
 
-kernels/int4_ptx_manual_pack.s: kernels/int4_ptx_manual_pack.cu.s
-.PHONY : kernels/int4_ptx_manual_pack.s
+kernels/int4_wmma.s: kernels/int4_wmma.cu.s
+.PHONY : kernels/int4_wmma.s
 
 # target to generate assembly for a file
-kernels/int4_ptx_manual_pack.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/kernels/int4_ptx_manual_pack.cu.s
-.PHONY : kernels/int4_ptx_manual_pack.cu.s
+kernels/int4_wmma.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/kernels/int4_wmma.cu.s
+.PHONY : kernels/int4_wmma.cu.s
 
 src/data_int4.o: src/data_int4.cu.o
 .PHONY : src/data_int4.o
 
 # target to build an object file
 src/data_int4.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/src/data_int4.cu.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/src/data_int4.cu.o
 .PHONY : src/data_int4.cu.o
 
 src/data_int4.i: src/data_int4.cu.i
@@ -166,7 +166,7 @@ src/data_int4.i: src/data_int4.cu.i
 
 # target to preprocess a source file
 src/data_int4.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/src/data_int4.cu.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/src/data_int4.cu.i
 .PHONY : src/data_int4.cu.i
 
 src/data_int4.s: src/data_int4.cu.s
@@ -174,7 +174,7 @@ src/data_int4.s: src/data_int4.cu.s
 
 # target to generate assembly for a file
 src/data_int4.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/src/data_int4.cu.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/src/data_int4.cu.s
 .PHONY : src/data_int4.cu.s
 
 src/main_int4.o: src/main_int4.cu.o
@@ -182,7 +182,7 @@ src/main_int4.o: src/main_int4.cu.o
 
 # target to build an object file
 src/main_int4.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/src/main_int4.cu.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/src/main_int4.cu.o
 .PHONY : src/main_int4.cu.o
 
 src/main_int4.i: src/main_int4.cu.i
@@ -190,7 +190,7 @@ src/main_int4.i: src/main_int4.cu.i
 
 # target to preprocess a source file
 src/main_int4.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/src/main_int4.cu.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/src/main_int4.cu.i
 .PHONY : src/main_int4.cu.i
 
 src/main_int4.s: src/main_int4.cu.s
@@ -198,7 +198,7 @@ src/main_int4.s: src/main_int4.cu.s
 
 # target to generate assembly for a file
 src/main_int4.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/src/main_int4.cu.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/src/main_int4.cu.s
 .PHONY : src/main_int4.cu.s
 
 src/solver_int4.o: src/solver_int4.cu.o
@@ -206,7 +206,7 @@ src/solver_int4.o: src/solver_int4.cu.o
 
 # target to build an object file
 src/solver_int4.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/src/solver_int4.cu.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/src/solver_int4.cu.o
 .PHONY : src/solver_int4.cu.o
 
 src/solver_int4.i: src/solver_int4.cu.i
@@ -214,7 +214,7 @@ src/solver_int4.i: src/solver_int4.cu.i
 
 # target to preprocess a source file
 src/solver_int4.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/src/solver_int4.cu.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/src/solver_int4.cu.i
 .PHONY : src/solver_int4.cu.i
 
 src/solver_int4.s: src/solver_int4.cu.s
@@ -222,7 +222,7 @@ src/solver_int4.s: src/solver_int4.cu.s
 
 # target to generate assembly for a file
 src/solver_int4.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_ptx_manual_pack.dir/build.make CMakeFiles/profile_int4_ptx_manual_pack.dir/src/solver_int4.cu.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/profile_int4_wmma.dir/build.make CMakeFiles/profile_int4_wmma.dir/src/solver_int4.cu.s
 .PHONY : src/solver_int4.cu.s
 
 # Help Target
@@ -233,10 +233,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... profile_int4_ptx_manual_pack"
-	@echo "... kernels/int4_ptx_manual_pack.o"
-	@echo "... kernels/int4_ptx_manual_pack.i"
-	@echo "... kernels/int4_ptx_manual_pack.s"
+	@echo "... profile_int4_wmma"
+	@echo "... kernels/int4_wmma.o"
+	@echo "... kernels/int4_wmma.i"
+	@echo "... kernels/int4_wmma.s"
 	@echo "... src/data_int4.o"
 	@echo "... src/data_int4.i"
 	@echo "... src/data_int4.s"
