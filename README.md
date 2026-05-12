@@ -262,4 +262,9 @@ for S in 512 1024 2048 4096 8192 16384; do
 	SKIP_VERIFY=1 PROFILE_SIZE=$S ncu --set full --target-processes all ./build/profile_fp16_ptx_fp16acc \
 		> fp16_ptx_fp16acc_ncu_${S}.txt 2>&1
 done
+
+
+# Full NCU report
+
+ncu --import-source yes --set full --export prof/int4_wmma ./build/profile_int4_wmma
 ```

@@ -1,0 +1,1 @@
+/usr/bin/g++ @CMakeFiles/profile_int4_ptx_mma_k64_x4_x2nontrans_ca.dir/objects1.rsp -o profile_int4_ptx_mma_k64_x4_x2nontrans_ca @CMakeFiles/profile_int4_ptx_mma_k64_x4_x2nontrans_ca.dir/linkLibs.rsp -L"/usr/local/cuda/targets/x86_64-linux/lib/stubs" -L"/usr/local/cuda/targets/x86_64-linux/lib"
