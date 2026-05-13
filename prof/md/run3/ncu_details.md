@@ -1,6 +1,4 @@
-# Run3 NCU Analysis Outline
-
-## Base INT4 Kernel Comparison
+# Run 3 - Int4 base kernels - comparison
 
 ### Profiled Kernels
 
@@ -45,6 +43,10 @@ k64 and 3stage win because:
 4. 54 registers/thread (vs 40 for wmma) enable larger tiled computation with less memory round-tripping.
 5. **Root cause of points 2 and 3:** `wmma::experimental::precision::s4` is **software-emulated** — the compiler expands `load_matrix_sync`/`mma_sync` into dozens of per-lane nibble-extraction PTX instructions with lane-indexed conditionals (e.g. predicates on `lane_id % 2`, `lane_id / 8`). These conditionals diverge across the warp, simultaneously inflating the instruction count and creating the divergent branches. k64 and 3stage bypass the WMMA abstraction entirely and emit three native hardware instructions per K-step: `ldmatrix.sync.aligned.m8n8.x4.shared.b16`, and `mma.sync.aligned.m16n8k64.row.col.s32.s4.s4.s32` (×2 for two n8 halves) — each a single-cycle hardware operation with no per-lane conditionals.
 
+![Avg. Active Threads Per Warp](../../charts/run3/Warp_State_Statistics_Avg._Active_Threads_Per_Warp.png)
+![Avg. Divergent Branches](../../charts/run3/Source_Counters_Avg._Divergent_Branches_branches.png)
+![Avg. Executed Instructions Per Scheduler](../../charts/run3/Instruction_Statistics_Avg._Executed_Instructions_Per_Scheduler_inst.png)
+
 The **crossover from 3stage-wins to k64-wins at N≈2048** is driven by the memory hierarchy: 3stage's explicit prefetching pipeline exhausts L1 capacity at large sizes (L1 hit rate collapses to 14% at N=8192), forcing all traffic to L2. k64's balanced cache reuse keeps ~62% of L1 requests hitting locally, which becomes the deciding factor at scale.
 
 ---
@@ -52,9 +54,6 @@ The **crossover from 3stage-wins to k64-wins at N≈2048** is driven by the memo
 ### Detailed Analysis
 
 #### 1. Kernel Duration
-
-![Duration (µs, sizes 512)](../../charts/run3/GPU_Speed_Of_Light_Throughput_Duration_us.png)
-![Duration (ms, sizes 1024–8192)](../../charts/run3/GPU_Speed_Of_Light_Throughput_Duration_ms.png)
 
 | Kernel | 512 (µs) | 1024 (ms) | 2048 (ms) | 4096 (ms) | 8192 (ms) |
 |--------|----------|-----------|-----------|-----------|-----------|
@@ -73,14 +72,6 @@ The performance gap between the top two kernels and the rest widens with problem
 ![Avg. Active Threads Per Warp](../../charts/run3/Warp_State_Statistics_Avg._Active_Threads_Per_Warp.png)
 
 The CUDA execution model groups 32 threads into a warp. If fewer than 32 are active, functional units sit idle. `int4_wmma` activates only **16–20 threads/warp** across all sizes — meaning 38–47% of compute capacity is wasted every single cycle.
-
-| Kernel | N=512 | N=8192 |
-|--------|-------|--------|
-| int4_wmma | 20.09 | 16.89 |
-| int4_ptx_mma_k32 | 32 | 32 |
-| int4_ptx_mma_k64 | **32** | **32** |
-| int4_ptx_manual_pack | 32 | 32 |
-| int4_ptx_3stage | **32** | **32** |
 
 k64 and 3stage maintain full warp occupancy regardless of problem size. wmma's active thread count actually *decreases* as N grows — suggesting its divergence-inducing control flow becomes a larger fraction of execution at scale.
 
@@ -171,7 +162,7 @@ wmma's grid is launched with much smaller thread blocks — each computing a sma
 ![One-or-More Eligible](../../charts/run3/Scheduler_Statistics_One_or_More_Eligible.png)
 ![Issued Warp Per Scheduler](../../charts/run3/Scheduler_Statistics_Issued_Warp_Per_Scheduler.png)
 
-The warp scheduler issues one instruction per eligible warp per cycle. If no warp is eligible — because all warps are stalled waiting for an operand — the cycle is wasted. wmma's high divergence and partial-warp execution translate directly into a higher fraction of **No-Eligible** cycles, stalling the pipeline. k64 and 3stage's full-warp, divergence-free execution maintains a near-peak eligible-warp supply to the scheduler at all times.
+The warp scheduler issues one instruction per eligible warp per cycle. The No-Eligible metric here is **counterintuitive**: wmma actually has the *lowest* No-Eligible fraction (45–51%), while k64 and 3stage have the *highest* (57–71%). This is a direct consequence of wmma's much larger active warp count per SM (11.3 vs 6.8 for k64 at N=512) — with more warps in flight, the scheduler can almost always find one that is ready, hiding latency through warp switching. k64 and 3stage deliberately run fewer warps per SM to support larger tiles and more registers, so the scheduler stalls more often. Yet they are still faster: the No-Eligible cycles are spent waiting on short, predictable memory latencies, whereas wmma's lower No-Eligible rate is sustained by burning through 6.5× more instructions per unit of useful work. Scheduler busyness is not throughput.
 
 ---
 
