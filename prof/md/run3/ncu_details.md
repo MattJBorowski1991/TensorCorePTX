@@ -43,6 +43,7 @@ k64 and 3stage win because:
 2. Zero conditional branches → zero divergence → no serialized execution paths.
 3. 6–7× fewer executed instructions compress the critical path across all units.
 4. 54 registers/thread (vs 40 for wmma) enable larger tiled computation with less memory round-tripping.
+5. **Root cause of points 2 and 3:** `wmma::experimental::precision::s4` is **software-emulated** — the compiler expands `load_matrix_sync`/`mma_sync` into dozens of per-lane nibble-extraction PTX instructions with lane-indexed conditionals (e.g. predicates on `lane_id % 2`, `lane_id / 8`). These conditionals diverge across the warp, simultaneously inflating the instruction count and creating the divergent branches. k64 and 3stage bypass the WMMA abstraction entirely and emit three native hardware instructions per K-step: `ldmatrix.sync.aligned.m8n8.x4.shared.b16`, and `mma.sync.aligned.m16n8k64.row.col.s32.s4.s4.s32` (×2 for two n8 halves) — each a single-cycle hardware operation with no per-lane conditionals.
 
 The **crossover from 3stage-wins to k64-wins at N≈2048** is driven by the memory hierarchy: 3stage's explicit prefetching pipeline exhausts L1 capacity at large sizes (L1 hit rate collapses to 14% at N=8192), forcing all traffic to L2. k64's balanced cache reuse keeps ~62% of L1 requests hitting locally, which becomes the deciding factor at scale.
 
@@ -100,7 +101,9 @@ Divergent branches force the warp scheduler to serialize two or more execution p
 | int4_ptx_manual_pack | 1,152,529 |
 | int4_ptx_3stage | **0** |
 
-k64 and 3stage contain **zero divergent branches at every problem size**. Their inner loops are written as unconditional PTX MMA sequences with no predicated sub-warps. This is the single most impactful structural difference between the winning and losing kernels.
+k64 and 3stage contain **zero divergent branches at every problem size**. The origin of wmma's divergence is architectural: `wmma::experimental::precision::s4` does not map to a single native hardware instruction. The PTX assembler emits a software-emulation path for `load_matrix_sync`/`mma_sync` that extracts nibbles from packed bytes using per-lane conditionals indexed by `lane_id % 2` and `lane_id / 8`. Because different lanes take different branches in the same warp, the warp scheduler must serialize those paths — this is the divergence NCU measures.
+
+k64 and 3stage avoid this entirely by calling the native hardware instruction directly via inline PTX (`mma.sync.aligned.m16n8k64.row.col.s32.s4.s4.s32`), which has no per-lane branching. This is the single most impactful structural difference between the winning and losing kernels.
 
 ---
 
@@ -119,7 +122,17 @@ Fewer instructions reduce pressure on every downstream unit: the scheduler, the 
 | int4_ptx_manual_pack | ~79M |
 | int4_ptx_3stage | **~46M** |
 
-k64 and 3stage execute roughly **6.5× fewer instructions than wmma**. The instruction overhead in wmma comes from its warp-level divergence handling, predicated execution overhead, and less efficient loop unrolling relative to the explicit PTX MMA approach.
+k64 and 3stage execute roughly **6.5× fewer instructions than wmma**. The instruction explosion in wmma shares the same root cause as its divergence (see §3): `wmma::experimental::precision::s4` is software-emulated. For each K-step, the compiler expands `load_matrix_sync` + `mma_sync` into tens of scalar PTX instructions per lane — byte loads, shifts, masks, and predicated moves — to unpack nibbles and feed the underlying hardware MMA unit.
+
+In contrast, k64 and 3stage issue three native hardware instructions per K-step:
+
+```ptx
+ldmatrix.sync.aligned.m8n8.x4.shared.b16  {ra0,ra1,ra2,ra3}, [addr];  // load A tile
+ldmatrix.sync.aligned.m8n8.x2.shared.b16  {rb0,rb1},         [addr];  // load B half
+mma.sync.aligned.m16n8k64.row.col.s32.s4.s4.s32  {c0..c3}, {ra..}, {rb..}, {c0..c3};
+```
+
+Each is a single-cycle hardware operation with no per-lane branching. The SMEM-to-register loads and the tensor-core MMA fire in unison across all 32 lanes without any nibble-unpacking overhead.
 
 ---
 
@@ -213,8 +226,9 @@ The 54-register allocation of k64 and 3stage reduces theoretical occupancy compa
 | # | Finding |
 |---|---------|
 | 1 | **Warp efficiency beats raw occupancy.** wmma has higher occupancy but consistently loses because its warps run at 50–63% thread fill with heavy divergence. |
-| 2 | **Zero divergence is a prerequisite for peak MMA throughput.** Every divergent branch destroys the SIMT execution model that INT4 tensor cores depend on. |
-| 3 | **Register investment pays off.** The extra 14 registers in k64/3stage (54 vs 40) enable larger tiles and register-blocked computation, reducing memory traffic at the cost of a tolerable occupancy reduction. |
-| 4 | **3stage wins at small sizes; k64's cache balance wins at large sizes.** The crossover is L1 capacity exhaustion: 3stage's aggressive prefetching exceeds the L1 footprint beyond N≈1024, driving all traffic to L2 and erasing its advantage over k64. |
-| 5 | **Launch geometry amplifies the gap.** k64/3stage's 2.7× smaller wave count reduces amortized block launch and cold-start costs, benefiting every size. |
-| 6 | **Instruction count dominates wall time.** k32 and manual_pack improve on wmma in warp utilization and divergence, yet still execute 1.7–1.8× more instructions than k64/3stage — confirming that raw arithmetic density, not memory or scheduler effects, is the primary differentiator at the top. |
+| 2 | **`wmma::experimental::precision::s4` is software-emulated — this is the root cause of both the divergent branches and the 6.5× instruction count.** The PTX assembler expands `load_matrix_sync`/`mma_sync` into per-lane nibble-extraction code with `lane_id`-indexed conditionals. k64/3stage call the native `mma.sync.aligned.m16n8k64.s4` instruction directly, bypassing the abstraction entirely. |
+| 3 | **Zero divergence is a prerequisite for peak MMA throughput.** Every divergent branch serializes warp execution paths, destroying the SIMT model that tensor cores depend on. |
+| 4 | **Register investment pays off.** The extra 14 registers in k64/3stage (54 vs 40) enable larger tiles and register-blocked computation, reducing memory traffic at the cost of a tolerable occupancy reduction. |
+| 5 | **3stage wins at small sizes; k64's cache balance wins at large sizes.** The crossover is L1 capacity exhaustion: 3stage's aggressive prefetching exceeds the L1 footprint beyond N≈1024, driving all traffic to L2 and erasing its advantage over k64. |
+| 6 | **Launch geometry amplifies the gap.** k64/3stage's 2.7× smaller wave count reduces amortized block launch and cold-start costs, benefiting every size. |
+| 7 | **Instruction count dominates wall time.** k32 and manual_pack improve on wmma in warp utilization and divergence, yet still execute 1.7–1.8× more instructions than k64/3stage — confirming that raw arithmetic density, not memory or scheduler effects, is the primary differentiator at the top. |
