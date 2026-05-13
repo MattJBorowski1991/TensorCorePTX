@@ -47,7 +47,7 @@ k64 and 3stage win because:
 ![Avg. Divergent Branches](../../charts/run3/Source_Counters_Avg._Divergent_Branches_branches.png)
 ![Avg. Executed Instructions Per Scheduler](../../charts/run3/Instruction_Statistics_Avg._Executed_Instructions_Per_Scheduler_inst.png)
 
-The **crossover from 3stage-wins to k64-wins at N≈2048** is driven by the memory hierarchy: 3stage's explicit prefetching pipeline exhausts L1 capacity at large sizes (L1 hit rate collapses to 14% at N=8192), forcing all traffic to L2. k64's balanced cache reuse keeps ~62% of L1 requests hitting locally, which becomes the deciding factor at scale.
+The **crossover from 3stage-wins to k64-wins at N≈2048** is visible in the memory hierarchy: 3stage's L1 hit rate collapses from ~56% at N=512 to 14% at N=8192, forcing almost all traffic to L2; k64 holds a steady ~62% L1 hit rate across all sizes. The exact cause of this divergence is not directly observable from NCU counters alone, but the consequence is clear — 3stage becomes L2-bound at scale while k64 stays L1-resident.
 
 ---
 
@@ -185,9 +185,9 @@ The memory behavior of k64 and 3stage diverges at large sizes, explaining the cr
 | int4_ptx_manual_pack | 66.06% |
 | int4_ptx_3stage | **14.49%** |
 
-3stage's explicit three-stage prefetch pipeline — while highly effective at small N — writes so many in-flight tiles into L1 at large N that the cache is saturated and hit rates collapse. The kernel compensates by saturating L2: its **L2 throughput grows from 19.5% utilization at N=512 to 95.6% at N=8192**, making 3stage an L2-bound kernel at scale.
+3stage's L1 hit rate collapses from ~56% at N=512 to **14.49% at N=8192** — almost every memory request misses L1 and goes to L2. Correspondingly its **L2 throughput grows from 19.5% utilization at N=512 to 95.6% at N=8192**, making 3stage an L2-bound kernel at scale. The exact mechanism behind this L1 collapse is not directly observable from NCU counters alone and requires deeper investigation (e.g. source-level L1 miss attribution).
 
-k64 avoids this by maintaining better spatial locality in its access pattern: L1 hit rate stays at ~62% at N=8192, reducing L2 traffic and keeping more data close to the compute units. This L1/L2 balance is the decisive factor that pushes k64 ahead of 3stage at large problem sizes.
+k64 does not exhibit this degradation: its L1 hit rate stays at ~62% at N=8192. Whether this is due to a difference in access pattern, shared memory usage, or prefetch policy is similarly not fully resolvable from the available NCU data, but the outcome is clear — k64 keeps far more traffic local to L1, which becomes the decisive factor at large problem sizes.
 
 wmma maintains the highest L1 hit rate (~80%) because its small tile footprint fits comfortably in L1 — but this is a symptom of its *less ambitious* tiling strategy, not a strength. The tile is small *because* there are fewer registers available (40 vs 54), forcing more frequent global memory reloads that wmma partially hides behind its high warp count.
 
@@ -220,6 +220,6 @@ The 54-register allocation of k64 and 3stage reduces theoretical occupancy compa
 | 2 | **`wmma::experimental::precision::s4` is software-emulated — this is the root cause of both the divergent branches and the 6.5× instruction count.** The PTX assembler expands `load_matrix_sync`/`mma_sync` into per-lane nibble-extraction code with `lane_id`-indexed conditionals. k64/3stage call the native `mma.sync.aligned.m16n8k64.s4` instruction directly, bypassing the abstraction entirely. |
 | 3 | **Zero divergence is a prerequisite for peak MMA throughput.** Every divergent branch serializes warp execution paths, destroying the SIMT model that tensor cores depend on. |
 | 4 | **Register investment pays off.** The extra 14 registers in k64/3stage (54 vs 40) enable larger tiles and register-blocked computation, reducing memory traffic at the cost of a tolerable occupancy reduction. |
-| 5 | **3stage wins at small sizes; k64's cache balance wins at large sizes.** The crossover is L1 capacity exhaustion: 3stage's aggressive prefetching exceeds the L1 footprint beyond N≈1024, driving all traffic to L2 and erasing its advantage over k64. |
+| 5 | **3stage wins at small sizes; k64's L1 efficiency wins at large sizes.** Beyond N≈1024, 3stage's L1 hit rate collapses (14% at N=8192) and it saturates L2 at 95.6%, while k64 holds ~62% L1 hit rate at N=8192. The root cause of this divergence is not fully attributable from NCU counters alone, but the performance consequence is unambiguous. |
 | 6 | **Launch geometry amplifies the gap.** k64/3stage's 2.7× smaller wave count reduces amortized block launch and cold-start costs, benefiting every size. |
 | 7 | **Instruction count dominates wall time.** k32 and manual_pack improve on wmma in warp utilization and divergence, yet still execute 1.7–1.8× more instructions than k64/3stage — confirming that raw arithmetic density, not memory or scheduler effects, is the primary differentiator at the top. |
