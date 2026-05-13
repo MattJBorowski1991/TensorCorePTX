@@ -2,17 +2,25 @@
 
 ## Part 1: Base INT4 Kernel Comparison
 
-### Goal
+### Profiled Kernels
 
-Identify the best core kernel family before any micro-tuning.
+- [int4_wmma](../../../kernels/int4_wmma.cu)
+- [int4_ptx_mma_k32](../../../kernels/int4_ptx_mma_k32.cu)
+- [int4_ptx_mma_k64](../../../kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu)
+- [int4_ptx_manual_pack](../../../kernels/int4_ptx_manual_pack.cu)
+- [int4_ptx_3stage](../../../kernels/int4_ptx_3stage.cu)
 
-### Kernels to Compare
+### Kernel Duration Summary (ms)
 
-- int4_wmma
-- int4_ptx_mma_k32
-- int4_ptx_mma_k64
-- int4_ptx_manual_pack
-- int4_ptx_3stage
+[int4_wmma](../../../kernels/int4_wmma.cu) is the baseline for the comparison below.
+
+| Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
+|--------|-----|------|------|------|------|
+| int4_wmma | 0.1954 | 1.4500 | 11.40 | 90.11 | 712.96 |
+| int4_ptx_manual_pack | 0.0878 (+123%) | 0.6110 (+137%) | 4.61 (+147%) | 35.55 (+154%) | 277.13 (+157%) |
+| int4_ptx_mma_k32 | 0.0870 (+125%) | 0.5794 (+150%) | 4.32 (+164%) | 33.99 (+165%) | 269.35 (+165%) |
+| int4_ptx_3stage | **0.0562** (+248%) | **0.3816** (+280%) | 2.91 (+292%) | 24.26 (+271%) | 197.63 (+261%) |
+| int4_ptx_mma_k64 | 0.0682 (+187%) | 0.3947 (+267%) | **2.81 (+306%)** | **21.52 (+319%)** | **167.10 (+327%)** |
 
 ### Metrics to Report
 
