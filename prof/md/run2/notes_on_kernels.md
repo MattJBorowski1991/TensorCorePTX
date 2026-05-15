@@ -53,24 +53,22 @@ width and switches every numeric type.
 Neither k8 (INT8) nor k32 (FP16) shapes exist in hardware — that asymmetry is why
 the two files go in opposite K directions.
 
-> **Implementation note.** The k32 kernel uses a *correctness-first* decomposition:
-> each WMMA_K=32 step is split into two k16 half-steps and handled with the same
-> `ldmatrix.x2` / `ldmatrix.x1.trans` / `mma.sync.m16n8k16` helpers as the k16 kernel.
-> The native `m16n8k32` opcode and `ldmatrix.x4` / `x2.trans` are **not** used in
-> the current implementation.
+> **Implementation note.** The k32 kernel (`int8_ptx_mma_k32`) uses the
+> native k32 path: `ldmatrix.x4` for A, `ldmatrix.x2` for each B n8-half, and
+> `mma.sync.aligned.m16n8k32.row.col.s32.s8.s8.s32`.
 
 | Aspect | `fp16_ptx_k8` | `int8_ptx_mma_k32` |
 |---|---|---|
 | K tile (WMMA_K) | 8 | 32 (`#undef WMMA_K` / `#define WMMA_K 32` after config.h) |
-| MMA opcode | `m16n8k8.row.col.f32.f16.f16.f32` | `m16n8k16.row.col.s32.s8.s8.s32` (×2 per N-half; k32 decomposed into 2 k16 calls) |
-| MMA calls per K-step | 4 (2 k-slices × 2 N-halves of the 16-wide tile) | 4 (2 k16-halves × 2 N-halves) |
-| ldmatrix A per K-step | 2 × `x2` (one per k8 sub-slice) → `ra[2]` each | 2 × `x2` → `ra_lo[2]` (k_off=0) + `ra_hi[2]` (k_off=16) |
-| ldmatrix B per K-step | 4 × `x1.trans` (2 k-slices × 2 N-halves) | 4 × `x1.trans` → `rb0_lo[1]`, `rb0_hi[1]` (n=0–7); `rb1_lo[1]`, `rb1_hi[1]` (n=8–15) |
-| Lane addressing A | `_r = lane%16, _c = k_off` per x2 call (k_off ∈ {0,16}) | same |
-| Lane addressing B | `_r = n_base + lane%8, _c = k_off` per x1.trans call (k_off ∈ {0,16}) | same |
+| MMA opcode | `m16n8k8.row.col.f32.f16.f16.f32` | `m16n8k32.row.col.s32.s8.s8.s32` |
+| MMA calls per K-step | 4 (2 k-slices × 2 N-halves of the 16-wide tile) | 2 (one per N-half: n=0..7 and n=8..15) |
+| ldmatrix A per K-step | 2 × `x2` (one per k8 sub-slice) → `ra[2]` each | 1 × `x4` → `ra[4]` |
+| ldmatrix B per K-step | 4 × `x1.trans` (2 k-slices × 2 N-halves) | 2 × `x2` (one per N-half) → `rb0[2]`, `rb1[2]` |
+| Lane addressing A | `_r = lane%16, _c = k_off` per x2 call (k_off ∈ {0,16}) | `_r = lane%16, _c = (lane/16)*16` |
+| Lane addressing B | `_r = n_base + lane%8, _c = k_off` per x1.trans call (k_off ∈ {0,16}) | `_r = n_base + lane%8, _c = (lane/8)*16` |
 | A element type | `half` | `int8_t` |
 | SMEM tile (As or Bs) | `half[16][16]` = 512 B | `int8_t[16][32]` = 512 B (same size) |
-| Register pressure | `ra[2]` live per sub-slice (lower, lower occupancy cost) | `ra_lo[2]` + `ra_hi[2]` live simultaneously (moderate; less than a true x4 path) |
+| Register pressure | `ra[2]` live per sub-slice (lower, lower occupancy cost) | `ra[4]` + two `rb[2]` fragments live for native k32 MMA |
 | Accumulator | `float rc[4]` | `int32_t rc[4]` |
 
 ---

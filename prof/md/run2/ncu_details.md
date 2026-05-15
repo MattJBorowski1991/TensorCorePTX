@@ -15,27 +15,27 @@
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | 152.00 µs | 116.58 µs | 204.54 µs | 159.55 µs | 151.87 µs | 588.80 µs |
-| 1024 | 1.11 ms | 788.83 µs | 1.33 ms | 1.17 ms | 1.15 ms | 4.65 ms |
-| 2048 | 8.55 ms | 5.96 ms | 9.61 ms | 8.93 ms | 10.22 ms | 36.75 ms |
-| 4096 | 68.47 ms | 46.19 ms | 72.93 ms | 69.54 ms | 93.88 ms | 296.86 ms |
-| 8192 | 858.30 ms | 487.57 ms | 582.00 ms | 617.68 ms | 820.32 ms | 2360 ms |
+| 512 | 152.00 µs | 108.67 µs | 204.54 µs | 159.55 µs | 151.87 µs | 588.80 µs |
+| 1024 | 1.11 ms | 726.46 µs | 1.33 ms | 1.17 ms | 1.15 ms | 4.65 ms |
+| 2048 | 8.55 ms | 5.41 ms | 9.61 ms | 8.93 ms | 10.22 ms | 36.75 ms |
+| 4096 | 68.47 ms | 42.00 ms | 72.93 ms | 69.54 ms | 93.88 ms | 296.86 ms |
+| 8192 | 858.30 ms | 480.06 ms | 582.00 ms | 617.68 ms | 820.32 ms | 2360 ms |
 
 ### Speedup / slowdown vs `int8_wmma` (negative = faster)
 
 | Size | k32 | k16 | manual_pack | 3stage | dp4a |
 |---|---|---|---|---|---|
-| 512 | **−23%** | +35% | +5% | ~0% | +287% |
-| 1024 | **−29%** | +20% | +5% | +4% | +319% |
-| 2048 | **−30%** | +12% | +4% | +20% | +330% |
-| 4096 | **−33%** | +7% | +2% | +37% | +333% |
-| 8192 | **−43%** | −32% | −28% | −4% | +175% |
+| 512 | **−28%** | +35% | +5% | ~0% | +287% |
+| 1024 | **−35%** | +20% | +5% | +4% | +319% |
+| 2048 | **−37%** | +12% | +4% | +20% | +330% |
+| 4096 | **−39%** | +7% | +2% | +37% | +333% |
+| 8192 | **−44%** | −32% | −28% | −4% | +175% |
 
 ![Average DRAM Active Cycles — flat at N≤4096 (compute-bound), diverges at N=8192 mirroring the speedup ranking](../../charts/run2/gpu_and_memory_workload_distribution__average_dram_active_cycles_cycle.png)
 
 ### Observations
 
-- **`int8_ptx_mma_k32` is consistently the fastest kernel at every matrix size** — its advantage grows monotonically from 23% faster at 512 to 43% faster at 8192.
+- **`int8_ptx_mma_k32` is consistently the fastest kernel at every matrix size** — its advantage grows monotonically from 28% faster at 512 to 44% faster at 8192.
 - **Small-size regime (512–1024):** `int8_wmma`, `int8_ptx_3stage`, and `int8_ptx_manual_pack` are tightly bunched within 0–5% of each other. Only `k32` stands apart.
 - **`int8_ptx_mma_k16` is surprisingly *slower* than `wmma` at sizes 512–4096** (+7–35% slower), but catches up at 8192 (−32%). Its regime transition is the sharpest of all kernels.
 - **`int8_ptx_3stage` degrades dramatically at 4096** (+37% vs wmma) before recovering at 8192 (−4%). The MIO stall dominates at mid sizes.
@@ -50,8 +50,8 @@
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | 9,895,936 | **7,446,528** | 10,211,328 | 13,717,504 | 9,879,552 | 29,917,184 |
-| 8192 | 34,745,614,336 | **19,774,046,208** | 39,356,203,008 | 49,816,797,184 | 38,767,951,872 | — |
+| 512 | 9,895,936 | **7,544,832** | 10,211,328 | 13,717,504 | 9,879,552 | 29,917,184 |
+| 8192 | 34,745,614,336 | **20,050,870,272** | 39,356,203,008 | 49,816,797,184 | 38,767,951,872 | — |
 
 ![Executed Instructions — markers = % slowdown vs int8_wmma](../../charts/run2/instruction_statistics__executed_instructions_inst.png)
 
@@ -71,15 +71,15 @@
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | 1.47 | 1.46 | 1.11 | **1.93** | 1.46 | 1.11 |
-| 8192 | 0.87 | 0.87 | 1.45 | **1.72** | 1.01 | 1.07 |
+| 512 | 1.47 | 1.51 | 1.11 | **1.93** | 1.46 | 1.11 |
+| 8192 | 0.87 | 0.86 | 1.45 | **1.72** | 1.01 | 1.07 |
 
 ### Compute (SM) Throughput %
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | ~44% | ~49% | ~37% | ~52% | ~47% | ~94% |
-| 8192 | 29.85% | 36.25% | 47.70% | 48.50% | 33.62% | 94.40% |
+| 512 | ~44% | ~41% | ~37% | ~52% | ~47% | ~94% |
+| 8192 | 29.85% | 28.19% | 47.70% | 48.50% | 33.62% | 94.40% |
 
 ![Executed IPC Active — markers = % slowdown vs int8_wmma](../../charts/run2/compute_workload_analysis__executed_ipc_active_inst_cycle.png)
 
@@ -99,36 +99,36 @@
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | 24.40 | **31.88** | 18.09 | 23.26 | 24.54 | 6.27 |
-| 8192 | 156.34 | 154.51 | 150.24 | 146.39 | 153.14 | 115.48 |
+| 512 | 24.40 | **34.21** | 18.09 | 23.26 | 24.54 | 6.27 |
+| 8192 | 156.34 | 157.29 | 150.24 | 146.39 | 153.14 | 115.48 |
 
 ### L1/TEX Hit Rate %
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | 77.60 | 63.64 | **85.98** | 79.98 | 58.74 | 52.28 |
-| 8192 | 33.56 | **61.17** | 75.90 | 37.22 | 23.68 | 49.89 |
+| 512 | 77.60 | 64.16 | **85.98** | 79.98 | 58.74 | 52.28 |
+| 8192 | 33.56 | **61.46** | 75.90 | 37.22 | 23.68 | 49.89 |
 
 ### L2 Hit Rate %
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | 95.53 | 93.40 | 92.89 | 93.58 | **97.60** | 96.09 |
-| 8192 | 81.86 | 65.84 | 68.75 | **87.87** | 84.46 | 50.12 |
+| 512 | 95.53 | 92.90 | 92.89 | 93.58 | **97.60** | 96.09 |
+| 8192 | 81.86 | 65.60 | 68.75 | **87.87** | 84.46 | 50.12 |
 
 ### Mem Busy % (L1 pipeline utilization)
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | 83.54 | 75.98 | 83.03 | 80.28 | **86.70** | 57.21 |
-| 8192 | 69.38 | 66.95 | **87.84** | **92.80** | 80.89 | 58.13 |
+| 512 | 83.54 | 78.07 | 83.03 | 80.28 | **86.70** | 57.21 |
+| 8192 | 69.38 | 64.77 | **87.84** | **92.80** | 80.89 | 58.13 |
 
 ### Max Bandwidth % (DRAM bandwidth utilization)
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | 45.07 | 46.74 | 35.90 | **49.71** | 45.52 | **92.63** |
-| 8192 | 60.73 | 51.55 | 50.12 | 79.10 | 79.17 | **94.40** |
+| 512 | 45.07 | 40.56 | 35.90 | **49.71** | 45.52 | **92.63** |
+| 8192 | 60.73 | 52.47 | 50.12 | 79.10 | 79.17 | **94.40** |
 
 ![Memory Throughput (GB/s)](../../charts/run2/memory_workload_analysis__memory_throughput_gbyte_s.png)
 
@@ -152,17 +152,17 @@
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage |
 |---|---|---|---|---|---|
-| 512 | 77,269 | 77,416 | 77,072 | 77,317 | 77,643 |
-| 1024 | 354,984 | 355,232 | 355,075 | 353,856 | 354,179 |
-| 2048 | 2,611,349 | 2,588,987 | 2,591,048 | 2,615,099 | 2,619,691 |
-| 4096 | 12,074,896 | 11,988,533 | 12,004,963 | 12,092,413 | 12,107,291 |
-| 8192 | **2,795,572,312** | **1,569,477,901** | **1,821,660,829** | **1,883,737,747** | **2,617,198,477** |
+| 512 | 77,269 | 77,461 | 77,072 | 77,317 | 77,643 |
+| 1024 | 354,984 | 354,272 | 355,075 | 353,856 | 354,179 |
+| 2048 | 2,611,349 | 2,581,587 | 2,591,048 | 2,615,099 | 2,619,691 |
+| 4096 | 12,074,896 | 12,001,069 | 12,004,963 | 12,092,413 | 12,107,291 |
+| 8192 | **2,795,572,312** | **1,573,085,848** | **1,821,660,829** | **1,883,737,747** | **2,617,198,477** |
 
 **vs wmma at N=8192 (DRAM cycles / wall-clock):**
 
 | Kernel | DRAM cycles vs wmma | Wall-clock vs wmma |
 |---|---|---|
-| `int8_ptx_mma_k32` | −43.9% | −43% |
+| `int8_ptx_mma_k32` | −43.7% | −44% |
 | `int8_ptx_mma_k16` | −34.8% | −32% |
 | `int8_ptx_manual_pack` | −32.6% | −28% |
 | `int8_ptx_3stage` | −6.4% | −4% |
@@ -178,13 +178,13 @@ At N ≤ 4096 all kernels show almost identical DRAM active cycle counts (within
 | Size | Kernel | Theoretical | Achieved | Limiter |
 |---|---|---|---|---|
 | 512 | int8_wmma | 100% | 80.22% | Warp scheduling imbalance |
-| 512 | int8_ptx_mma_k32 | **66.67%** | 57.77% | **Register pressure** (54 regs/thread) |
+| 512 | int8_ptx_mma_k32 | **66.67%** | 57.99% | **Register pressure** (54 regs/thread) |
 | 512 | int8_ptx_mma_k16 | 83.33% | 73.77% | Warp scheduling imbalance |
 | 512 | int8_ptx_manual_pack | 83.33% | 68.91% | Warp scheduling imbalance |
 | 512 | int8_ptx_3stage | 83.33% | 66.94% | Warp scheduling imbalance |
 | 512 | int8_dp4a | 100% | 96.43% | None significant |
 | 8192 | int8_wmma | 100% | 98.66% | None |
-| 8192 | int8_ptx_mma_k32 | **66.67%** | 66.40% | **Register pressure** |
+| 8192 | int8_ptx_mma_k32 | **66.67%** | 66.55% | **Register pressure** |
 | 8192 | int8_ptx_mma_k16 | 83.33% | 82.92% | None |
 | 8192 | int8_ptx_manual_pack | 83.33% | 97.28% | *(exceeds theoretical — wave effects)* |
 | 8192 | int8_ptx_3stage | 83.33% | 82.07% | None |
@@ -217,15 +217,15 @@ At N ≤ 4096 all kernels show almost identical DRAM active cycle counts (within
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | 9.68 | 6.93 | 8.86 | 8.29 | 8.06 | **11.57** |
+| 512 | 9.68 | 6.96 | 8.86 | 8.29 | 8.06 | **11.57** |
 | 8192 | 11.82 | 7.99 | 9.98 | 7.26 | 9.70 | **11.99** |
 
 ### Eligible Warps Per Scheduler (ready to issue)
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | 0.99 | 0.85 | 0.59 | **1.39** | 1.12 | 1.31 |
-| 8192 | 0.53 | 0.34 | 0.69 | 0.73 | 0.89 | 1.31 |
+| 512 | 0.99 | 0.83 | 0.59 | **1.39** | 1.12 | 1.31 |
+| 8192 | 0.53 | 0.32 | 0.69 | 0.73 | 0.89 | 1.31 |
 
 ### Issue Rate (cycles per issued instruction)
 
@@ -253,8 +253,8 @@ At N ≤ 4096 all kernels show almost identical DRAM active cycle counts (within
 
 | Size | int8_wmma | int8_ptx_mma_k32 | int8_ptx_mma_k16 | int8_ptx_manual_pack | int8_ptx_3stage | int8_dp4a |
 |---|---|---|---|---|---|---|
-| 512 | 26.11 | **18.95** | 31.75 | **17.12** | 21.97 | 41.80 |
-| 8192 | 54.40 | 36.44 | 27.55 | **21.13** | 39.00 | 45.04 |
+| 512 | 26.11 | **18.49** | 31.75 | **17.12** | 21.97 | 41.80 |
+| 8192 | 54.40 | 37.22 | 27.55 | **21.13** | 39.00 | 45.04 |
 
 ### Average Active Threads Per Warp
 
@@ -268,7 +268,7 @@ At N ≤ 4096 all kernels show almost identical DRAM active cycle counts (within
 | Kernel | Size 512 primary stall | Size 8192 primary stall |
 |---|---|---|
 | int8_wmma | L1TEX scoreboard 8.8c (33.8%) + MIO 8.6c (33.0%) | L1TEX 27.5c (50.6%) + MIO 19.2c (35.3%) |
-| int8_ptx_mma_k32 | — | L1TEX 18.7c (51.4%) |
+| int8_ptx_mma_k32 | L1TEX 6.5c (35.2%) | L1TEX 20.0c (53.8%) |
 | int8_ptx_mma_k16 | L1TEX 9.8c (31.0%) | L1TEX 13.0c (47.3%) |
 | int8_ptx_manual_pack | MIO 6.4c (37.5%) | L1TEX 17.7c (83.9%) |
 | int8_ptx_3stage | MIO 13.7c (62.4%) | MIO 28.9c (74.0%) |
@@ -355,7 +355,7 @@ At N ≤ 4096 all kernels show almost identical DRAM active cycle counts (within
 - **`k32` stands apart on coalescing.** Only 6% excessive global sectors at 512 (vs 48–64% for all others) and near-zero at 8192 (0.4%). Its carefully crafted PTX load layout aligns sectors perfectly to thread groups. This is likely a key reason for its low instruction count and high L1 hit rate.
 - **`k16` global loads are spectacularly uncoalesced** (1 of 32 bytes used per sector) — every thread in a warp fetches a byte from a different 32-byte line. NCU estimates an 80–85% potential speedup from fixing this one access pattern alone.
 - **Shared memory bank conflicts are pervasive across all kernels.** wmma, k16, manual_pack, and 3stage all show 76–78% excessive shared wavefronts. k32 is best at 64–66% but still significant. This suggests the shared memory tile layout (row-major byte tiles vs 4-byte wide bank addresses) induces systematic bank conflicts for int8 data.
-- **`k32` shared memory bank conflict:** at 8192, k32 is explicitly flagged for a 2.7-way average bank conflict across 1.6 billion shared load requests, producing 2.1 billion conflicts. Fixing this is estimated to give 33% additional speedup — suggesting k32 still has room for improvement.
+- **`k32` shared memory bank conflict:** at 8192, k32 is explicitly flagged for a 5.3-way average bank conflict across 805 million shared load requests, producing about 2.15 billion conflicts. Fixing this is estimated to give ~32% additional speedup — suggesting k32 still has room for improvement.
 - **`k32`'s low uncoalesced global access rate means its L2 traffic is substantially lower**, which explains why its L2 hit rate drops to 65.8% at 8192 while wmma hits 81.9%, despite wmma being slower — wmma fetches more redundant data, finds more of it in L2.
 
 ---
@@ -388,7 +388,7 @@ At N ≤ 4096 all kernels show almost identical DRAM active cycle counts (within
 - Primary stall at 8192: L1TEX scoreboard (18.7 cycles, 51.4%)
 - Full warp utilization (32/32 threads active) and zero divergent branches
 - NCU classifies as memory-bound (L1). Estimated 24–33% further speedup possible from reducing its 64–66% uncoalesced shared memory bank conflicts
-- Performance advantage grows with N: 23% faster than wmma at 512, 43% faster at 8192
+- Performance advantage grows with N: 28% faster than wmma at 512, 44% faster at 8192
 
 ### `int8_ptx_mma_k16` — Competitive at large sizes only
 - Mediocre at 512–4096 (7–35% slower than wmma), excellent at 8192 (32% faster)
