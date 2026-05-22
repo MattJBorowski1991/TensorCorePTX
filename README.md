@@ -22,22 +22,13 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 **Run 4 (`int4 k64 deep dive`)** isolates the `int4_ptx_mma_k64*` family and sweeps loader split (`x1/x2/x4`), cache policy (`ca/cg`), and B layout (`nontrans/trans`). Main result: non-trans `ca` variants form a tight optimum basin, `cg` is a mild regression, and `trans` is a structural outlier with severe coalescing and throughput collapse.
 
 
-
-## mma.sync Tile Shapes
-
-Available shapes (L4 / SM89) by precision:
-
-| Precision | mma.sync shapes         |
-|-----------|-------------------------|
-| FP16      | m16n8k8, m16n8k16       |
-| INT8      | m16n8k16, m16n8k32      |
-| INT4      | m16n8k32, m16n8k64      |
-
 ---
 
 ## Run 1 — fp16 - Profiling Results
 
 > Full Summary: [`prof/md/run1/ncu_summary.md`](prof/md/run1/ncu_summary.md)
+
+Kernels profiled: [`fp16_wmma`](kernels/fp16_wmma.cu), [`fp16_ptx_mma`](kernels/fp16_ptx_mma.cu), [`fp16_ptx_k8`](kernels/fp16_ptx_k8.cu), [`fp16_ptx_fp16acc`](kernels/fp16_ptx_fp16acc.cu), [`fp16_ptx_3stage`](kernels/fp16_ptx_3stage.cu), [`fp16_ptx_manual_pack`](kernels/fp16_ptx_manual_pack.cu)
 
 ![NCU Metrics Chart](prof/md/run1/ncu_metrics_chart.png)
 
@@ -65,6 +56,8 @@ Six FP16 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 
 ## Run 2 — int8 - Profiling Results
 
 > Full Analysis: [`prof/md/run2/ncu_details.md`](prof/md/run2/ncu_details.md)
+
+Kernels profiled: [`int8_wmma`](kernels/int8_wmma.cu), [`int8_ptx_mma_k16`](kernels/int8_ptx_mma_k16.cu), [`int8_ptx_mma_k32`](kernels/int8_ptx_mma_k32.cu), [`int8_ptx_manual_pack`](kernels/int8_ptx_manual_pack.cu), [`int8_ptx_3stage`](kernels/int8_ptx_3stage.cu), [`int8_dp4a`](kernels/int8_dp4a.cu)
 
 Six INT8 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 512 → 8192 (square, INT8 A/B inputs, INT32 accumulation, no in-kernel dequant). Performance is measured relative to `int8_wmma` (the WMMA-API baseline).
 
@@ -109,6 +102,8 @@ Six INT8 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 
 
 > Full Analysis: [`prof/md/run3/ncu_details.md`](prof/md/run3/ncu_details.md)
 
+Kernels profiled: [`int4_wmma`](kernels/int4_wmma.cu), [`int4_ptx_mma_k32`](kernels/int4_ptx_mma_k32.cu), [`int4_ptx_manual_pack`](kernels/int4_ptx_manual_pack.cu), [`int4_ptx_3stage`](kernels/int4_ptx_3stage.cu), [`int4_ptx_mma_k64`](kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu)
+
 Five INT4 kernels were profiled across N = 512 -> 8192 with `int4_wmma` as baseline. The two top kernels are `int4_ptx_mma_k64` and `int4_ptx_3stage`: `3stage` is fastest at very small sizes (512/1024), while `k64` becomes fastest from 2048 onward and widens the lead at large N.
 
 ![Avg. Active Threads Per Warp](prof/charts/run3/Warp_State_Statistics_Avg._Active_Threads_Per_Warp.png)
@@ -151,6 +146,8 @@ The key crossover mechanism between the two winners is memory hierarchy behavior
 ## Run 4 — int4 - Profiling Results for the optimal k64 kernel family
 
 > Full Analysis: [`prof/md/run4/ncu_details.md`](prof/md/run4/ncu_details.md)
+
+Kernels profiled: [`int4_ptx_mma_k64_x1_x2nontrans_ca`](kernels/int4_ptx_mma_k64_x1_x2nontrans_ca.cu), [`int4_ptx_mma_k64_x2_x2nontrans_ca`](kernels/int4_ptx_mma_k64_x2_x2nontrans_ca.cu), [`int4_ptx_mma_k64_x4_x1nontrans_ca`](kernels/int4_ptx_mma_k64_x4_x1nontrans_ca.cu), [`int4_ptx_mma_k64_x4_x2nontrans_ca`](kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu), [`int4_ptx_mma_k64_x4_x2nontrans_cg`](kernels/int4_ptx_mma_k64_x4_x2nontrans_cg.cu), [`int4_ptx_mma_k64_x4_x2trans_ca`](kernels/int4_ptx_mma_k64_x4_x2trans_ca.cu)
 
 This run isolates the `int4_ptx_mma_k64*` family to test loader split (`x1/x2/x4`), cache policy (`ca` vs `cg`), and B layout (`nontrans` vs `trans`) while keeping the core MMA strategy fixed.
 
