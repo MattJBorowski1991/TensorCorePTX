@@ -58,10 +58,13 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 	</tbody>
 </table>
 
+### Raw durations (ms)
+
 <table width="100%">
 	<thead>
 		<tr>
-			<th>Kernel (raw duration, ms)</th>
+			<th>Kernel</th>
+			<th>Per Dtype</th>
 			<th>512</th>
 			<th>1024</th>
 			<th>2048</th>
@@ -71,15 +74,17 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 	</thead>
 	<tbody>
 		<tr>
-			<td><code>fp16_wmma</code></td>
-			<td>680.155</td>
-			<td>684.000</td>
-			<td>813.093</td>
-			<td>1539.726</td>
-			<td>14098.618</td>
+			<td><a href="kernels/fp16_wmma.cu"><code>fp16_wmma</code></a></td>
+			<td><code>Base & Optimal</code></td>
+			<td>0.184</td>
+			<td>1.430</td>
+			<td>11.850</td>
+			<td>102.350</td>
+			<td>16500.000</td>
 		</tr>
 		<tr>
-			<td><code>int8_wmma</code></td>
+			<td><a href="kernels/int8_wmma.cu"><code>int8_wmma</code></a></td>
+			<td><code>Base</code></td>
 			<td>0.152</td>
 			<td>1.110</td>
 			<td>8.550</td>
@@ -87,7 +92,8 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>858.300</td>
 		</tr>
 		<tr>
-			<td><code>int8_ptx_mma_k32</code></td>
+			<td><a href="kernels/int8_ptx_mma_k32.cu"><code>int8_ptx_mma_k32</code></a></td>
+			<td><code>Optimal</code></td>
 			<td>0.109</td>
 			<td>0.726</td>
 			<td>5.410</td>
@@ -95,7 +101,8 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>480.060</td>
 		</tr>
 		<tr>
-			<td><code>int4_wmma</code></td>
+			<td><a href="kernels/int4_wmma.cu"><code>int4_wmma</code></a></td>
+			<td><code>Base</code></td>
 			<td>0.195</td>
 			<td>1.450</td>
 			<td>11.400</td>
@@ -103,7 +110,8 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>712.960</td>
 		</tr>
 		<tr>
-			<td><code>int4_ptx_3stage</code></td>
+			<td><a href="kernels/int4_ptx_3stage.cu"><code>int4_ptx_3stage</code></a></td>
+			<td><code>Optimal (small N)</code></td>
 			<td>0.056</td>
 			<td>0.382</td>
 			<td>2.910</td>
@@ -111,7 +119,8 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>197.630</td>
 		</tr>
 		<tr>
-			<td><code>int4_ptx_mma_k64</code></td>
+			<td><a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a></td>
+			<td><code>Optimal (large N)</code></td>
 			<td>0.068</td>
 			<td>0.395</td>
 			<td>2.810</td>
