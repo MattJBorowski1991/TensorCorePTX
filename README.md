@@ -1,4 +1,4 @@
-# TensorCorePTX — PTX-first Tensor Core GEMM Exploration
+# TensorCorePTX — PTX Tensor Core GEMM Exploration
 
 This repository collects findings, experiments, and design notes for implementing high-performance PTX GEMM kernels using `cp.async`, `ldmatrix` and `mma.sync` on Nvidia L4 (Ada/SM89). The focus is a PTX-first path across three precisions (`fp16`, `int8`, `int4`): for each precision we run a multi-variant deep dive over key PTX instruction choices and compare against a double-buffered WMMA-API kernel used as the baseline.
 
@@ -214,15 +214,15 @@ Kernels profiled: [`fp16_wmma`](kernels/fp16_wmma.cu), [`fp16_ptx_mma`](kernels/
 | `fp16_ptx_3stage` | 689.617 | 683.957 | 794.762 | 1577.620 | 14828.855 |
 | `fp16_ptx_manual_pack` | 673.823 | 699.585 | 789.764 | 1574.092 | 14312.770 |
 
-**Slowdown / speedup vs `fp16_wmma` (%, + slower, - faster):**
+**Speedup vs `fp16_wmma` (x, >1 faster, <1 slower):**
 
 | Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
 |---|---:|---:|---:|---:|---:|
-| `fp16_ptx_mma` | +4.5% | +2.1% | -3.7% | +0.9% | +0.4% |
-| `fp16_ptx_k8` | +0.8% | +5.9% | -1.4% | +0.0% | +0.3% |
-| `fp16_ptx_fp16acc` | -2.3% | +2.4% | -3.0% | +1.0% | +3.2% |
-| `fp16_ptx_3stage` | +1.4% | +0.0% | -2.3% | +2.5% | +5.2% |
-| `fp16_ptx_manual_pack` | -0.9% | +2.3% | -2.9% | +2.2% | +1.5% |
+| `fp16_ptx_mma` | 0.96x | 0.98x | 1.04x | 0.99x | 1.00x |
+| `fp16_ptx_k8` | 0.99x | 0.94x | 1.01x | 1.00x | 1.00x |
+| `fp16_ptx_fp16acc` | 1.02x | 0.98x | 1.03x | 0.99x | 0.97x |
+| `fp16_ptx_3stage` | 0.99x | 1.00x | 1.02x | 0.98x | 0.95x |
+| `fp16_ptx_manual_pack` | 1.01x | 0.98x | 1.03x | 0.98x | 0.99x |
 
 ![NCU Metrics Chart](prof/md/run1/ncu_metrics_chart.png)
 
@@ -264,15 +264,15 @@ Kernels profiled: [`int8_wmma`](kernels/int8_wmma.cu), [`int8_ptx_mma_k16`](kern
 | `int8_ptx_3stage` | 151.87 us | 1.15 ms | 10.22 ms | 93.88 ms | 820.32 ms |
 | `int8_dp4a` | 588.80 us | 4.65 ms | 36.75 ms | 296.86 ms | 2360 ms |
 
-**Slowdown / speedup vs `int8_wmma` (%, + slower, - faster):**
+**Speedup vs `int8_wmma` (x, >1 faster, <1 slower):**
 
 | Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
 |---|---:|---:|---:|---:|---:|
-| `int8_ptx_mma_k32` | -28.5% | -34.6% | -36.7% | -38.7% | -44.1% |
-| `int8_ptx_mma_k16` | +34.6% | +19.8% | +12.4% | +6.5% | -32.2% |
-| `int8_ptx_manual_pack` | +5.0% | +5.4% | +4.4% | +1.6% | -28.0% |
-| `int8_ptx_3stage` | -0.1% | +3.6% | +19.5% | +37.1% | -4.4% |
-| `int8_dp4a` | +287.4% | +318.9% | +329.8% | +333.6% | +174.9% |
+| `int8_ptx_mma_k32` | 1.40x | 1.53x | 1.58x | 1.63x | 1.79x |
+| `int8_ptx_mma_k16` | 0.74x | 0.83x | 0.89x | 0.94x | 1.47x |
+| `int8_ptx_manual_pack` | 0.95x | 0.95x | 0.96x | 0.98x | 1.39x |
+| `int8_ptx_3stage` | 1.00x | 0.97x | 0.84x | 0.73x | 1.05x |
+| `int8_dp4a` | 0.26x | 0.24x | 0.23x | 0.23x | 0.36x |
 
 Six INT8 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 512 → 8192 (square, INT8 A/B inputs, INT32 accumulation, no in-kernel dequant). Performance is measured relative to `int8_wmma` (the WMMA-API baseline).
 
@@ -319,28 +319,28 @@ Kernels profiled: [`int4_wmma`](kernels/int4_wmma.cu), [`int4_ptx_mma_k32`](kern
 | `int4_ptx_manual_pack` | 87.84 us | 0.611 ms | 4.61 ms | 35.55 ms | 277.13 ms |
 | `int4_ptx_3stage` | 56.16 us | 0.382 ms | 2.91 ms | 24.26 ms | 197.63 ms |
 
-**Slowdown / speedup vs `int4_wmma` (%, + slower, - faster):**
+**Speedup vs `int4_wmma` (x, >1 faster, <1 slower):**
 
 | Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
 |---|---:|---:|---:|---:|---:|
-| `int4_ptx_mma_k32` | -55.5% | -60.1% | -62.1% | -62.3% | -62.2% |
-| `int4_ptx_mma_k64` | -65.1% | -72.8% | -75.4% | -76.1% | -76.6% |
-| `int4_ptx_manual_pack` | -55.1% | -57.9% | -59.6% | -60.5% | -61.1% |
-| `int4_ptx_3stage` | -71.3% | -73.7% | -74.5% | -73.1% | -72.3% |
+| `int4_ptx_mma_k32` | 2.25x | 2.51x | 2.64x | 2.65x | 2.65x |
+| `int4_ptx_mma_k64` | 2.87x | 3.68x | 4.07x | 4.18x | 4.27x |
+| `int4_ptx_manual_pack` | 2.23x | 2.38x | 2.48x | 2.53x | 2.57x |
+| `int4_ptx_3stage` | 3.48x | 3.80x | 3.92x | 3.72x | 3.61x |
 
 Five INT4 kernels were profiled across N = 512 -> 8192 with `int4_wmma` as baseline. The two top kernels are `int4_ptx_mma_k64` and `int4_ptx_3stage`: `3stage` is fastest at very small sizes (512/1024), while `k64` becomes fastest from 2048 onward and widens the lead at large N.
 
 ![Avg. Active Threads Per Warp](prof/charts/run3/Warp_State_Statistics_Avg._Active_Threads_Per_Warp.png)
 
-**Wall-time speedup vs `int4_wmma` (from run3 profile):**
+**Wall-time speedup vs `int4_wmma` (x, from run3 profile):**
 
 | Size | `int4_ptx_3stage` | `int4_ptx_mma_k64` |
 |---|---|---|
-| 512 | **+248%** | +187% |
-| 1024 | **+280%** | +267% |
-| 2048 | +292% | **+306%** |
-| 4096 | +271% | **+319%** |
-| 8192 | +261% | **+327%** |
+| 512 | **3.48x** | 2.87x |
+| 1024 | **3.80x** | 3.67x |
+| 2048 | 3.92x | **4.06x** |
+| 4096 | 3.71x | **4.19x** |
+| 8192 | 3.61x | **4.27x** |
 
 At N=8192, the top-2 separation from the middle pack is large in both wall time and instruction pressure: `int4_ptx_mma_k64` / `int4_ptx_3stage` run at 167.10 / 197.63 ms, while `int4_ptx_mma_k32` / `int4_ptx_manual_pack` are 269.35 / 277.13 ms. The same ordering appears in average executed instructions per scheduler (~45-46M for k64/3stage vs ~79-81M for k32/manual_pack), confirming that arithmetic-density and instruction footprint are dominant differentiators once WMMA emulation is removed.
 
@@ -384,15 +384,15 @@ Kernels profiled: [`int4_ptx_mma_k64_x1_x2nontrans_ca`](kernels/int4_ptx_mma_k64
 | `x4_x2nontrans_cg` | 1282.004 | 1386.205 | 2066.496 | 6451.012 | 39894.840 |
 | `x4_x2trans_ca` | 1295.441 | 1554.672 | 3155.077 | 14994.947 | 108172.047 |
 
-**Slowdown / speedup vs `x4_x2nontrans_ca` (%, + slower, - faster):**
+**Speedup vs `x4_x2nontrans_ca` (x, >1 faster, <1 slower):**
 
 | Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
 |---|---:|---:|---:|---:|---:|
-| `x1_x2nontrans_ca` | +3.2% | +3.2% | +5.3% | +6.6% | +8.2% |
-| `x2_x2nontrans_ca` | +4.6% | +2.8% | +4.0% | +4.8% | +5.8% |
-| `x4_x1nontrans_ca` | +6.1% | +4.9% | +6.8% | +6.4% | +7.4% |
-| `x4_x2nontrans_cg` | +5.9% | +5.9% | +8.6% | +11.7% | +13.8% |
-| `x4_x2trans_ca` | +7.0% | +18.7% | +65.8% | +159.6% | +208.7% |
+| `x1_x2nontrans_ca` | 0.97x | 0.97x | 0.95x | 0.94x | 0.92x |
+| `x2_x2nontrans_ca` | 0.96x | 0.97x | 0.96x | 0.95x | 0.95x |
+| `x4_x1nontrans_ca` | 0.94x | 0.95x | 0.94x | 0.94x | 0.93x |
+| `x4_x2nontrans_cg` | 0.94x | 0.94x | 0.92x | 0.90x | 0.88x |
+| `x4_x2trans_ca` | 0.93x | 0.84x | 0.60x | 0.39x | 0.32x |
 
 This run isolates the `int4_ptx_mma_k64*` family to test loader split (`x1/x2/x4`), cache policy (`ca` vs `cg`), and B layout (`nontrans` vs `trans`) while keeping the core MMA strategy fixed.
 
