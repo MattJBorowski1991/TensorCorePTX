@@ -11,13 +11,13 @@ This repository collects findings, experiments, and design notes for implementin
 
 ## Overview
 
-Most kernels in this project follow the same core pattern: overlap DRAM->SRAM prefetch (`cp.async`) with tile-level compute in registers (`ldmatrix` + `mma.sync`) to hide memory latency. Additional variants include manual SRAM->register packing paths (no `ldmatrix`) and an INT8 `dp4a` path; for each precision family, the baseline is always the WMMA-API kernel (`*_wmma`), and PTX variants are evaluated relative to that baseline.
+Most kernels in this project follow the same core pattern: overlap DRAM->SRAM prefetch (`cp.async`) with tile-level compute in registers (`ldmatrix` + `mma.sync`) to hide memory latency. Additional variants include manual SRAM->register packing paths (no `ldmatrix`) and an INT8 `dp4a` path; for each precision family, the baseline is always the WMMA-API kernel (`*_wmma`), and PTX variants are evaluated relative to that baseline. All kernels were profiled with Nsight Compute across square matrix sizes N = 512 → 8192. 
 
-**Run 1 (`fp16`)** benchmarks the FP16 PTX design space against `fp16_wmma` and establishes the first compute-bound vs memory-bound split. Main result: PTX variants are competitive, but no FP16 PTX variant clearly beats the WMMA baseline across all sizes.
+**Run 1 (`fp16`)** Best kernel: [`fp16_wmma`](kernels/fp16_wmma.cu). No FP16 PTX variant beats the WMMA baseline because the WMMA path already gives the compiler a highly optimized double-buffered `cp.async` + tensor-core schedule.
 
-**Run 2 (`int8`)** compares several INT8 PTX formulations against `int8_wmma`, including `k16`, `k32`, `3stage`, manual packing, and `dp4a`. Main result: `int8_ptx_mma_k32` is consistently best, with instruction-count efficiency and better coalescing driving the win, especially at large N.
+**Run 2 (`int8`)** Main result: `int8_ptx_mma_k32` is consistently best, with instruction-count efficiency and better coalescing driving the win, especially at large N.
 
-**Run 3 (`int4`)** is the base INT4 comparison that identifies the winning family before fine-grained tuning. Main result: `int4_ptx_mma_k64` and `int4_ptx_3stage` dominate by avoiding WMMA INT4 emulation overhead; `3stage` leads at small sizes, while `k64` scales better at large sizes.
+**Run 3 (`int4`)** Main result: `int4_ptx_mma_k64` and `int4_ptx_3stage` dominate by avoiding WMMA INT4 emulation overhead; `3stage` leads at small sizes, while `k64` scales better at large sizes.
 
 **Run 4 (`int4 k64 deep dive`)** isolates the `int4_ptx_mma_k64*` family and sweeps loader split (`x1/x2/x4`), cache policy (`ca/cg`), and B layout (`nontrans/trans`). Main result: non-trans `ca` variants form a tight optimum basin, `cg` is a mild regression, and `trans` is a structural outlier with severe coalescing and throughput collapse.
 
@@ -29,6 +29,27 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 > Full Summary: [`prof/md/run1/ncu_summary.md`](prof/md/run1/ncu_summary.md)
 
 Kernels profiled: [`fp16_wmma`](kernels/fp16_wmma.cu), [`fp16_ptx_mma`](kernels/fp16_ptx_mma.cu), [`fp16_ptx_k8`](kernels/fp16_ptx_k8.cu), [`fp16_ptx_fp16acc`](kernels/fp16_ptx_fp16acc.cu), [`fp16_ptx_3stage`](kernels/fp16_ptx_3stage.cu), [`fp16_ptx_manual_pack`](kernels/fp16_ptx_manual_pack.cu)
+
+**Raw durations (ms):**
+
+| Kernel | 512 | 1024 | 2048 | 4096 | 8192 | 16384 |
+|---|---:|---:|---:|---:|---:|---:|
+| `fp16_wmma` (baseline) | 680.155 | 684.000 | 813.093 | 1539.726 | 14098.618 | 110469.695 |
+| `fp16_ptx_mma` | 710.899 | 698.062 | 782.720 | 1553.984 | 14150.838 | 110724.594 |
+| `fp16_ptx_k8` | 685.578 | 724.600 | 801.493 | 1540.406 | 14135.938 | 110679.141 |
+| `fp16_ptx_fp16acc` | 664.341 | 700.616 | 789.057 | 1555.479 | 14553.427 | 112874.984 |
+| `fp16_ptx_3stage` | 689.617 | 683.957 | 794.762 | 1577.620 | 14828.855 | 114753.836 |
+| `fp16_ptx_manual_pack` | 673.823 | 699.585 | 789.764 | 1574.092 | 14312.770 | 111871.609 |
+
+**Slowdown / speedup vs `fp16_wmma` (%, + slower, - faster):**
+
+| Kernel | 512 | 1024 | 2048 | 4096 | 8192 | 16384 |
+|---|---:|---:|---:|---:|---:|---:|
+| `fp16_ptx_mma` | +4.5% | +2.1% | -3.7% | +0.9% | +0.4% | +0.2% |
+| `fp16_ptx_k8` | +0.8% | +5.9% | -1.4% | +0.0% | +0.3% | +0.2% |
+| `fp16_ptx_fp16acc` | -2.3% | +2.4% | -3.0% | +1.0% | +3.2% | +2.2% |
+| `fp16_ptx_3stage` | +1.4% | +0.0% | -2.3% | +2.5% | +5.2% | +3.9% |
+| `fp16_ptx_manual_pack` | -0.9% | +2.3% | -2.9% | +2.2% | +1.5% | +1.3% |
 
 ![NCU Metrics Chart](prof/md/run1/ncu_metrics_chart.png)
 
@@ -59,19 +80,30 @@ Six FP16 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 
 
 Kernels profiled: [`int8_wmma`](kernels/int8_wmma.cu), [`int8_ptx_mma_k16`](kernels/int8_ptx_mma_k16.cu), [`int8_ptx_mma_k32`](kernels/int8_ptx_mma_k32.cu), [`int8_ptx_manual_pack`](kernels/int8_ptx_manual_pack.cu), [`int8_ptx_3stage`](kernels/int8_ptx_3stage.cu), [`int8_dp4a`](kernels/int8_dp4a.cu)
 
+**Raw durations:**
+
+| Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
+|---|---:|---:|---:|---:|---:|
+| `int8_wmma` (baseline) | 152.00 us | 1.11 ms | 8.55 ms | 68.47 ms | 858.30 ms |
+| `int8_ptx_mma_k32` | 108.67 us | 726.46 us | 5.41 ms | 42.00 ms | 480.06 ms |
+| `int8_ptx_mma_k16` | 204.54 us | 1.33 ms | 9.61 ms | 72.93 ms | 582.00 ms |
+| `int8_ptx_manual_pack` | 159.55 us | 1.17 ms | 8.93 ms | 69.54 ms | 617.68 ms |
+| `int8_ptx_3stage` | 151.87 us | 1.15 ms | 10.22 ms | 93.88 ms | 820.32 ms |
+| `int8_dp4a` | 588.80 us | 4.65 ms | 36.75 ms | 296.86 ms | 2360 ms |
+
+**Slowdown / speedup vs `int8_wmma` (%, + slower, - faster):**
+
+| Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
+|---|---:|---:|---:|---:|---:|
+| `int8_ptx_mma_k32` | -28.5% | -34.6% | -36.7% | -38.7% | -44.1% |
+| `int8_ptx_mma_k16` | +34.6% | +19.8% | +12.4% | +6.5% | -32.2% |
+| `int8_ptx_manual_pack` | +5.0% | +5.4% | +4.4% | +1.6% | -28.0% |
+| `int8_ptx_3stage` | -0.1% | +3.6% | +19.5% | +37.1% | -4.4% |
+| `int8_dp4a` | +287.4% | +318.9% | +329.8% | +333.6% | +174.9% |
+
 Six INT8 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 512 → 8192 (square, INT8 A/B inputs, INT32 accumulation, no in-kernel dequant). Performance is measured relative to `int8_wmma` (the WMMA-API baseline).
 
 ![Average DRAM Active Cycles — flat at N≤4096 (compute-bound), diverges at N=8192 mirroring the speedup ranking](prof/charts/run2/gpu_and_memory_workload_distribution__average_dram_active_cycles_cycle.png)
-
-**Speedup / slowdown vs `int8_wmma` (negative = faster):**
-
-| Size | k32 | k16 | manual_pack | 3stage |
-|---|---|---|---|---|
-| 512 | **−23%** | +35% | +5% | ~0% |
-| 1024 | **−29%** | +20% | +5% | +4% |
-| 2048 | **−30%** | +12% | +4% | +20% |
-| 4096 | **−33%** | +7% | +2% | +37% |
-| 8192 | **−43%** | −32% | −28% | −4% |
 
 **`int8_ptx_mma_k32` is the fastest kernel at every size**, ranging from 23% faster than `int8_wmma` at N=512 up to 43% faster at N=8192. Its advantage is rooted in instruction count: it executes 25–43% fewer instructions than wmma by decomposing each K=32 tile step into two tightly unrolled `m16n8k16` MMA calls, eliminating most of the overhead present in the other kernels. Its coalescing is also exceptional — only 0.4% wasted global sectors at N=8192, vs ~50% for every other kernel.
 
@@ -103,6 +135,25 @@ Six INT8 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 
 > Full Analysis: [`prof/md/run3/ncu_details.md`](prof/md/run3/ncu_details.md)
 
 Kernels profiled: [`int4_wmma`](kernels/int4_wmma.cu), [`int4_ptx_mma_k32`](kernels/int4_ptx_mma_k32.cu), [`int4_ptx_manual_pack`](kernels/int4_ptx_manual_pack.cu), [`int4_ptx_3stage`](kernels/int4_ptx_3stage.cu), [`int4_ptx_mma_k64`](kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu)
+
+**Raw durations:**
+
+| Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
+|---|---:|---:|---:|---:|---:|
+| `int4_wmma` (baseline) | 195.42 us | 1.450 ms | 11.40 ms | 90.11 ms | 712.96 ms |
+| `int4_ptx_mma_k32` | 87.01 us | 0.579 ms | 4.32 ms | 33.99 ms | 269.35 ms |
+| `int4_ptx_mma_k64` | 68.19 us | 0.395 ms | 2.81 ms | 21.52 ms | 167.10 ms |
+| `int4_ptx_manual_pack` | 87.84 us | 0.611 ms | 4.61 ms | 35.55 ms | 277.13 ms |
+| `int4_ptx_3stage` | 56.16 us | 0.382 ms | 2.91 ms | 24.26 ms | 197.63 ms |
+
+**Slowdown / speedup vs `int4_wmma` (%, + slower, - faster):**
+
+| Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
+|---|---:|---:|---:|---:|---:|
+| `int4_ptx_mma_k32` | -55.5% | -60.1% | -62.1% | -62.3% | -62.2% |
+| `int4_ptx_mma_k64` | -65.1% | -72.8% | -75.4% | -76.1% | -76.6% |
+| `int4_ptx_manual_pack` | -55.1% | -57.9% | -59.6% | -60.5% | -61.1% |
+| `int4_ptx_3stage` | -71.3% | -73.7% | -74.5% | -73.1% | -72.3% |
 
 Five INT4 kernels were profiled across N = 512 -> 8192 with `int4_wmma` as baseline. The two top kernels are `int4_ptx_mma_k64` and `int4_ptx_3stage`: `3stage` is fastest at very small sizes (512/1024), while `k64` becomes fastest from 2048 onward and widens the lead at large N.
 
@@ -149,19 +200,30 @@ The key crossover mechanism between the two winners is memory hierarchy behavior
 
 Kernels profiled: [`int4_ptx_mma_k64_x1_x2nontrans_ca`](kernels/int4_ptx_mma_k64_x1_x2nontrans_ca.cu), [`int4_ptx_mma_k64_x2_x2nontrans_ca`](kernels/int4_ptx_mma_k64_x2_x2nontrans_ca.cu), [`int4_ptx_mma_k64_x4_x1nontrans_ca`](kernels/int4_ptx_mma_k64_x4_x1nontrans_ca.cu), [`int4_ptx_mma_k64_x4_x2nontrans_ca`](kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu), [`int4_ptx_mma_k64_x4_x2nontrans_cg`](kernels/int4_ptx_mma_k64_x4_x2nontrans_cg.cu), [`int4_ptx_mma_k64_x4_x2trans_ca`](kernels/int4_ptx_mma_k64_x4_x2trans_ca.cu)
 
+**Raw durations (ms):**
+
+| Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
+|---|---:|---:|---:|---:|---:|
+| `x4_x2nontrans_ca` (baseline) | 1210.219 | 1309.438 | 1902.636 | 5775.392 | 35043.367 |
+| `x1_x2nontrans_ca` | 1249.271 | 1351.661 | 2002.608 | 6155.718 | 37926.035 |
+| `x2_x2nontrans_ca` | 1266.319 | 1345.487 | 1978.199 | 6050.660 | 37072.375 |
+| `x4_x1nontrans_ca` | 1283.560 | 1373.870 | 2031.992 | 6142.130 | 37640.043 |
+| `x4_x2nontrans_cg` | 1282.004 | 1386.205 | 2066.496 | 6451.012 | 39894.840 |
+| `x4_x2trans_ca` | 1295.441 | 1554.672 | 3155.077 | 14994.947 | 108172.047 |
+
+**Slowdown / speedup vs `x4_x2nontrans_ca` (%, + slower, - faster):**
+
+| Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
+|---|---:|---:|---:|---:|---:|
+| `x1_x2nontrans_ca` | +3.2% | +3.2% | +5.3% | +6.6% | +8.2% |
+| `x2_x2nontrans_ca` | +4.6% | +2.8% | +4.0% | +4.8% | +5.8% |
+| `x4_x1nontrans_ca` | +6.1% | +4.9% | +6.8% | +6.4% | +7.4% |
+| `x4_x2nontrans_cg` | +5.9% | +5.9% | +8.6% | +11.7% | +13.8% |
+| `x4_x2trans_ca` | +7.0% | +18.7% | +65.8% | +159.6% | +208.7% |
+
 This run isolates the `int4_ptx_mma_k64*` family to test loader split (`x1/x2/x4`), cache policy (`ca` vs `cg`), and B layout (`nontrans` vs `trans`) while keeping the core MMA strategy fixed.
 
 ![Memory Throughput (GB/s)](prof/charts/run4/Memory_Workload_Analysis_Memory_Throughput_Gbyte_s.png)
-
-**Duration delta vs baseline `x4_x2nontrans_ca`:**
-
-| Size | x1_x2nontrans_ca | x2_x2nontrans_ca | x4_x1nontrans_ca | x4_x2nontrans_cg | x4_x2trans_ca |
-|---|---:|---:|---:|---:|---:|
-| 512 | -0.3% | -0.3% | +1.4% | +7.1% | +237.3% |
-| 1024 | -0.3% | -0.3% | +1.4% | +7.1% | +237.3% |
-| 2048 | +1.1% | +0.8% | +4.0% | +7.0% | +239.8% |
-| 4096 | +3.7% | +2.5% | +4.2% | +9.6% | +243.5% |
-| 8192 | +3.9% | +2.3% | +3.1% | +5.9% | +242.2% |
 
 Run4 shows that the chosen k64 baseline sits inside a tight local optimum basin: non-trans `ca` variants (`x1/x2/x4`) move only a few percent because they do not change the bottleneck class. Their occupancy, scheduler eligibility class, and memory-throughput range remain similar, so tuning these knobs mostly redistributes pressure between L1/L2 and instruction issue rather than changing end-to-end throughput.
 
@@ -171,7 +233,7 @@ By contrast, the `cg` and `trans` variants reveal two distinct failure modes. `c
 
 | Metric | x4_x2nontrans_ca (baseline) | x4_x2nontrans_cg | x4_x2trans_ca |
 |---|---:|---:|---:|
-| Duration delta vs baseline | 0% | ~+6% to +10% | ~+237% to +244% |
+| Duration delta vs baseline | 0% | ~+6% to +14% | ~+7% to +209% |
 | L1/TEX hit rate (%) | ~64 | ~20 | very low utility |
 | L2 throughput (%) | ~26 | ~50 | high-pressure, low-efficiency |
 | Eligible warps/scheduler | ~0.57 | ~0.50 | ~0.20 |
@@ -184,7 +246,7 @@ By contrast, the `cg` and `trans` variants reveal two distinct failure modes. `c
 
 - Non-trans `ca` variants are effectively tied: changing `x1/x2/x4` shifts only second-order metrics (L1/L2 mix, eligible warps, few-percent latency), not the dominant bottleneck.
 - `x4_x2nontrans_cg` is consistently slightly worse because it pushes traffic from L1 to L2 (L1 hit/throughput down, L2 throughput up), increasing latency without compute-side benefit.
-- `x4_x2trans_ca` is structurally worse (~3.4x slower): severe uncoalesced global loads and shared bank conflicts drive scheduler starvation.
+- `x4_x2trans_ca` is structurally worse (up to ~3.1x slower at large sizes): severe uncoalesced global loads and shared bank conflicts drive scheduler starvation.
 - As a direct result, `x4_x2trans_ca` shows a collapse in effective memory throughput (Gbyte/s) versus the non-trans baseline.
 - Trans evidence is direct in NCU: only ~2.2/32 bytes per global-load sector utilized, eligible warps/scheduler ~0.20 vs ~0.57 baseline, and warp cycles/instruction ~27.8 vs ~12.5 baseline.
 - Baseline remains optimal because none of the tested knobs changed the bottleneck class; they only redistributed pressure inside the same bound.
