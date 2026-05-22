@@ -34,26 +34,26 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 		<tr>
 			<td><code>Run 1 - fp16</code></td>
 			<td><a href="kernels/fp16_wmma.cu"><code>fp16_wmma</code></a></td>
-			<td><code>1.0x-1.0x</code></td>
-			<td>PTX variants do not improve wall time: at <code>N &lt;= 4096</code> local gains are offset by extra instruction/packing overhead, and after the L2-capacity cliff (<code>N &gt;= 8192</code>) all kernels converge because DRAM becomes the dominant bottleneck.</td>
+			<td><code>1.0x</code></td>
+			<td>PTX doesn't improve wall time: local gains are offset by extra instruction/packing overhead.</td>
 		</tr>
 		<tr>
 			<td><code>Run 2 - int8</code></td>
 			<td><a href="kernels/int8_ptx_mma_k32.cu"><code>int8_ptx_mma_k32</code></a></td>
 			<td><code>1.4x-1.8x</code></td>
-			<td><code>k32</code> wins with fewer executed instructions and better global-load coalescing; at <code>N=8192</code>, Average DRAM Active Cycles tracks duration nearly 1:1, confirming memory-efficiency-driven ranking in the DRAM-bound regime.</td>
+			<td><code>k32</code> wins with fewer executed instructions and better global-load coalescing; at <code>N=8192</code>, Average DRAM Active Cycles tracks duration nearly 1:1.</td>
 		</tr>
 		<tr>
 			<td><code>Run 3 - int4</code></td>
 			<td><a href="kernels/int4_ptx_3stage.cu"><code>int4_ptx_3stage</code></a> (small <code>N</code>), <a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a> (large <code>N</code>)</td>
 			<td><code>2.9x-4.3x</code></td>
-			<td>Both kernels avoid WMMA INT4 software emulation overhead; the crossover comes from memory hierarchy behavior, where <code>3stage</code> loses L1 locality as <code>N</code> grows while <code>k64</code> retains higher L1 hit rate and scales better.</td>
+			<td>Both kernels avoid wmma int4 software emulation overhead; <code>3stage</code> loses L1 locality as <code>N</code> grows while <code>k64</code> retains higher L1 hit rate.</td>
 		</tr>
 		<tr>
 			<td><code>Run 4 - int4 + k64</code></td>
 			<td><a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a></td>
 			<td><code>2.9x-4.3x</code></td>
-			<td>Sweeping loader split (<code>x1/x2/x4</code>), cache policy (<code>ca/cg</code>), and B layout (<code>nontrans/trans</code>) does not beat baseline: non-trans <code>ca</code> variants remain in the same bottleneck class, <code>cg</code> adds L2-latency pressure, and <code>trans</code> breaks coalescing with a large throughput penalty.</td>
+			<td>Loader split (<code>x1/x2/x4</code>), cache policy (<code>ca/cg</code>), and B layout (<code>nontrans/trans</code>) does not beat baseline: non-trans <code>ca</code> variants remain in the same bottleneck class, <code>cg</code> adds L2-latency pressure, and <code>trans</code> breaks coalescing.</td>
 		</tr>
 	</tbody>
 </table>
