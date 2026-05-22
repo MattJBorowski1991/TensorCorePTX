@@ -3,23 +3,24 @@
 This repository collects findings, experiments, and design notes for implementing high-performance PTX GEMM kernels using `cp.async`, `ldmatrix` and `mma.sync` on Nvidia L4 (Ada/SM89). The focus is a PTX-first path across three precisions (`fp16`, `int8`, `int4`): for each precision we run a multi-variant deep dive over key PTX instruction choices and compare against a double-buffered WMMA-API kernel used as the baseline.
 
 ## Table of Contents
-- [Overview](#overview)
+- [Summary](#summary)
 - [Run 1 — fp16 - Profiling Results](#run-1--fp16---profiling-results)
 - [Run 2 — int8 - Profiling Results](#run-2--int8---profiling-results)
 - [Run 3 — int4 - Profiling Results for Base Kernels](#run-3--int4---profiling-results-for-base-kernels)
 - [Run 4 — int4 - Profiling Results for the optimal k64 kernel family](#run-4--int4---profiling-results-for-the-optimal-k64-kernel-family)
 
-## Overview
+## Summary
 
 Most kernels in this project follow the same core pattern: overlap DRAM->SRAM prefetch (`cp.async`) with tile-level compute in registers (`ldmatrix` + `mma.sync`) to hide memory latency. Additional variants include manual SRAM->register packing paths (no `ldmatrix`) and an INT8 `dp4a` path; for each precision family, the baseline is always the WMMA-API kernel (`*_wmma`), and PTX variants are evaluated relative to that baseline. All kernels were profiled with Nsight Compute across square matrix sizes N = 512 → 8192. 
 
-**Run 1 (`fp16`)** Best kernel: [`fp16_wmma`](kernels/fp16_wmma.cu). No FP16 PTX variant beats the WMMA baseline because the WMMA path already gives the compiler a highly optimized double-buffered `cp.async` + tensor-core schedule.
+### At-a-Glance Results
 
-**Run 2 (`int8`)** Main result: `int8_ptx_mma_k32` is consistently best, with instruction-count efficiency and better coalescing driving the win, especially at large N.
-
-**Run 3 (`int4`)** Main result: `int4_ptx_mma_k64` and `int4_ptx_3stage` dominate by avoiding WMMA INT4 emulation overhead; `3stage` leads at small sizes, while `k64` scales better at large sizes.
-
-**Run 4 (`int4 k64 deep dive`)** isolates the `int4_ptx_mma_k64*` family and sweeps loader split (`x1/x2/x4`), cache policy (`ca/cg`), and B layout (`nontrans/trans`). Main result: non-trans `ca` variants form a tight optimum basin, `cg` is a mild regression, and `trans` is a structural outlier with severe coalescing and throughput collapse.
+| Run | Best kernel(s) | Key finding |
+|---|---|---|
+| `Run 1 (fp16)` | [`fp16_wmma`](kernels/fp16_wmma.cu) | PTX variants do not improve wall time: at `N <= 4096` local gains are offset by extra instruction/packing overhead, and after the L2-capacity cliff (`N >= 8192`) all kernels converge because DRAM becomes the dominant bottleneck. |
+| `Run 2 (int8)` | [`int8_ptx_mma_k32`](kernels/int8_ptx_mma_k32.cu) | `k32` wins with fewer executed instructions and better global-load coalescing; at `N=8192`, Average DRAM Active Cycles tracks duration nearly 1:1, confirming memory-efficiency-driven ranking in the DRAM-bound regime. |
+| `Run 3 (int4)` | [`int4_ptx_3stage`](kernels/int4_ptx_3stage.cu) (small `N`), [`int4_ptx_mma_k64`](kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu) (large `N`) | Both kernels avoid WMMA INT4 software emulation overhead; the crossover comes from memory hierarchy behavior, where `3stage` loses L1 locality as `N` grows while `k64` retains higher L1 hit rate and scales better. |
+| `Run 4 (int4 k64 deep dive)` | [`int4_ptx_mma_k64`](kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu) | Sweeping loader split (`x1/x2/x4`), cache policy (`ca/cg`), and B layout (`nontrans/trans`) does not beat baseline: non-trans `ca` variants remain in the same bottleneck class, `cg` adds L2-latency pressure, and `trans` breaks coalescing with a large throughput penalty. |
 
 
 ---
@@ -32,28 +33,28 @@ Kernels profiled: [`fp16_wmma`](kernels/fp16_wmma.cu), [`fp16_ptx_mma`](kernels/
 
 **Raw durations (ms):**
 
-| Kernel | 512 | 1024 | 2048 | 4096 | 8192 | 16384 |
-|---|---:|---:|---:|---:|---:|---:|
-| `fp16_wmma` (baseline) | 680.155 | 684.000 | 813.093 | 1539.726 | 14098.618 | 110469.695 |
-| `fp16_ptx_mma` | 710.899 | 698.062 | 782.720 | 1553.984 | 14150.838 | 110724.594 |
-| `fp16_ptx_k8` | 685.578 | 724.600 | 801.493 | 1540.406 | 14135.938 | 110679.141 |
-| `fp16_ptx_fp16acc` | 664.341 | 700.616 | 789.057 | 1555.479 | 14553.427 | 112874.984 |
-| `fp16_ptx_3stage` | 689.617 | 683.957 | 794.762 | 1577.620 | 14828.855 | 114753.836 |
-| `fp16_ptx_manual_pack` | 673.823 | 699.585 | 789.764 | 1574.092 | 14312.770 | 111871.609 |
+| Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
+|---|---:|---:|---:|---:|---:|
+| `fp16_wmma` (baseline) | 680.155 | 684.000 | 813.093 | 1539.726 | 14098.618 |
+| `fp16_ptx_mma` | 710.899 | 698.062 | 782.720 | 1553.984 | 14150.838 |
+| `fp16_ptx_k8` | 685.578 | 724.600 | 801.493 | 1540.406 | 14135.938 |
+| `fp16_ptx_fp16acc` | 664.341 | 700.616 | 789.057 | 1555.479 | 14553.427 |
+| `fp16_ptx_3stage` | 689.617 | 683.957 | 794.762 | 1577.620 | 14828.855 |
+| `fp16_ptx_manual_pack` | 673.823 | 699.585 | 789.764 | 1574.092 | 14312.770 |
 
 **Slowdown / speedup vs `fp16_wmma` (%, + slower, - faster):**
 
-| Kernel | 512 | 1024 | 2048 | 4096 | 8192 | 16384 |
-|---|---:|---:|---:|---:|---:|---:|
-| `fp16_ptx_mma` | +4.5% | +2.1% | -3.7% | +0.9% | +0.4% | +0.2% |
-| `fp16_ptx_k8` | +0.8% | +5.9% | -1.4% | +0.0% | +0.3% | +0.2% |
-| `fp16_ptx_fp16acc` | -2.3% | +2.4% | -3.0% | +1.0% | +3.2% | +2.2% |
-| `fp16_ptx_3stage` | +1.4% | +0.0% | -2.3% | +2.5% | +5.2% | +3.9% |
-| `fp16_ptx_manual_pack` | -0.9% | +2.3% | -2.9% | +2.2% | +1.5% | +1.3% |
+| Kernel | 512 | 1024 | 2048 | 4096 | 8192 |
+|---|---:|---:|---:|---:|---:|
+| `fp16_ptx_mma` | +4.5% | +2.1% | -3.7% | +0.9% | +0.4% |
+| `fp16_ptx_k8` | +0.8% | +5.9% | -1.4% | +0.0% | +0.3% |
+| `fp16_ptx_fp16acc` | -2.3% | +2.4% | -3.0% | +1.0% | +3.2% |
+| `fp16_ptx_3stage` | +1.4% | +0.0% | -2.3% | +2.5% | +5.2% |
+| `fp16_ptx_manual_pack` | -0.9% | +2.3% | -2.9% | +2.2% | +1.5% |
 
 ![NCU Metrics Chart](prof/md/run1/ncu_metrics_chart.png)
 
-Six FP16 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 512 → 16384 (square, FP16 inputs, FP32 accumulation). The four tracked metrics — GFLOPS, Compute (SM) Throughput %, Achieved Occupancy %, and L1/TEX Cache Throughput % — reveal two distinct operating regimes separated by an L2 capacity cliff between N = 4096 and N = 8192.
+Six FP16 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 512 → 8192 (square, FP16 inputs, FP32 accumulation). The four tracked metrics — GFLOPS, Compute (SM) Throughput %, Achieved Occupancy %, and L1/TEX Cache Throughput % — reveal two distinct operating regimes separated by an L2 capacity cliff between N = 4096 and N = 8192.
 
 **Compute-bound regime (N ≤ 4096):** All kernels sustain 1,280–1,500 GFLOPS. `fp16_ptx_manual_pack` has the highest Compute (SM) % (~57%) and `fp16_ptx_k8` is second (~47%), but both are still slower than `fp16_wmma` — the baseline WMMA intrinsic path. The penalty ranges from +1% (`ptx_mma`, `ptx_k8`) up to +22% (`ptx_manual_pack`) at N = 512 due to unrecovered packing overhead at small tile counts. No hand-written PTX variant outperforms the compiler-optimised WMMA path in this regime.
 
@@ -316,7 +317,7 @@ rm -rf build && cmake -B build -DKERNEL=fp16_ptx_fp16acc -DCUDA_ARCH=89 && cmake
 
 # Run NVIDIA Nsight Compute (`ncu`) across a set of 2^N sizes.
 # This invokes the same executable repeatedly while setting `PROFILE_SIZE`.
-for S in 512 1024 2048 4096 8192 16384; do
+for S in 512 1024 2048 4096 8192; do
 	echo "Profiling size=$S"
 	SKIP_VERIFY=1 PROFILE_SIZE=$S ncu --set full --target-processes all ./build/profile_fp16_ptx_fp16acc \
 		> fp16_ptx_fp16acc_ncu_${S}.txt 2>&1
