@@ -17,17 +17,17 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 
 <table width="100%">
 	<colgroup>
-		<col width="13.2%" />
-		<col width="11%" />
-		<col width="22%" />
-		<col width="53.8%" />
+		<col width="16%" />
+		<col width="14%" />
+		<col width="30%" />
+		<col width="40%" />
 	</colgroup>
 	<thead>
 		<tr>
-			<th>Run</th>
-			<th>Precision</th>
-			<th>Best kernel(s)</th>
-			<th>Key finding</th>
+			<th width="16%">Run</th>
+			<th width="14%">Precision</th>
+			<th width="30%">Best kernel(s)</th>
+			<th width="40%">Key finding</th>
 		</tr>
 	</thead>
 	<tbody>
