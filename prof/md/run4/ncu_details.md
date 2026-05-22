@@ -86,7 +86,16 @@ Note: `cg` does not mean "L1 globally equals zero"; it changes caching policy fo
 ![Warp Cycles Per Executed Instruction](../../charts/run4/Warp_State_Statistics_Warp_Cycles_Per_Executed_Instruction_cycle.png)
 ![Avg Executed Instructions Per Scheduler](../../charts/run4/Instruction_Statistics_Avg._Executed_Instructions_Per_Scheduler_inst.png)
 
-NCU diagnostics for `trans` also explicitly flag severe uncoalesced global loads (very low bytes used per sector) and shared-load bank conflicts. This explains the apparent paradox of high memory busy but low useful GB/s.
+NCU diagnostics for `trans` show concrete uncoalescing and bank-conflict penalties:
+
+- Global-load sector utilization is only **2.2/32 bytes** per sector (~6.9% useful payload) for `trans`.
+- In the same run, non-trans `ca` kernels do not trigger this severe global-load warning and are far better coalesced overall (their total global excessive sectors are much lower).
+- Source Counters at N=2048: `trans` has **1,998,848 excessive global sectors out of 2,293,760 (87%)**.
+- Baseline `x4_x2nontrans_ca` at N=2048: **32,768 excessive sectors out of 327,680 (10%)**.
+- Relative gap: `trans` has about **8.7x higher excessive-sector rate** (87% vs 10%) and about **61x more excessive sectors** in absolute count.
+- Shared-load bank conflicts exist too (about **5.3-way**), but similar conflict signatures also appear in non-trans variants, so the primary separator is global-load coalescing, not shared-load conflict alone.
+
+This relative data explains the paradox: `trans` keeps memory hardware busy with low-efficiency global transactions, so useful GB/s and scheduler eligibility collapse.
 
 ---
 
