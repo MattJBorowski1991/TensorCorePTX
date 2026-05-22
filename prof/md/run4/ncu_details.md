@@ -33,8 +33,6 @@ Interpretation:
 - `cg` is consistently a small regression (+6% to +10% around larger sizes).
 - `trans` is a structural failure mode (~3.4x slower).
 
-![Duration (us)](../../charts/run4/GPU_Speed_Of_Light_Throughput_Duration_us.png)
-
 ---
 
 ## Details
