@@ -226,15 +226,13 @@ Kernels profiled: [`fp16_wmma`](kernels/fp16_wmma.cu), [`fp16_ptx_mma`](kernels/
 
 ![NCU Metrics Chart](prof/md/run1/ncu_metrics_chart.png)
 
-Six FP16 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 512 → 8192 (square, FP16 inputs, FP32 accumulation). The four tracked metrics — GFLOPS, Compute (SM) Throughput %, Achieved Occupancy %, and L1/TEX Cache Throughput % — reveal two distinct operating regimes separated by an L2 capacity cliff between N = 4096 and N = 8192.
+The four tracked metrics — GFLOPS, Compute (SM) Throughput %, Achieved Occupancy %, and L1/TEX Cache Throughput % — reveal two distinct operating regimes separated by an L2 capacity cliff between N = 4096 and N = 8192.
 
 **Compute-bound regime (N ≤ 4096):** All kernels sustain 1,280–1,500 GFLOPS. `fp16_ptx_manual_pack` has the highest Compute (SM) % (~57%) and `fp16_ptx_k8` is second (~47%), but both are still slower than `fp16_wmma` — the baseline WMMA intrinsic path. The penalty ranges from +1% (`ptx_mma`, `ptx_k8`) up to +22% (`ptx_manual_pack`) at N = 512 due to unrecovered packing overhead at small tile counts. No hand-written PTX variant outperforms the compiler-optimised WMMA path in this regime.
 
 **Memory-bound regime (N ≥ 8192):** Once the matrices (~537 MB combined at N = 8192, FP16 A/B + FP32 C) exceed L2 capacity, every kernel stalls on DRAM. L1/TEX throughput collapses from ~90% to ~38%, GFLOPS halves to 620–666, and all slowdown differences shrink to < 1%. The instruction mix becomes irrelevant — bandwidth is the sole bottleneck.
 
 **`fp16_ptx_fp16acc` occupancy anomaly:** Using FP16 accumulators halves the accumulator register count, lifting Achieved Occupancy to 70–82% vs 56–66% for all other kernels. Despite this, GFLOPS are not higher — confirming that occupancy alone does not drive throughput when the kernel is not latency-limited by a warp-count shortage.
-
-**Next steps:** (1) verify tensor-core `mma` instructions are actually being issued via `inst_executed_pipe_tensor`; (2) profile DRAM bandwidth to quantify saturation at large sizes; (3) improve shared-memory tiling to recover L1/TEX utilisation in the compute-bound region; (4) extend triple-buffered `cp.async` pipeline (`ptx_3stage`) more aggressively to mask L2 latency at the cliff boundary.
 
 | Kernel | SRAM→Regs | mma.sync shape | Acc type | Pipeline | Notes |
 |---|---|---|---|---|---|
@@ -273,8 +271,6 @@ Kernels profiled: [`int8_wmma`](kernels/int8_wmma.cu), [`int8_ptx_mma_k16`](kern
 | `int8_ptx_manual_pack` | 0.95x | 0.95x | 0.96x | 0.98x | 1.39x |
 | `int8_ptx_3stage` | 1.00x | 0.97x | 0.84x | 0.73x | 1.05x |
 | `int8_dp4a` | 0.26x | 0.24x | 0.23x | 0.23x | 0.36x |
-
-Six INT8 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 512 → 8192 (square, INT8 A/B inputs, INT32 accumulation, no in-kernel dequant). Performance is measured relative to `int8_wmma` (the WMMA-API baseline).
 
 ![Average DRAM Active Cycles — flat at N≤4096 (compute-bound), diverges at N=8192 mirroring the speedup ranking](prof/charts/run2/gpu_and_memory_workload_distribution__average_dram_active_cycles_cycle.png)
 
@@ -365,6 +361,14 @@ The key crossover mechanism between the two winners is memory hierarchy behavior
 - Instruction pressure tracks performance closely: winners execute roughly 6-7x fewer instructions per scheduler than `int4_wmma` at large N.
 - `k64` sustains stronger large-size behavior than `3stage` because `3stage` becomes more L2-bound as N grows (L1 hit-rate collapse), while `k64` keeps much higher L1 locality at N=8192 (~62% vs ~14% for `3stage`).
 
+| Kernel | SRAM→Regs | mma.sync shape | Acc type | Pipeline | Notes |
+|---|---|---|---|---|---|
+| `int4_wmma` | `wmma::load_matrix_sync` | m8n8k32 (WMMA) | int32 | 2-stage cp.async | WMMA baseline; INT4 path is software-expanded |
+| `int4_ptx_mma_k32` | A: 1x `ldmatrix.x2`, B: 2x `ldmatrix.x1` | m16n8k32 | int32 | 2-stage cp.async | First native-PTX INT4 path; removes WMMA expansion cost |
+| `int4_ptx_manual_pack` | scalar `ld.shared` + pack | m16n8k32 | int32 | 2-stage cp.async | No `ldmatrix`; pays extra instruction overhead |
+| `int4_ptx_3stage` | A: 1x `ldmatrix.x4`, B: 2x `ldmatrix.x2` | m16n8k64 | int32 | **3-stage** cp.async | `wait_group 1`; best at small `N`, but more L2-driven at scale |
+| `int4_ptx_mma_k64` | A: 1x `ldmatrix.x4`, B: 2x `ldmatrix.x2` | m16n8k64 | int32 | 2-stage cp.async | Best large-`N` kernel; stronger L1 locality than `3stage` |
+
 ---
 
 ### Run 4 — int4 - Profiling Results for the optimal k64 kernel family
@@ -423,6 +427,15 @@ By contrast, the `cg` and `trans` variants reveal two distinct failure modes. `c
 - As a direct result, `x4_x2trans_ca` shows a collapse in effective memory throughput (Gbyte/s) versus the non-trans baseline.
 - Trans evidence is direct in NCU: only ~2.2/32 bytes per global-load sector utilized, eligible warps/scheduler ~0.20 vs ~0.57 baseline, and warp cycles/instruction ~27.8 vs ~12.5 baseline.
 - Baseline remains optimal because none of the tested knobs changed the bottleneck class; they only redistributed pressure inside the same bound.
+
+| Kernel | SRAM→Regs | mma.sync shape | Acc type | Pipeline | Notes |
+|---|---|---|---|---|---|
+| `x1_x2nontrans_ca` | A: 4x `ldmatrix.x1`, B: 2x `ldmatrix.x2` | m16n8k64 | int32 | 2-stage `cp.async.ca` | Narrowest A loader split; slightly slower than baseline |
+| `x2_x2nontrans_ca` | A: 2x `ldmatrix.x2`, B: 2x `ldmatrix.x2` | m16n8k64 | int32 | 2-stage `cp.async.ca` | Middle A-loader split; same bottleneck class as baseline |
+| `x4_x1nontrans_ca` | A: 1x `ldmatrix.x4`, B: 2x `ldmatrix.x1` | m16n8k64 | int32 | 2-stage `cp.async.ca` | Narrows B fragment loads; no end-to-end gain |
+| `x4_x2nontrans_ca` | A: 1x `ldmatrix.x4`, B: 2x `ldmatrix.x2` | m16n8k64 | int32 | 2-stage `cp.async.ca` | Baseline and local optimum in this family |
+| `x4_x2nontrans_cg` | A: 1x `ldmatrix.x4`, B: 2x `ldmatrix.x2` | m16n8k64 | int32 | 2-stage `cp.async.cg` | More L2 pressure; modest latency regression |
+| `x4_x2trans_ca` | A: 1x `ldmatrix.x4`, B: 2x `ldmatrix.x2.trans` | m16n8k64 | int32 | 2-stage `cp.async.ca` | Transposed B layout breaks coalescing and collapses throughput |
 
 ---
 
