@@ -34,29 +34,94 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 		<tr>
 			<td><code>Run 1 - fp16</code></td>
 			<td><a href="kernels/fp16_wmma.cu"><code>fp16_wmma</code></a></td>
-			<td><code>1.0x</code></td>
+			<td><code>1.0x-1.0x</code></td>
 			<td>PTX variants do not improve wall time: at <code>N &lt;= 4096</code> local gains are offset by extra instruction/packing overhead, and after the L2-capacity cliff (<code>N &gt;= 8192</code>) all kernels converge because DRAM becomes the dominant bottleneck.</td>
 		</tr>
 		<tr>
 			<td><code>Run 2 - int8</code></td>
 			<td><a href="kernels/int8_ptx_mma_k32.cu"><code>int8_ptx_mma_k32</code></a></td>
-			<td><code>1.8x</code></td>
+			<td><code>1.4x-1.8x</code></td>
 			<td><code>k32</code> wins with fewer executed instructions and better global-load coalescing; at <code>N=8192</code>, Average DRAM Active Cycles tracks duration nearly 1:1, confirming memory-efficiency-driven ranking in the DRAM-bound regime.</td>
 		</tr>
 		<tr>
 			<td><code>Run 3 - int4</code></td>
 			<td><a href="kernels/int4_ptx_3stage.cu"><code>int4_ptx_3stage</code></a> (small <code>N</code>), <a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a> (large <code>N</code>)</td>
-			<td><code>3.5x</code>, <code>4.3x</code></td>
+			<td><code>2.9x-4.3x</code></td>
 			<td>Both kernels avoid WMMA INT4 software emulation overhead; the crossover comes from memory hierarchy behavior, where <code>3stage</code> loses L1 locality as <code>N</code> grows while <code>k64</code> retains higher L1 hit rate and scales better.</td>
 		</tr>
 		<tr>
 			<td><code>Run 4 - int4 + k64</code></td>
 			<td><a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a></td>
-			<td><code>4.3x</code></td>
+			<td><code>2.9x-4.3x</code></td>
 			<td>Sweeping loader split (<code>x1/x2/x4</code>), cache policy (<code>ca/cg</code>), and B layout (<code>nontrans/trans</code>) does not beat baseline: non-trans <code>ca</code> variants remain in the same bottleneck class, <code>cg</code> adds L2-latency pressure, and <code>trans</code> breaks coalescing with a large throughput penalty.</td>
 		</tr>
 	</tbody>
 </table>
+
+<table width="100%">
+	<thead>
+		<tr>
+			<th>Kernel (raw duration, ms)</th>
+			<th>512</th>
+			<th>1024</th>
+			<th>2048</th>
+			<th>4096</th>
+			<th>8192</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>fp16_wmma</code></td>
+			<td>680.155</td>
+			<td>684.000</td>
+			<td>813.093</td>
+			<td>1539.726</td>
+			<td>14098.618</td>
+		</tr>
+		<tr>
+			<td><code>int8_wmma</code></td>
+			<td>0.152</td>
+			<td>1.110</td>
+			<td>8.550</td>
+			<td>68.470</td>
+			<td>858.300</td>
+		</tr>
+		<tr>
+			<td><code>int8_ptx_mma_k32</code></td>
+			<td>0.109</td>
+			<td>0.726</td>
+			<td>5.410</td>
+			<td>42.000</td>
+			<td>480.060</td>
+		</tr>
+		<tr>
+			<td><code>int4_wmma</code></td>
+			<td>0.195</td>
+			<td>1.450</td>
+			<td>11.400</td>
+			<td>90.110</td>
+			<td>712.960</td>
+		</tr>
+		<tr>
+			<td><code>int4_ptx_3stage</code></td>
+			<td>0.056</td>
+			<td>0.382</td>
+			<td>2.910</td>
+			<td>24.260</td>
+			<td>197.630</td>
+		</tr>
+		<tr>
+			<td><code>int4_ptx_mma_k64</code></td>
+			<td>0.068</td>
+			<td>0.395</td>
+			<td>2.810</td>
+			<td>21.520</td>
+			<td>167.100</td>
+		</tr>
+	</tbody>
+</table>
+
+All values above are in <code>ms</code>; entries originally reported in <code>us</code> were converted.
 
 
 ---
