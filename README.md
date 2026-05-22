@@ -17,10 +17,10 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 
 <table>
 	<colgroup>
-		<col style="width: 11%;" />
+		<col style="width: 13.2%;" />
 		<col style="width: 11%;" />
 		<col style="width: 22%;" />
-		<col style="width: 56%;" />
+		<col style="width: 53.8%;" />
 	</colgroup>
 	<thead>
 		<tr>
