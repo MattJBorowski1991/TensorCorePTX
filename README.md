@@ -6,6 +6,8 @@ This repository collects findings, experiments, and design notes for implementin
 - [Overview](#overview)
 - [Run 1 — FP16 Profiling Results](#run-1--fp16---profiling-results)
 - [Run 2 — INT8 Profiling Results](#run-2--int8---profiling-results)
+- [Run 3 — INT4 Base Kernels](#run-3--int4-base-kernels)
+- [Run 4 — INT4 k64 Family Deep Dive](#run-4--int4-k64-family-deep-dive)
 - [Data Movement](#data-movement)
 - [Shared Memory Layout](#shared-memory-layout)
 - [mma.sync Tile Shapes](#mmasync-tile-shapes)
@@ -91,6 +93,60 @@ Six INT8 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 
 
 ---
 
+## Run 3 — INT4 Base Kernels
+
+> Full Analysis: [`prof/md/run3/ncu_details.md`](prof/md/run3/ncu_details.md)
+
+Five INT4 kernels were profiled across N = 512 -> 8192 with `int4_wmma` as baseline. The two top kernels are `int4_ptx_mma_k64` and `int4_ptx_3stage`: `3stage` is fastest at very small sizes (512/1024), while `k64` becomes fastest from 2048 onward and widens the lead at large N.
+
+**Wall-time speedup vs `int4_wmma` (from run3 profile):**
+
+| Size | `int4_ptx_3stage` | `int4_ptx_mma_k64` |
+|---|---|---|
+| 512 | **+248%** | +187% |
+| 1024 | **+280%** | +267% |
+| 2048 | +292% | **+306%** |
+| 4096 | +271% | **+319%** |
+| 8192 | +261% | **+327%** |
+
+**Condensed takeaways:**
+
+- `int4_wmma` underperforms mainly because WMMA INT4 (`wmma::experimental::precision::s4`) is software-expanded, which inflates instruction count and introduces heavy lane-dependent divergence.
+- The winning PTX kernels call native INT4 Tensor Core MMA directly (`mma.sync...m16n8k64.s4`) and avoid that expansion cost.
+- Warp efficiency is the biggest separator: winners keep ~32 active threads/warp with zero divergent branches, while `int4_wmma` runs with partial warp activity and millions of divergent branches at large sizes.
+- Instruction pressure tracks performance closely: winners execute roughly 6-7x fewer instructions per scheduler than `int4_wmma` at large N.
+- `k64` sustains stronger large-size behavior than `3stage` because `3stage` becomes more L2-bound as N grows (L1 hit-rate collapse), while `k64` keeps healthier L1 locality.
+
+---
+
+## Run 4 — INT4 k64 Family Deep Dive
+
+> Full Analysis: [`prof/md/run4/ncu_details.md`](prof/md/run4/ncu_details.md)
+
+This run isolates the `int4_ptx_mma_k64*` family to test loader split (`x1/x2/x4`), cache policy (`ca` vs `cg`), and B layout (`nontrans` vs `trans`) while keeping the core MMA strategy fixed.
+
+![Duration vs kernel variant family](prof/charts/run4/GPU_Speed_Of_Light_Throughput_Duration_us.png)
+
+**Duration delta vs baseline `x4_x2nontrans_ca`:**
+
+| Size | x1_x2nontrans_ca | x2_x2nontrans_ca | x4_x1nontrans_ca | x4_x2nontrans_cg | x4_x2trans_ca |
+|---|---:|---:|---:|---:|---:|
+| 512 | -0.3% | -0.3% | +1.4% | +7.1% | +237.3% |
+| 1024 | -0.3% | -0.3% | +1.4% | +7.1% | +237.3% |
+| 2048 | +1.1% | +0.8% | +4.0% | +7.0% | +239.8% |
+| 4096 | +3.7% | +2.5% | +4.2% | +9.6% | +243.5% |
+| 8192 | +3.9% | +2.3% | +3.1% | +5.9% | +242.2% |
+
+**Condensed takeaways:**
+
+- Non-trans `ca` variants are effectively tied: changing `x1/x2/x4` shifts only second-order metrics (L1/L2 mix, eligible warps, few-percent latency), not the dominant bottleneck.
+- `x4_x2nontrans_cg` is consistently slightly worse because it pushes traffic from L1 to L2 (L1 hit/throughput down, L2 throughput up), increasing latency without compute-side benefit.
+- `x4_x2trans_ca` is structurally worse (~3.4x slower): severe uncoalesced global loads and shared bank conflicts drive scheduler starvation.
+- Trans evidence is direct in NCU: only ~2.2/32 bytes per global-load sector utilized, eligible warps/scheduler ~0.20 vs ~0.57 baseline, and warp cycles/instruction ~27.8 vs ~12.5 baseline.
+- Baseline remains optimal because none of the tested knobs changed the bottleneck class; they only redistributed pressure inside the same bound.
+
+---
+
 ## Data Movement
 
 - Global → SRAM
@@ -139,11 +195,6 @@ Notes:
 - Clean PTX GEMM pipeline: `cp.async` → `ldmatrix` → `mma.sync.m16n8k16` → epilogue (no WMMA).
 - Consider `ldmatrix.trans` for B — compare to storing B transposed in SRAM.
 - Epilogue: accumulate in F32 registers; pack stores with `st.global.v4`.
-
-### FP8 (e4m3, e5m2)
-- Native Ada support: evaluate conversion and packing sequences such as `cvt.rn.satfinite.e4m3x2.f32`.
-- Example PTX opcode: `mma.sync.aligned.m16n8k32.row.col.f32.e4m3.e4m3.f32`.
-- Trade-offs: `e4m3` vs `e5m2` (range vs precision). SparseMoE observed FP8 slower than FP16 due to conversion overhead — investigate whether end-to-end FP8 inputs avoid that penalty.
 
 ### INT8
 - Compare `dp4a` (vadd4 family) vs `mma.sync` for INT8 workloads: `dp4a` is flexible; `mma.sync` offers higher Tensor Core throughput.
