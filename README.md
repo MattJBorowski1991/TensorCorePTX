@@ -15,12 +15,48 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 
 ### At-a-Glance Results
 
-| Run | Precision | Best kernel(s) | Key finding |
-|---|---|---|---|
-| `Run 1` | `fp16` | [`fp16_wmma`](kernels/fp16_wmma.cu) | PTX variants do not improve wall time: at `N <= 4096` local gains are offset by extra instruction/packing overhead, and after the L2-capacity cliff (`N >= 8192`) all kernels converge because DRAM becomes the dominant bottleneck. |
-| `Run 2` | `int8` | [`int8_ptx_mma_k32`](kernels/int8_ptx_mma_k32.cu) | `k32` wins with fewer executed instructions and better global-load coalescing; at `N=8192`, Average DRAM Active Cycles tracks duration nearly 1:1, confirming memory-efficiency-driven ranking in the DRAM-bound regime. |
-| `Run 3` | `int4` | [`int4_ptx_3stage`](kernels/int4_ptx_3stage.cu) (small `N`), [`int4_ptx_mma_k64`](kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu) (large `N`) | Both kernels avoid WMMA INT4 software emulation overhead; the crossover comes from memory hierarchy behavior, where `3stage` loses L1 locality as `N` grows while `k64` retains higher L1 hit rate and scales better. |
-| `Run 4` | `int4` + `k64` | [`int4_ptx_mma_k64`](kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu) | Sweeping loader split (`x1/x2/x4`), cache policy (`ca/cg`), and B layout (`nontrans/trans`) does not beat baseline: non-trans `ca` variants remain in the same bottleneck class, `cg` adds L2-latency pressure, and `trans` breaks coalescing with a large throughput penalty. |
+<table>
+	<colgroup>
+		<col style="width: 11%;" />
+		<col style="width: 11%;" />
+		<col style="width: 22%;" />
+		<col style="width: 56%;" />
+	</colgroup>
+	<thead>
+		<tr>
+			<th>Run</th>
+			<th>Precision</th>
+			<th>Best kernel(s)</th>
+			<th>Key finding</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>Run 1</code></td>
+			<td><code>fp16</code></td>
+			<td><a href="kernels/fp16_wmma.cu"><code>fp16_wmma</code></a></td>
+			<td>PTX variants do not improve wall time: at <code>N &lt;= 4096</code> local gains are offset by extra instruction/packing overhead, and after the L2-capacity cliff (<code>N &gt;= 8192</code>) all kernels converge because DRAM becomes the dominant bottleneck.</td>
+		</tr>
+		<tr>
+			<td><code>Run 2</code></td>
+			<td><code>int8</code></td>
+			<td><a href="kernels/int8_ptx_mma_k32.cu"><code>int8_ptx_mma_k32</code></a></td>
+			<td><code>k32</code> wins with fewer executed instructions and better global-load coalescing; at <code>N=8192</code>, Average DRAM Active Cycles tracks duration nearly 1:1, confirming memory-efficiency-driven ranking in the DRAM-bound regime.</td>
+		</tr>
+		<tr>
+			<td><code>Run 3</code></td>
+			<td><code>int4</code></td>
+			<td><a href="kernels/int4_ptx_3stage.cu"><code>int4_ptx_3stage</code></a> (small <code>N</code>), <a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a> (large <code>N</code>)</td>
+			<td>Both kernels avoid WMMA INT4 software emulation overhead; the crossover comes from memory hierarchy behavior, where <code>3stage</code> loses L1 locality as <code>N</code> grows while <code>k64</code> retains higher L1 hit rate and scales better.</td>
+		</tr>
+		<tr>
+			<td><code>Run 4</code></td>
+			<td><code>int4</code> + <code>k64</code></td>
+			<td><a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a></td>
+			<td>Sweeping loader split (<code>x1/x2/x4</code>), cache policy (<code>ca/cg</code>), and B layout (<code>nontrans/trans</code>) does not beat baseline: non-trans <code>ca</code> variants remain in the same bottleneck class, <code>cg</code> adds L2-latency pressure, and <code>trans</code> breaks coalescing with a large throughput penalty.</td>
+		</tr>
+	</tbody>
+</table>
 
 
 ---
