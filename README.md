@@ -26,7 +26,7 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 		<tr>
 			<th width="22%">Run</th>
 			<th width="29%">Best kernel(s)</th>
-			<th width="14%">Speedup vs wmma</th>
+			<th width="14%">Speedup vs dtype_wmma</th>
 			<th width="35%">Key finding</th>
 		</tr>
 	</thead>
@@ -130,12 +130,74 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 	</tbody>
 </table>
 
-All values above are in <code>ms</code>; entries originally reported in <code>us</code> were converted.
+### Speed up vs fp16_wmma
 
+<table width="100%">
+	<thead>
+		<tr>
+			<th>Kernel</th>
+			<th>Per Dtype</th>
+			<th>512</th>
+			<th>1024</th>
+			<th>2048</th>
+			<th>4096</th>
+			<th>8192</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><a href="kernels/int8_wmma.cu"><code>int8_wmma</code></a></td>
+			<td><code>Base</code></td>
+			<td><code>1.2x</code></td>
+			<td><code>1.3x</code></td>
+			<td><code>1.4x</code></td>
+			<td><code>1.5x</code></td>
+			<td><code>19.2x</code></td>
+		</tr>
+		<tr>
+			<td><a href="kernels/int8_ptx_mma_k32.cu"><code>int8_ptx_mma_k32</code></a></td>
+			<td><code>Optimal</code></td>
+			<td><code>1.7x</code></td>
+			<td><code>2.0x</code></td>
+			<td><code>2.2x</code></td>
+			<td><code>2.4x</code></td>
+			<td><code>34.4x</code></td>
+		</tr>
+		<tr>
+			<td><a href="kernels/int4_wmma.cu"><code>int4_wmma</code></a></td>
+			<td><code>Base</code></td>
+			<td><code>0.9x</code></td>
+			<td><code>1.0x</code></td>
+			<td><code>1.0x</code></td>
+			<td><code>1.1x</code></td>
+			<td><code>23.1x</code></td>
+		</tr>
+		<tr>
+			<td><a href="kernels/int4_ptx_3stage.cu"><code>int4_ptx_3stage</code></a></td>
+			<td><code>Optimal (small N)</code></td>
+			<td><code>3.3x</code></td>
+			<td><code>3.7x</code></td>
+			<td><code>4.1x</code></td>
+			<td><code>4.2x</code></td>
+			<td><code>83.5x</code></td>
+		</tr>
+		<tr>
+			<td><a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a></td>
+			<td><code>Optimal (large N)</code></td>
+			<td><code>2.7x</code></td>
+			<td><code>3.6x</code></td>
+			<td><code>4.2x</code></td>
+			<td><code>4.8x</code></td>
+			<td><code>98.7x</code></td>
+		</tr>
+	</tbody>
+</table>
 
 ---
 
-## Run 1 — fp16 - Profiling Results
+## Details
+
+### Run 1 — fp16 - Profiling Results
 
 > Full Summary: [`prof/md/run1/ncu_summary.md`](prof/md/run1/ncu_summary.md)
 
@@ -185,7 +247,7 @@ Six FP16 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 
 
 ---
 
-## Run 2 — int8 - Profiling Results
+### Run 2 — int8 - Profiling Results
 
 > Full Analysis: [`prof/md/run2/ncu_details.md`](prof/md/run2/ncu_details.md)
 
@@ -241,7 +303,7 @@ Six INT8 GEMM kernels were profiled with Nsight Compute across matrix sizes N = 
 
 ---
 
-## Run 3 — int4 - Profiling Results for Base Kernels
+### Run 3 — int4 - Profiling Results for Base Kernels
 
 > Full Analysis: [`prof/md/run3/ncu_details.md`](prof/md/run3/ncu_details.md)
 
@@ -305,7 +367,7 @@ The key crossover mechanism between the two winners is memory hierarchy behavior
 
 ---
 
-## Run 4 — int4 - Profiling Results for the optimal k64 kernel family
+### Run 4 — int4 - Profiling Results for the optimal k64 kernel family
 
 > Full Analysis: [`prof/md/run4/ncu_details.md`](prof/md/run4/ncu_details.md)
 
