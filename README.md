@@ -46,13 +46,13 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 		<tr>
 			<td><code>Run 3 - int4</code></td>
 			<td><a href="kernels/int4_ptx_3stage.cu"><code>int4_ptx_3stage</code></a> (small <code>N</code>), <a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a> (large <code>N</code>)</td>
-			<td><code>3.5x</code> (small <code>N</code>), <code>4.3x</code> (large <code>N</code>)</td>
+			<td><code>3.5x</code>, <code>4.3x</code></td>
 			<td>Both kernels avoid WMMA INT4 software emulation overhead; the crossover comes from memory hierarchy behavior, where <code>3stage</code> loses L1 locality as <code>N</code> grows while <code>k64</code> retains higher L1 hit rate and scales better.</td>
 		</tr>
 		<tr>
 			<td><code>Run 4 - int4 + k64</code></td>
 			<td><a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a></td>
-			<td><code>4.3x</code> (vs <code>int4_wmma</code> at large <code>N</code>)</td>
+			<td><code>4.3x</code></td>
 			<td>Sweeping loader split (<code>x1/x2/x4</code>), cache policy (<code>ca/cg</code>), and B layout (<code>nontrans/trans</code>) does not beat baseline: non-trans <code>ca</code> variants remain in the same bottleneck class, <code>cg</code> adds L2-latency pressure, and <code>trans</code> breaks coalescing with a large throughput penalty.</td>
 		</tr>
 	</tbody>
