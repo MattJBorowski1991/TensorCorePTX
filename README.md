@@ -7,7 +7,7 @@ This repository collects findings, experiments, and design notes for implementin
 - [Run 1 — fp16 - Profiling Results](#run-1--fp16---profiling-results)
 - [Run 2 — int8 - Profiling Results](#run-2--int8---profiling-results)
 - [Run 3 — int4 - Profiling Results for Base Kernels](#run-3--int4---profiling-results-for-base-kernels)
-- [Run 4 — int4 - Profiling Results for the optimal k64 kernel family](#run-4--int4---profiling-results-for-the-optimal-k64-kernel-family)
+- [Run 4 — int4 - Profiling Results for The Optimal k64 Kernels](#run-4--int4---profiling-results-for-the-optimal-k64-kernel-family)
 - [Usage](#usage)
 
 ## Summary
