@@ -8,6 +8,7 @@ This repository collects findings, experiments, and design notes for implementin
 - [Run 2 — int8 - Profiling Results](#run-2--int8---profiling-results)
 - [Run 3 — int4 - Profiling Results for Base Kernels](#run-3--int4---profiling-results-for-base-kernels)
 - [Run 4 — int4 - Profiling Results for the optimal k64 kernel family](#run-4--int4---profiling-results-for-the-optimal-k64-kernel-family)
+- [Usage](#usage)
 
 ## Summary
 
@@ -439,7 +440,28 @@ By contrast, the `cg` and `trans` variants reveal two distinct failure modes. `c
 
 ---
 
-## PyTorch Bindings
+## Usage
+
+### Compile & Run
+```
+rm -rf build && cmake -B build -DKERNEL=fp16_ptx_fp16acc -DCUDA_ARCH=89 && cmake --build build -j$(nproc)
+./build/profile_fp16_ptx_fp16acc > fp16_ptx_fp16acc.txt
+
+# Run NVIDIA Nsight Compute (`ncu`) across a set of 2^N sizes.
+# This invokes the same executable repeatedly while setting `PROFILE_SIZE`.
+for S in 512 1024 2048 4096 8192; do
+	echo "Profiling size=$S"
+	SKIP_VERIFY=1 PROFILE_SIZE=$S ncu --set full --target-processes all ./build/profile_fp16_ptx_fp16acc \
+		> fp16_ptx_fp16acc_ncu_${S}.txt 2>&1
+done
+
+
+# Full NCU report
+
+ncu --import-source yes --set full --export prof/int4_wmma ./build/profile_int4_wmma
+```
+
+### PyTorch Bindings
 
 Each kernel can be installed as a standalone Python extension via `setup.py`. One extension = one kernel; the module name matches the kernel name.
 
@@ -480,22 +502,3 @@ The `CUDA_ARCH` env var (default `89`) selects the SM target. For an A100 use `C
 Bindings live in `bindings/bindings_fp16.cpp` and `bindings/bindings_int8.cpp`; `setup.py` wires them to the correct kernel sources.
 
 ---
-
-## Compile & Run
-```
-rm -rf build && cmake -B build -DKERNEL=fp16_ptx_fp16acc -DCUDA_ARCH=89 && cmake --build build -j$(nproc)
-./build/profile_fp16_ptx_fp16acc > fp16_ptx_fp16acc.txt
-
-# Run NVIDIA Nsight Compute (`ncu`) across a set of 2^N sizes.
-# This invokes the same executable repeatedly while setting `PROFILE_SIZE`.
-for S in 512 1024 2048 4096 8192; do
-	echo "Profiling size=$S"
-	SKIP_VERIFY=1 PROFILE_SIZE=$S ncu --set full --target-processes all ./build/profile_fp16_ptx_fp16acc \
-		> fp16_ptx_fp16acc_ncu_${S}.txt 2>&1
-done
-
-
-# Full NCU report
-
-ncu --import-source yes --set full --export prof/int4_wmma ./build/profile_int4_wmma
-```
