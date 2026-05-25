@@ -1,11 +1,11 @@
 # TensorCorePTX — PTX Tensor Core GEMM Exploration
 
-This repository collects findings, experiments, and design notes for implementing high-performance PTX GEMM kernels using `cp.async`, `ldmatrix` and `mma.sync` on Nvidia L4 (Ada/SM89). The techniques presented are **applicable to any GPU with Tensor Cores** (e.g., H100, A100, RTX 40-series) and provide **significant performance improvements with minimal effort**, especially for quantized workloads:
+This repository collects findings, experiments, and design notes for implementing high-performance PTX GEMM kernels using `cp.async`, `ldmatrix`, and `mma.sync` on NVIDIA L4 (Ada/SM89). The optimization patterns studied here can be transferred to any other Tensor Core GPUs (e.g., H100, A100, RTX 40-series) with exact gains being hardware- and compiler-dependent. On L4 at `N=8192`, the best quantized kernels in this repository deliver large speedups relative to the `fp16_wmma` baseline:
 
 - **int8 kernels**: **34.4× speedup** over fp16 (N=8192)
 - **int4 kernels**: **98.7× speedup** over fp16 (N=8192)
 
-These speedups enable deployment of large open-source LLMs (e.g., weights-quantized Llama, Mistral, Qwen) on single GPUs with excellent inference performance. The focus is a PTX-first path across three precisions (`fp16`, `int8`, `int4`): for each precision we run a multi-variant deep dive over key PTX instruction choices and compare against a double-buffered WMMA-API kernel used as the baseline.
+We show that targeted PTX injections can provide substantial relative speedups over the repository baseline while keeping integration overhead low. In practice, these gains improve the feasibility of running large open-weight LLMs (e.g., quantized Nemotron, Llama, Mistral, Qwen) on a single GPU. The focus is a PTX-first path across three precisions (`fp16`, `int8`, `int4`): for each precision we run a multi-variant deep dive over key PTX instruction choices and compare against a double-buffered WMMA-API kernel used as the baseline.
 
 ## Table of Contents
 - [Summary](#summary)
@@ -14,6 +14,7 @@ These speedups enable deployment of large open-source LLMs (e.g., weights-quanti
 - [Run 3 — int4 - Profiling Results for Base Kernels](#run-3--int4---profiling-results-for-base-kernels)
 - [Run 4 — int4 - Profiling Results for The Optimal k64 Kernels](#run-4--int4---profiling-results-for-the-optimal-k64-kernel-family)
 - [Usage](#usage)
+- [License](#license)
 
 ## Summary
 
@@ -585,3 +586,7 @@ The `CUDA_ARCH` env var (default `89`) selects the SM target. For an A100 use `C
 Bindings live in `bindings/bindings_fp16.cpp` and `bindings/bindings_int8.cpp`; `setup.py` wires them to the correct kernel sources.
 
 ---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for the full text.
