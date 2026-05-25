@@ -38,33 +38,31 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 	</thead>
 	<tbody>
 		<tr>
-			<td><code>Run 1 - fp16</code></td>
+			<td><a href="#run-1--fp16---profiling-results"><code>Run 1 - fp16</code></a></td>
 			<td><a href="kernels/fp16_wmma.cu"><code>fp16_wmma</code></a></td>
 			<td><code>1.0x</code></td>
 			<td>PTX doesn't improve wall time: local gains are offset by extra instruction/packing overhead.</td>
 		</tr>
 		<tr>
-			<td><code>Run 2 - int8</code></td>
+			<td><a href="#run-2--int8---profiling-results"><code>Run 2 - int8</code></a></td>
 			<td><a href="kernels/int8_ptx_mma_k32.cu"><code>int8_ptx_mma_k32</code></a></td>
 			<td><code>1.4x-1.8x</code></td>
 			<td><code>k32</code> wins with fewer executed instructions and better global-load coalescing; at <code>N=8192</code>, Average DRAM Active Cycles tracks duration nearly 1:1.</td>
 		</tr>
 		<tr>
-			<td><code>Run 3 - int4</code></td>
+			<td><a href="#run-3--int4---profiling-results-for-base-kernels"><code>Run 3 - int4</code></a></td>
 			<td><a href="kernels/int4_ptx_3stage.cu"><code>int4_ptx_3stage</code></a> (small <code>N</code>), <a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a> (large <code>N</code>)</td>
 			<td><code>2.9x-4.3x</code></td>
 			<td>Both kernels avoid wmma int4 software emulation overhead; <code>3stage</code> loses L1 locality as <code>N</code> grows while <code>k64</code> retains higher L1 hit rate.</td>
 		</tr>
 		<tr>
-			<td><code>Run 4 - int4 + k64</code></td>
+			<td><a href="#run-4--int4---profiling-results-for-the-optimal-k64-kernel-family"><code>Run 4 - int4 + k64</code></a></td>
 			<td><a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a></td>
 			<td><code>2.9x-4.3x</code></td>
 			<td>Loader split (<code>x1/x2/x4</code>), cache policy (<code>ca/cg</code>), and B layout (<code>nontrans/trans</code>) does not beat baseline: non-trans <code>ca</code> variants remain in the same bottleneck class, <code>cg</code> adds L2-latency pressure, and <code>trans</code> breaks coalescing.</td>
 		</tr>
 	</tbody>
 </table>
-
-### Arithmetic Intensity & TFLOPS (N=8192)
 
 <table width="100%">
 	<thead>
@@ -74,8 +72,9 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<th>Duration (ms)</th>
 			<th>AI (ops/byte)</th>
 			<th>TFLOPS</th>
+			<th>DRAM Throughput %</th>
 			<th>L2 Hit Rate %</th>
-			<th>Achieved Occupancy %</th>
+			<th>L1/TEX Hit Rate %</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -85,8 +84,9 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>16500</td>
 			<td>2.73</td>
 			<td>66.6</td>
+			<td>54.0</td>
 			<td>65.9</td>
-			<td>36.8</td>
+			<td>26.7</td>
 		</tr>
 		<tr>
 			<td><a href="kernels/int8_wmma.cu"><code>int8_wmma</code></a></td>
@@ -94,8 +94,9 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>858.3</td>
 			<td>5.46</td>
 			<td>1281</td>
+			<td>52.2</td>
 			<td>81.9</td>
-			<td>98.7</td>
+			<td>33.6</td>
 		</tr>
 		<tr>
 			<td><a href="kernels/int8_ptx_mma_k32.cu"><code>int8_ptx_mma_k32</code></a></td>
@@ -103,8 +104,9 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>480.1</td>
 			<td>5.46</td>
 			<td>2289</td>
+			<td>52.5</td>
 			<td>65.6</td>
-			<td>66.6</td>
+			<td>61.5</td>
 		</tr>
 		<tr>
 			<td><a href="kernels/int4_wmma.cu"><code>int4_wmma</code></a></td>
@@ -112,8 +114,9 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>713.0</td>
 			<td>10.92</td>
 			<td>1542</td>
+			<td>0.88</td>
 			<td>99.7</td>
-			<td>99.9</td>
+			<td>80.3</td>
 		</tr>
 		<tr>
 			<td><a href="kernels/int4_ptx_3stage.cu"><code>int4_ptx_3stage</code></a></td>
@@ -121,8 +124,9 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>197.6</td>
 			<td>10.92</td>
 			<td>5562</td>
+			<td>3.16</td>
 			<td>99.8</td>
-			<td>61.1</td>
+			<td>14.5</td>
 		</tr>
 		<tr>
 			<td><a href="kernels/int4_ptx_mma_k64_x4_x2nontrans_ca.cu"><code>int4_ptx_mma_k64</code></a></td>
@@ -130,8 +134,9 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>167.1</td>
 			<td>10.92</td>
 			<td>6577</td>
+			<td>3.73</td>
 			<td>99.5</td>
-			<td>66.5</td>
+			<td>61.6</td>
 		</tr>
 	</tbody>
 </table>
