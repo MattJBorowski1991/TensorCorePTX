@@ -70,8 +70,8 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<th>Kernel</th>
 			<th>Precision</th>
 			<th>Duration (ms)</th>
-			<th>AI (ops/byte)</th>
-			<th>TFLOPS</th>
+			<th>AI</th>
+			<th>TOPS</th>
 			<th>DRAM Throughput %</th>
 			<th>L2 Hit Rate %</th>
 			<th>L1/TEX Hit Rate %</th>
@@ -83,7 +83,7 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>fp16</td>
 			<td>16500</td>
 			<td>2.73</td>
-			<td>66.6</td>
+			<td>0.067</td>
 			<td>54.0</td>
 			<td>65.9</td>
 			<td>26.7</td>
@@ -93,7 +93,7 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>int8</td>
 			<td>858.3</td>
 			<td>5.46</td>
-			<td>1281</td>
+			<td>1.281</td>
 			<td>52.2</td>
 			<td>81.9</td>
 			<td>33.6</td>
@@ -103,7 +103,7 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>int8</td>
 			<td>480.1</td>
 			<td>5.46</td>
-			<td>2289</td>
+			<td>2.290</td>
 			<td>52.5</td>
 			<td>65.6</td>
 			<td>61.5</td>
@@ -113,7 +113,7 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>int4</td>
 			<td>713.0</td>
 			<td>10.92</td>
-			<td>1542</td>
+			<td>1.542</td>
 			<td>0.88</td>
 			<td>99.7</td>
 			<td>80.3</td>
@@ -123,7 +123,7 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>int4</td>
 			<td>197.6</td>
 			<td>10.92</td>
-			<td>5562</td>
+			<td>5.564</td>
 			<td>3.16</td>
 			<td>99.8</td>
 			<td>14.5</td>
@@ -133,7 +133,7 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 			<td>int4</td>
 			<td>167.1</td>
 			<td>10.92</td>
-			<td>6577</td>
+			<td>6.581</td>
 			<td>3.73</td>
 			<td>99.5</td>
 			<td>61.6</td>
