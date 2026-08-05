@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "TensorCorePTX: PTX Tensor Core GEMM Exploration"
+abstract: >-
+  Hand-written PTX GEMM kernels (cp.async, ldmatrix, mma.sync) for fp16,
+  int8, and int4 on NVIDIA Ada (SM89), with a benchmarking/verification
+  harness, Nsight Compute profiling results, and PyTorch bindings.
+  Quantized PTX kernels reach up to 34.4x (int8) and 98.7x (int4)
+  speedup over an fp16 WMMA baseline at N=8192 on an NVIDIA L4.
+authors:
+  - family-names: Borowski
+    given-names: Matt J.
+    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO: add ORCID
+  - family-names: Osinski
+    given-names: Blazej
+    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO: add ORCID
+repository-code: "https://github.com/MattJBorowski1991/TensorCorePTX"
+license: MIT
+version: v1.0-sc26
+date-released: "2026-08-06"  # TODO: set to the actual release date
+keywords:
+  - CUDA
+  - PTX
+  - Tensor Cores
+  - GEMM
+  - quantization
+  - int4
+  - int8
+  - Nsight Compute
+  - GPU performance
