@@ -15,6 +15,7 @@ authors:
   - family-names: Osinski
     given-names: Blazej
     # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO: add ORCID
+doi: 10.5281/zenodo.21815137
 repository-code: "https://github.com/MattJBorowski1991/TensorCorePTX"
 license: MIT
 version: v1.0-sc26

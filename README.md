@@ -1,5 +1,7 @@
 # TensorCorePTX — PTX Tensor Core GEMM Exploration
 
+[![DOI](https://zenodo.org/badge/1206439626.svg)](https://doi.org/10.5281/zenodo.21815136)
+
 This repository collects findings, experiments, and design notes for implementing high-performance PTX GEMM kernels using `cp.async`, `ldmatrix`, and `mma.sync` on NVIDIA L4 (Ada/SM89). The optimization patterns studied here can be transferred to any other Tensor Core GPUs (e.g., H100, A100, RTX 40-series) with exact gains being hardware- and compiler-dependent. On L4 at `N=8192`, the best quantized kernels in this repository deliver large speedups relative to the `fp16_wmma` baseline:
 
 - **int8 kernels**: **34.4× speedup** over fp16 (N=8192)
