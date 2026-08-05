@@ -18,7 +18,7 @@ authors:
 repository-code: "https://github.com/MattJBorowski1991/TensorCorePTX"
 license: MIT
 version: v1.0-sc26
-date-released: "2026-08-06"  # TODO: set to the actual release date
+date-released: "2026-08-06"
 keywords:
   - CUDA
   - PTX
