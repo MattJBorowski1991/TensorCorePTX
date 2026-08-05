@@ -1,0 +1,21 @@
+# Build outputs
+build/
+build-repro/
+build*/
+
+# Reproduction outputs
+results/
+
+# Python
+__pycache__/
+*.egg-info/
+dist/
+*.so
+
+# LaTeX
+sc26-appendix/*.aux
+sc26-appendix/*.log
+sc26-appendix/*.out
+sc26-appendix/*.fls
+sc26-appendix/*.fdb_latexmk
+sc26-appendix/*.synctex.gz

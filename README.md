@@ -286,7 +286,7 @@ Most kernels in this project follow the same core pattern: overlap DRAM->SRAM pr
 
 > Full Summary: [`prof/md/run1/ncu_summary.md`](prof/md/run1/ncu_summary.md)
 
-Kernels profiled: [`fp16_wmma`](kernels/fp16_wmma.cu), [`fp16_ptx_mma`](kernels/fp16_ptx_mma.cu), [`fp16_ptx_k8`](kernels/fp16_ptx_k8.cu), [`fp16_ptx_fp16acc`](kernels/fp16_ptx_fp16acc.cu), [`fp16_ptx_3stage`](kernels/fp16_ptx_3stage.cu), [`fp16_ptx_manual_pack`](kernels/fp16_ptx_manual_pack.cu)
+Kernels profiled: [`fp16_wmma`](kernels/fp16_wmma.cu), [`fp16_ptx_mma`](kernels/fp16_ptx_mma_k16.cu), [`fp16_ptx_k8`](kernels/fp16_ptx_k8.cu), [`fp16_ptx_fp16acc`](kernels/fp16_ptx_fp16acc.cu), [`fp16_ptx_3stage`](kernels/fp16_ptx_3stage.cu), [`fp16_ptx_manual_pack`](kernels/fp16_ptx_manual_pack.cu)
 
 **Raw durations (ms):**
 
@@ -533,9 +533,12 @@ rm -rf build && cmake -B build -DKERNEL=fp16_ptx_fp16acc -DCUDA_ARCH=89 && cmake
 
 # Run NVIDIA Nsight Compute (`ncu`) across a set of 2^N sizes.
 # This invokes the same executable repeatedly while setting `PROFILE_SIZE`.
+# Note: every run first performs a built-in 512^3 correctness verification
+# against a CPU reference. The int8/int4 binaries additionally accept
+# SKIP_PROFILE=1 to run verification only (skipping the profiling pass).
 for S in 512 1024 2048 4096 8192; do
 	echo "Profiling size=$S"
-	SKIP_VERIFY=1 PROFILE_SIZE=$S ncu --set full --target-processes all ./build/profile_fp16_ptx_fp16acc \
+	PROFILE_SIZE=$S ncu --set full --target-processes all ./build/profile_fp16_ptx_fp16acc \
 		> fp16_ptx_fp16acc_ncu_${S}.txt 2>&1
 done
 
